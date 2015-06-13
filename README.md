@@ -1,2 +1,2 @@
 # libunistd
-Libunistd is a Windows POSIX library that enables many Linux programs to build on Windows with little or no changes.
+Libunistd is a lightweight Windows POSIX library that enables typical Linux programs to build on Windows with few or no changes.
