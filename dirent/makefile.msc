@@ -1,0 +1,3 @@
+dirent.lib : dirent.c
+	cl -MD -Ox -I. -c dirent.c
+	lib -out:dirent.lib dirent.obj
