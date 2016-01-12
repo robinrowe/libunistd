@@ -9,8 +9,7 @@
 #ifndef WIN32_UNISTD_H
 #define WIN32_UNISTD_H
 
-#include <iostream>
-
+#define WIN32_LEAN_AND_MEAN
 #include <WinSock2.h>
 #include <windows.h>
 #include <fcntl.h>
@@ -31,7 +30,9 @@
 #include <Winerror.h>
 #include <mswsock.h> //for SO_UPDATE_ACCEPT_CONTEXT
 #include <Ws2tcpip.h>//for InetNtop
+#include <iostream>
 //#define inet_ntop InetNtop
+#pragma comment(lib, "Ws2_32.lib")
 
 #ifndef __cplusplus
 #define inline __inline
@@ -212,18 +213,6 @@ int setuid(uid_t )
 
 // Call this function before using Winsock in a console app!
 
-#ifdef __cplusplus
-
-class StartWinsock
-{public:
-	StartWinsock()
-	{	WORD version_requested=MAKEWORD(2,0);
-		WSADATA data;
-		WSAStartup(version_requested,&data);
-}	};
-
-#endif
-
 #pragma warning (disable : 4996)
 
 inline 
@@ -256,7 +245,7 @@ const char* getsysconfdir()
 inline 
 int mkstemp(char *filename)
 {	char buffer[MAX_PATH];
-	unsigned filenameNo = GetTempFileName(".",filename,0,buffer);
+	unsigned filenameNo = GetTempFileNameA(".",filename,0,buffer);
 	return (int) filenameNo;
 }
 

@@ -24,11 +24,12 @@
 
 
 #define WIN32_LEAN_AND_MEAN
+#include <WinSock2.h>
 #include <windows.h> /* for GetFileAttributes */
 
 #define SUFFIX	"*"
 #define	SLASH	"\\"
-
+#pragma warning (disable : 4996)
 /*
  * opendir
  *

@@ -1,7 +1,7 @@
-# libunistd 
+# libunistd
 
-Libunistd is a lightweight Windows POSIX library that enables typical Linux C/C++ code to build on Windows with few or no changes. It provides unistd.h and many BSD sockets header files in a Windows Visual C++ environment. It does not provide fork(). Use C++ threads instread.
+Libunistd is a lightweight Windows POSIX library that enables typical Linux C/C++ code with BSD sockets to build on Windows with few or no changes. However, does not provide fork(). In Linux code that has trouble compiling on Windows, include this at top of your header file:
 
-Robin.Rowe@cinepaint.org
-Hollywood, California
-310-359-8796
+#include <unistd.h>
+
+Robin.Rowe@cinepaint.org Hollywood, California 310-359-8796
