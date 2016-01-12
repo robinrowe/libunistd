@@ -27,6 +27,7 @@
 *.out
 *.app
 
+bak
 vcpp/Backup
 vcpp/Release
 vcpp/Debug
