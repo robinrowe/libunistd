@@ -11,3 +11,7 @@ Usage: Set the include path in your VC++ project to include the directory libuni
 Because unistd.h exists in Linux as a standard header file, making this change for Windows will not break Linux code.
 
 Robin.Rowe@cinepaint.org Hollywood, California 310-359-8796
+
+git config user.name "Robin Rowe"
+git config user.email "Robin.Rowe@cinepaint.org"
+git commit --amend --reset-author

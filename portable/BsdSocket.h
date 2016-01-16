@@ -6,7 +6,7 @@
 #ifndef BsdSocket_h
 #define BsdSocket_h
 
-#include "MsgBuffer.h"
+#include <thread>
 #include <unistd.h>
 #include <memory.h> 
 #include <arpa/inet.h>
@@ -14,8 +14,8 @@
 #include <netinet/in.h>
 #include <string>
 #include <memory>
-#include <thread>
-  
+#include "MsgBuffer.h"
+
 class BsdSocket
 {protected:
 	int s;
@@ -38,19 +38,20 @@ class BsdSocket
 		{	return socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	}	}
 public:
+	MsgBuffer<120> errorMsg;
+	virtual ~BsdSocket()
+	{	Close();
+	}
 	BsdSocket(unsigned bufsize)
 	:	s(0)
 	,	slen(sizeof(sockaddr_in))
 	,	bufsize(bufsize)
 	,	recv_len(0)
 	,	isGo(false)
+	,	length(0)
 	{	buffer=std::unique_ptr<char[]>(new char[bufsize]);
 		//buffer=std::make_unique<char[]>(bufsize);
 	}
-	virtual ~BsdSocket()
-	{	Close();
-	}
-	MsgBuffer<120> errorMsg;
 	void Stop()
 	{	if(isGo)
 		{	isGo=false;
