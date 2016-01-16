@@ -38,8 +38,6 @@
 #define inline __inline
 #endif
 
-#include "fix_vcast.h"
-
 #ifdef Fl_H
 
 #include <string.h>

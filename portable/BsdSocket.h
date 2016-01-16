@@ -6,12 +6,12 @@
 #ifndef BsdSocket_h
 #define BsdSocket_h
 
-#include "FirstError.h"
+#include "MsgBuffer.h"
+#include <unistd.h>
 #include <memory.h> 
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <unistd.h>
 #include <string>
 #include <memory>
 #include <thread>
@@ -22,6 +22,7 @@ class BsdSocket
 	int slen;
 	const unsigned bufsize;
 	std::unique_ptr<char[]> buffer;
+	int length;
 	int recv_len;
 	bool isGo;
 	sockaddr_in sin;
@@ -46,9 +47,10 @@ public:
 	{	buffer=std::unique_ptr<char[]>(new char[bufsize]);
 		//buffer=std::make_unique<char[]>(bufsize);
 	}
-	~BsdSocket()
+	virtual ~BsdSocket()
 	{	Close();
 	}
+	MsgBuffer<120> errorMsg;
 	void Stop()
 	{	if(isGo)
 		{	isGo=false;
@@ -71,7 +73,7 @@ public:
 	bool OpenClient(const char* serverName,int serverPort,bool isTcp=true)
 	{	s = OpenSocket(isTcp);
 		if(s == -1)
-		{	puts(firstError.GetSocketError());
+		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
 		memset((char *) &sin, 0, sizeof(sin));
@@ -79,21 +81,21 @@ public:
 		sin.sin_port = htons(serverPort);  
 //		sin.sin_addr.S_un.S_addr = inet_addr(serverName);
 		if(1!=inet_pton(AF_INET,serverName,&sin.sin_addr))
-		{	puts(firstError.GetSocketError());
+		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
 		return true;
 	}
 	bool SendTo(const char* msg,unsigned len)
 	{	if(sendto(s,msg,len,0,(struct sockaddr *)&sin,slen)==-1)
-		{	puts(firstError.GetSocketError());
+		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
 		return true;
 	}
 	bool RecvFrom()
 	{	if(recvfrom(s,buffer.get(),bufsize,0,(struct sockaddr *)&sin,&slen) == -1)
-		{	puts(firstError.GetSocketError());
+		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
 		return true;
@@ -104,14 +106,14 @@ public:
 	bool OpenServer(int serverPort,bool isTcp)
 	{	s=OpenSocket(isTcp);
 		if(s == -1)
-		{	puts(firstError.GetSocketError());
+		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
 		sin.sin_family = AF_INET;
 		sin.sin_port = htons(serverPort);
 		sin.sin_addr.s_addr = htonl(INADDR_ANY);
 		if(bind(s, (struct sockaddr*)&sin,sizeof(sin)) == -1)
-		{	puts(firstError.GetSocketError());
+		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
 		isGo=true;
@@ -121,7 +123,7 @@ public:
 	{	sockaddr_in si_other;
 		recv_len = recvfrom(s, buffer.get(), bufsize, 0, (struct sockaddr *) &si_other, &slen);
 		if(recv_len == -1)
-		{	puts(firstError.GetSocketError());
+		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
 //		printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
@@ -132,6 +134,22 @@ public:
 		{	OnPacket(Listen());
 		}
 		OnStop();
+	}
+	bool Append(const char* data,unsigned length)
+	{	if (this->length + length > bufsize)
+		{	return false;
+		}
+		memcpy(buffer.get()+this->length,data,length);
+		this->length+=length;
+		return true;
+	}
+	bool SendBuffer()
+	{	if(!length)
+		{	return true;
+		}
+		const bool ok=SendTo(buffer.get(),length);
+		length=0;
+		return ok;
 	}
 	virtual void OnPacket(bool isGood)
 	{}
