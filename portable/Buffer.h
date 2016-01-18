@@ -10,14 +10,23 @@
 namespace portable 
 {
 
+class Marker
+{	char *buffer;
+public:
+	void Set(unsigned size)
+	{	memcpy(buffer,&size,sizeof(unsigned));
+	}
+};
+
 template <unsigned bufsize>
 class Buffer
 {	char buffer[bufsize];
-	unsigned* size;
+	typedef unsigned T;
+	T* size;
 public:
 	Buffer()	
 	{	size=(unsigned*) buffer;
-		*size=sizeof(*size);
+		*size=sizeof(T);
 		buffer[size]=0;
 	}
 	char* get() 
@@ -46,6 +55,12 @@ public:
 	bool Append(unsigned data)
 	{	return buffer.Append((const char*) &data,sizeof(data));
 	}
+	Marker GetMarker()
+	{	char* p=buffer+*size;
+		*size+=sizeof(T);
+		return Marker(p);
+	}
+#if 0
 	bool ends()
 	{	if(*size<bufsize)
 		{	buffer[*size]=0;
@@ -53,6 +68,7 @@ public:
 		}
 		return false;
 	}
+#endif
 };
 
 }

@@ -16,6 +16,9 @@
 #include <memory>
 #include "MsgBuffer.h"
 
+namespace portable 
+{
+
 class BsdSocket
 {protected:
 	int s;
@@ -138,6 +141,7 @@ public:
 		}
 		OnStop();
 	}
+#if 0
 	bool Append(const char* data,unsigned length)
 	{	if (this->length + length > bufsize)
 		{	return false;
@@ -154,10 +158,13 @@ public:
 		length=0;
 		return ok;
 	}
+#endif
 	virtual void OnPacket(bool isGood)
 	{}
 	virtual void OnStop() const
 	{}
 };
+
+}
 
 #endif
