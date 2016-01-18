@@ -49,8 +49,10 @@ public:
 	,	recv_len(0)
 	,	isGo(false)
 	,	length(0)
-	{	buffer=std::unique_ptr<char[]>(new char[bufsize]);
-		//buffer=std::make_unique<char[]>(bufsize);
+	{	if(bufsize>0)
+		{	buffer=std::unique_ptr<char[]>(new char[bufsize]);
+		}
+	//buffer=std::make_unique<char[]>(bufsize);
 	}
 	void Stop()
 	{	if(isGo)
