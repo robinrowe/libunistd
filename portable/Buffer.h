@@ -10,65 +10,42 @@
 namespace portable 
 {
 
-class Marker
-{	char *buffer;
-public:
-	void Set(unsigned size)
-	{	memcpy(buffer,&size,sizeof(unsigned));
-	}
-};
-
-template <unsigned bufsize>
+template <typename T,unsigned bufsize>
 class Buffer
-{	char buffer[bufsize];
-	typedef unsigned T;
-	T* size;
+{	T buffer[bufsize];
+	unsigned size;
 public:
 	Buffer()	
-	{	size=(unsigned*) buffer;
-		*size=sizeof(T);
-		buffer[size]=0;
+	{	size=0;
 	}
-	char* get() 
+	T* get() 
 	{	return buffer;
 	}
-	const char* get() const
+	const T* get() const
 	{	return buffer;
-	}
-	const char* data() const
-	{	return buffer+sizeof(*size);
 	}
 	unsigned capacity() const
 	{	return bufsize;
 	}
 	unsigned length() const
-	{	return *size;
+	{	return size;
 	}
-	bool Append(const char* data,unsigned length)
-	{	if (*size + length > bufsize)
+	bool Append(T* data,unsigned length)
+	{	if (size + length > bufsize)
 		{	return false;
 		}
-		memcpy(buffer+*size,data,length);
-		*size+=length;
+		memcpy(buffer+size,data,length);
+		size+=length;
 		return true;
 	}
-	bool Append(unsigned data)
-	{	return buffer.Append((const char*) &data,sizeof(data));
-	}
-	Marker GetMarker()
-	{	char* p=buffer+*size;
-		*size+=sizeof(T);
-		return Marker(p);
-	}
-#if 0
-	bool ends()
-	{	if(*size<bufsize)
-		{	buffer[*size]=0;
-			return true;
+	bool Append(T data)
+	{	if (size + sizeof(T) > bufsize)
+		{	return false;
 		}
-		return false;
+		buffer[size]=data;
+		size++;
+		return true;
 	}
-#endif
 };
 
 }
