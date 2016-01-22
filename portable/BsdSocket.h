@@ -93,14 +93,20 @@ public:
 		return true;
 	}
 	bool SendTo(const char* msg,unsigned len)
-	{	if(sendto(s,msg,len,0,(struct sockaddr *)&sin,slen)==-1)
+	{	if(s<=0)
+		{	return false;
+		}
+		if(sendto(s,msg,len,0,(struct sockaddr *)&sin,slen)==-1)
 		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
 		return true;
 	}
 	bool RecvFrom()
-	{	if(recvfrom(s,buffer.get(),bufsize,0,(struct sockaddr *)&sin,&slen) == -1)
+	{	if(s<=0)
+		{	return false;
+		}
+		if(recvfrom(s,buffer.get(),bufsize,0,(struct sockaddr *)&sin,&slen) == -1)
 		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
@@ -126,7 +132,10 @@ public:
 		return true;
 	}
 	bool Listen()
-	{	sockaddr_in si_other;
+	{	if(s<=0)
+		{	return false;
+		}
+		sockaddr_in si_other;
 		recv_len = recvfrom(s, buffer.get(), bufsize, 0, (struct sockaddr *) &si_other, &slen);
 		if(recv_len == -1)
 		{	puts(errorMsg.GetSocketError());

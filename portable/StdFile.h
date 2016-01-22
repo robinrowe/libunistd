@@ -49,11 +49,14 @@ public:
 	{	return Open(filename,"ab");
 	}
 	size_t Read(char* data,size_t length)
-	{	bytes=fread(data,1,length,fp);
+	{	if(!fp)
+		{	return 0;
+		}
+		bytes=fread(data,1,length,fp);
 		return bytes;
 	}
 	bool Write(const char* data,size_t length)
-	{	if(!data)
+	{	if(!data || !fp)
 		{	return false;
 		}
 		bytes=fwrite(data,1,length,fp);
@@ -70,7 +73,10 @@ public:
 	{	return Write("",1);
 	}
 	bool Slurp(std::vector<char>& buffer)
-	{	const int err=fseek(fp,0,SEEK_END);
+	{	if(!fp)
+		{	return false;
+		}
+		const int err=fseek(fp,0,SEEK_END);
 		if(err)
 		{	return false;
 		}
@@ -82,10 +88,11 @@ public:
 		return size==readSize;
 	}
 	void Close()
-	{	if(0!=fp)
+	{	if(fp>0)
 		{	fclose(fp);
-			fp=0;
-	}	}
+		}
+		fp=0;
+	}
 };
 
 inline
