@@ -76,15 +76,14 @@ public:
 	bool SendTo(BsdSocket& socket)
 	{	return socket.SendTo(get(),length());
 	}
-#if 0
-	bool ends()
+	bool Append(char c)
 	{	if(*size<bufsize)
-		{	buffer[*size]=0;
+		{	buffer[*size]=c;
+			*size++;
 			return true;
 		}
 		return false;
 	}
-#endif
 };
 
 }

@@ -74,15 +74,19 @@ class TimeStamp
 #ifdef WIN32
         const errno_t err = _localtime64_s(&t,&microseconds); 
 		const bool isOk=!err;
+		if(!isOk)
+        {	_strerror_s(buffer,bufsize,"");
+			return buffer;
+        }
 #else
 		tm* ok=localtime_r(const time_t *timep, struct tm *result);
 		const bool isOk=0!=ok;
-#endif
 		if(!isOk)
         {	memcpy(buffer,"Error",6);
 			return buffer;
         }
-	    strftime(buffer,bufsize-1,timeFormat,&t);
+#endif
+		strftime(buffer,bufsize-1,timeFormat,&t);
 		if(isMicros)
 		{	char* p=buffer+strlen(buffer);
 			const int micros = int(microseconds%1000000);
