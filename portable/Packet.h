@@ -62,12 +62,6 @@ public:
 		*size+=length;
 		return true;
 	}
-	bool Append(unsigned data)
-	{	return Append((const char*) &data,sizeof(data));
-	}
-	bool Append(long long data)
-	{	return Append((const char*) &data,sizeof(data));
-	}
 	PacketMarker GetMarker()
 	{	char* p=buffer+*size;
 		*size+=sizeof(T);
@@ -76,14 +70,38 @@ public:
 	bool SendTo(BsdSocket& socket)
 	{	return socket.SendTo(get(),length());
 	}
-	bool Append(char c)
-	{	if(*size<bufsize)
-		{	buffer[*size]=c;
-			*size++;
-			return true;
+	bool Append(const std::string& s)
+	{	const size_t length = s.size()+1;
+		if(!Append(s.c_str(),length))
+		{	return false;
 		}
-		return false;
+		buffer[*size-1]='\n';
+		return true;
 	}
+	bool Append(const char* s)
+	{	if(!s)
+		{	return false;
+		}
+		const size_t length = strlen(s)+1;
+		if(!Append(s,length))
+		{	return false;
+		}
+		buffer[*size-1]='\n';
+		return true;
+	}
+	bool Append(unsigned data)
+	{	const char* p = (const char*) &data;
+		return Append(p,sizeof(data));
+	}
+	bool Append(long long data)
+	{	const char* p = (const char*) &data;
+		return Append(p,sizeof(data));
+	}
+#if 0
+	bool Append(char c)
+	{	return Append(*this,data);
+	}
+#endif
 };
 
 }
