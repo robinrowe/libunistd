@@ -11,6 +11,9 @@ class AtomicCounter
 {	std::atomic<T> n;
 public:
 	AtomicCounter<T>()
+	{	clear();
+	}
+	void clear()
 	{	n=0;
 	}
 	AtomicCounter<T>(T n)
