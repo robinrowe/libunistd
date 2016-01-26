@@ -25,31 +25,45 @@ public:
 	}
 };
 
+struct PacketSizer
+{	char* buffer;
+	unsigned bufsize;
+	PacketSizer(char* buffer,unsigned bufsize)
+	:	buffer(buffer)
+	,	bufsize(bufsize)
+	{}
+};
+
 template <unsigned bufsize>
-class Packet
+class PacketBuffer
 {	char buffer[bufsize];
+public:
+	operator PacketSizer()
+	{	return PacketSizer(buffer,bufsize);
+	}
+};
+
+class Packet
+{	char* buffer;
 	typedef unsigned T;
 	T* size;
+	unsigned bufsize;
 public:
-	Packet()
-	{	Reset();
+	Packet(const PacketSizer& sizer)
+	{	buffer=sizer.buffer;
+		bufsize=sizer.bufsize;
+		Reset();
 	}
 	void Reset()
 	{	size=(unsigned*) buffer;
 		*size=sizeof(T);
 		buffer[*size]=0;
 	}
-	char* get() 
-	{	return buffer;
-	}
 	const char* get() const
 	{	return buffer;
 	}
 	const char* data() const
 	{	return buffer+sizeof(*size);
-	}
-	unsigned capacity() const
-	{	return bufsize;
 	}
 	unsigned length() const
 	{	return *size;
