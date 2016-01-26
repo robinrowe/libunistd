@@ -42,7 +42,7 @@ public:
 #endif
 	}
 	unsigned length() const
-	{	return strlen(buffer);
+	{	return (unsigned) strlen(buffer);
 	}
 	unsigned capacity() const
 	{	return bufsize-1;

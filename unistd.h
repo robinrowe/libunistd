@@ -80,14 +80,14 @@ typedef int ssize_t;
 typedef unsigned short mode_t;
 
 inline 
-int mkdir(const char* path,int flags=0)
+int mkdir(const char* path,int=0)
 {	 return _mkdir(path);
 }
 
 typedef int pid_t;
 
 inline
-int kill(pid_t pid, int sig)
+int kill(pid_t, int)
 {	return -1;
 }
 
@@ -248,7 +248,7 @@ int mkstemp(char *filename)
 }
 
 inline
-int fchmod(int fildes, mode_t mode)
+int fchmod(int, mode_t)
 {	return 0;
 }
 

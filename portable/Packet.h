@@ -85,7 +85,7 @@ public:
 	{	return socket.SendTo(get(),length());
 	}
 	bool Append(const std::string& s)
-	{	const size_t length = s.size()+1;
+	{	const unsigned length = (unsigned) s.size()+1;
 		if(!Append(s.c_str(),length))
 		{	return false;
 		}
@@ -96,7 +96,7 @@ public:
 	{	if(!s)
 		{	return false;
 		}
-		const size_t length = strlen(s)+1;
+		const unsigned length = (unsigned) strlen(s)+1;
 		if(!Append(s,length))
 		{	return false;
 		}

@@ -21,7 +21,7 @@ namespace portable
 
 class BsdSocket
 {protected:
-	int s;
+	SOCKET s;
 	int slen;
 	const unsigned bufsize;
 	std::unique_ptr<char[]> buffer;
@@ -35,10 +35,10 @@ class BsdSocket
     }
 	int OpenSocket(bool isTcp)
 	{	if(isTcp)
-		{	return socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+		{	return (int) socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
 		}
 		else
-		{	return socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+		{	return (int) socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	}	}
 public:
 	MsgBuffer<120> errorMsg;
@@ -84,7 +84,7 @@ public:
 		}
 		memset((char *) &sin, 0, sizeof(sin));
 		sin.sin_family = AF_INET;
-		sin.sin_port = htons(serverPort);  
+		sin.sin_port = htons((u_short) serverPort);  
 //		sin.sin_addr.S_un.S_addr = inet_addr(serverName);
 		if(1!=inet_pton(AF_INET,serverName,&sin.sin_addr))
 		{	puts(errorMsg.GetSocketError());
@@ -122,7 +122,7 @@ public:
 			return false;
 		}
 		sin.sin_family = AF_INET;
-		sin.sin_port = htons(serverPort);
+		sin.sin_port = htons((u_short) serverPort);
 		sin.sin_addr.s_addr = htonl(INADDR_ANY);
 		if(bind(s, (struct sockaddr*)&sin,sizeof(sin)) == -1)
 		{	puts(errorMsg.GetSocketError());
@@ -168,7 +168,7 @@ public:
 		return ok;
 	}
 #endif
-	virtual void OnPacket(bool isGood)
+	virtual void OnPacket(bool /* isGood */)
 	{}
 	virtual void OnStop() const
 	{}
