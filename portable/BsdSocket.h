@@ -23,7 +23,7 @@ class BsdSocket
 {protected:
 	SOCKET s;
 	int slen;
-	const unsigned bufsize;
+	unsigned bufsize;
 	std::unique_ptr<char[]> buffer;
 	int length;
 	int recv_len;
@@ -45,15 +45,19 @@ public:
 	virtual ~BsdSocket()
 	{	Close();
 	}
-	BsdSocket(unsigned bufsize)
+	BsdSocket(unsigned bufsize=0)
 	:	s(0)
 	,	slen(sizeof(sockaddr_in))
-	,	bufsize(bufsize)
+	,	bufsize(0)
 	,	recv_len(0)
 	,	isGo(false)
 	,	length(0)
+	{	Resize(bufsize);
+	}
+	void Resize(unsigned bufsize)
 	{	if(bufsize>0)
 		{	buffer=std::unique_ptr<char[]>(new char[bufsize]);
+			this->bufsize = bufsize;
 		}
 	//buffer=std::make_unique<char[]>(bufsize);
 	}
