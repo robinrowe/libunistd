@@ -15,6 +15,7 @@
 #include <string>
 #include <memory>
 #include "MsgBuffer.h"
+#include "Packet.h"
 
 namespace portable 
 {
@@ -22,17 +23,16 @@ namespace portable
 class BsdSocket
 {protected:
 	SOCKET s;
-	int slen;
-	unsigned bufsize;
 	std::unique_ptr<char[]> buffer;
+	unsigned bufsize;
+#if 0
+	int slen;
 	int length;
 	int recv_len;
+#endif
 	bool isGo;
 	sockaddr_in sin;
 	std::thread worker;
-    static void Main(BsdSocket* self)
-    {   self->Run();
-    }
 	int OpenSocket(bool isTcp)
 	{	if(isTcp)
 		{	return (int) socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
@@ -40,26 +40,57 @@ class BsdSocket
 		else
 		{	return (int) socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	}	}
+	bool Listen(Packet& packet)
+	{	if(s<=0)
+		{	return false;
+		}
+		sockaddr_in si_other;
+		int slen = sizeof(sockaddr_in);
+		const int recv_len = recvfrom(s, buffer.get(), bufsize, 0, (struct sockaddr *) &si_other, &slen);
+		if(recv_len == -1)
+		{	puts(errorMsg.GetSocketError());
+			return false;
+		}
+//		printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
+		return true;
+	}
+	void Run(Packet& packet)
+	{	while(isGo)
+		{	OnPacket(Listen(packet));
+		}
+		OnStop();
+	}
+    static void Main(BsdSocket* self)
+    {   PacketSizer packetSizer(self->buffer.get(),self->bufsize);
+		Packet packet(packetSizer);
+		self->Run(packet);
+    }
 public:
 	MsgBuffer<120> errorMsg;
 	virtual ~BsdSocket()
 	{	Close();
 	}
-	BsdSocket(unsigned bufsize=0)
+	BsdSocket()
 	:	s(0)
+	,	buffer(0)
+	,	bufsize(bufsize)
+#if 0
 	,	slen(sizeof(sockaddr_in))
 	,	bufsize(0)
 	,	recv_len(0)
-	,	isGo(false)
 	,	length(0)
-	{	Resize(bufsize);
-	}
+#endif
+	,	isGo(false)
+	{}
 	void Resize(unsigned bufsize)
-	{	if(bufsize>0)
-		{	buffer=std::unique_ptr<char[]>(new char[bufsize]);
-			this->bufsize = bufsize;
+	{	if(!bufsize)
+		{	this->bufsize = 0;
+			buffer.reset();
+			return;
 		}
-	//buffer=std::make_unique<char[]>(bufsize);
+		buffer=std::unique_ptr<char[]>(new char[bufsize]);
+		this->bufsize = bufsize;
+		//buffer=std::make_unique<char[]>(bufsize);
 	}
 	void Stop()
 	{	if(isGo)
@@ -100,16 +131,21 @@ public:
 	{	if(s<=0)
 		{	return false;
 		}
+		int slen = sizeof(sockaddr_in);
 		if(sendto(s,msg,len,0,(struct sockaddr *)&sin,slen)==-1)
 		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
 		return true;
 	}
+	bool SendTo(Packet& packet)
+	{	return SendTo(packet.get(),packet.length());
+	}
 	bool RecvFrom()
 	{	if(s<=0)
 		{	return false;
 		}
+		int slen = sizeof(sockaddr_in);
 		if(recvfrom(s,buffer.get(),bufsize,0,(struct sockaddr *)&sin,&slen) == -1)
 		{	puts(errorMsg.GetSocketError());
 			return false;
@@ -134,25 +170,6 @@ public:
 		}
 		isGo=true;
 		return true;
-	}
-	bool Listen()
-	{	if(s<=0)
-		{	return false;
-		}
-		sockaddr_in si_other;
-		recv_len = recvfrom(s, buffer.get(), bufsize, 0, (struct sockaddr *) &si_other, &slen);
-		if(recv_len == -1)
-		{	puts(errorMsg.GetSocketError());
-			return false;
-		}
-//		printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-		return true;
-	}
-	void Run()
-	{	while(isGo)
-		{	OnPacket(Listen());
-		}
-		OnStop();
 	}
 #if 0
 	bool Append(const char* data,unsigned length)
