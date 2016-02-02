@@ -18,6 +18,9 @@
     <ClCompile Include="..\dirent\dirent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\portable\TimerPump.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dirent.h">

@@ -79,6 +79,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\dirent\dirent.cpp" />
+    <ClCompile Include="..\portable\TimerPump.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\arpa\inet.h" />
