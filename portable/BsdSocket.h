@@ -40,7 +40,7 @@ class BsdSocket
 		else
 		{	return (int) socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	}	}
-	bool Listen(Packet& packet)
+	bool Listen()
 	{	if(s<=0)
 		{	return false;
 		}
@@ -56,7 +56,7 @@ class BsdSocket
 	}
 	void Run(Packet& packet)
 	{	while(isGo)
-		{	OnPacket(Listen(packet));
+		{	OnPacket(Listen(),packet);
 		}
 		OnStop();
 	}
@@ -189,7 +189,7 @@ public:
 		return ok;
 	}
 #endif
-	virtual void OnPacket(bool /* isGood */)
+	virtual void OnPacket(bool /* isGood */,Packet&)
 	{}
 	virtual void OnStop() const
 	{}
