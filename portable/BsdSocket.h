@@ -111,22 +111,6 @@ public:
 		{	closesocket(s);
 			s=0;
 	}	}
-	bool OpenClient(const char* serverName,int serverPort,bool isTcp=true)
-	{	s = OpenSocket(isTcp);
-		if(s == -1)
-		{	puts(errorMsg.GetSocketError());
-			return false;
-		}
-		memset((char *) &sin, 0, sizeof(sin));
-		sin.sin_family = AF_INET;
-		sin.sin_port = htons((u_short) serverPort);  
-//		sin.sin_addr.S_un.S_addr = inet_addr(serverName);
-		if(1!=inet_pton(AF_INET,serverName,&sin.sin_addr))
-		{	puts(errorMsg.GetSocketError());
-			return false;
-		}
-		return true;
-	}
 	bool SendTo(const char* msg,unsigned len)
 	{	if(s<=0)
 		{	return false;
@@ -154,6 +138,22 @@ public:
 	}
 	const char* GetString() const
 	{	return buffer.get();
+	}
+	bool OpenClient(const char* serverName,int serverPort,bool isTcp=true)
+	{	s = OpenSocket(isTcp);
+		if(s == -1)
+		{	puts(errorMsg.GetSocketError());
+			return false;
+		}
+		memset((char *) &sin, 0, sizeof(sin));
+		sin.sin_family = AF_INET;
+		sin.sin_port = htons((u_short) serverPort);  
+//		sin.sin_addr.S_un.S_addr = inet_addr(serverName);
+		if(1!=inet_pton(AF_INET,serverName,&sin.sin_addr))
+		{	puts(errorMsg.GetSocketError());
+			return false;
+		}
+		return true;
 	}
 	bool OpenServer(int serverPort,bool isTcp)
 	{	s=OpenSocket(isTcp);
