@@ -172,6 +172,24 @@ public:
 		Invalidate();
 		return false;
 	}
+	bool Read(const char*& s,unsigned& length)
+	{	if(IsInvalid() || IsEmpty())
+		{	return false;
+		}
+		const char* p = readPtr;
+		const char* endPtr = GetEndPtr();
+		while(p<endPtr)
+		{	if('\n' == *p)
+			{	s=readPtr;
+				length=p-readPtr;
+				readPtr = p+1;
+				return true;
+			}
+			p++;
+		}
+		Invalidate();
+		return false;
+	}
 };
 
 }
