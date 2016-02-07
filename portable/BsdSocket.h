@@ -25,11 +25,6 @@ class BsdSocket
 	SOCKET s;
 	std::unique_ptr<char[]> buffer;
 	unsigned bufsize;
-#if 0
-	int slen;
-	int length;
-	int recv_len;
-#endif
 	bool isGo;
 	sockaddr_in sin;
 	std::thread worker;
@@ -42,7 +37,8 @@ class BsdSocket
 	}	}
 	bool Listen()
 	{	if(s<=0)
-		{	return false;
+		{	errorMsg.Set("Socket not open");
+			return false;
 		}
 		sockaddr_in si_other;
 		int slen = sizeof(sockaddr_in);
@@ -54,16 +50,17 @@ class BsdSocket
 //		printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
 		return true;
 	}
-	void Run(Packet& packet)
-	{	while(isGo)
-		{	OnPacket(Listen(),packet);
+	void Run()
+	{	PacketSizer packetSizer(buffer.get(),bufsize);
+		Packet packet(packetSizer);
+		while(isGo)
+		{	const bool isGood = Listen();
+			OnPacket(isGood,packet);
 		}
 		OnStop();
 	}
     static void Main(BsdSocket* self)
-    {   PacketSizer packetSizer(self->buffer.get(),self->bufsize);
-		Packet packet(packetSizer);
-		self->Run(packet);
+    {   self->Run();
     }
 public:
 	MsgBuffer<120> errorMsg;
@@ -74,12 +71,6 @@ public:
 	:	s(0)
 	,	buffer(0)
 	,	bufsize(bufsize)
-#if 0
-	,	slen(sizeof(sockaddr_in))
-	,	bufsize(0)
-	,	recv_len(0)
-	,	length(0)
-#endif
 	,	isGo(false)
 	{}
 	void Resize(unsigned bufsize)

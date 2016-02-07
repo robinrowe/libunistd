@@ -22,6 +22,9 @@ public:
 	void Reset()
 	{	buffer[0]=0;
 	}
+	const char* Get() const
+	{	return buffer;
+	}
 	const char* GetSystemError() 
 	{	SetBufferErrno();
 		return buffer;
@@ -50,9 +53,13 @@ public:
 	void Append(const char* text)
 	{	const unsigned len=length();
 #pragma warning (disable : 4996)
-		strncpy(buffer+len,p,bufsize-len-1);
+		strncpy(buffer+len,text,bufsize-len-1);
 #pragma warning (default : 4996)
 		buffer[bufsize-1]=0;
+	}
+	void Set(const char* text)
+	{	Reset();
+		Append(text);
 	}
 	void MsgBuffer::SetBufferErrno()
 	{	char* p=strerror(errno);
