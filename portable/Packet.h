@@ -48,9 +48,9 @@ class Packet
 	typedef unsigned T;
 	T* packetSize;
 	unsigned bufsize;
-	const char* readPtr;
-	const char* GetEndPtr() const
-	{	return buffer+*packetSize+sizeof(T);
+	unsigned readOffset;
+	unsigned GetDirtySize() const
+	{	return sizeof(*packetSize)+*packetSize;
 	}
 public:
 	Packet(const PacketSizer& sizer,bool isReset=true)
@@ -62,20 +62,20 @@ public:
 		{	Reset();
 	}	}
 	void Rewind()
-	{	readPtr = buffer+sizeof(T);
+	{	readOffset = sizeof(T);
 	}
 	void Reset()
 	{	*packetSize=sizeof(T);
 		buffer[*packetSize]=0;
 	}
 	bool IsInvalid(unsigned length) const
-	{	return length+readPtr > GetEndPtr();
+	{	return readOffset > GetDirtySize();
 	}
 	bool IsInvalid() const
-	{	return !readPtr;
+	{	return !readOffset;
 	}
 	void Invalidate()
-	{	readPtr = 0;
+	{	readOffset = 0;
 	}
 	const char* get() const
 	{	return buffer;
@@ -135,18 +135,18 @@ public:
 	}
 #endif
 	bool IsEmpty() const
-	{	return readPtr>=GetEndPtr();
+	{	return readOffset ? readOffset>=GetDirtySize():true;
 	}
 	bool Read(char* data,unsigned length)
-	{	if(!readPtr)
+	{	if(!readOffset)
 		{	return false;
 		}
 		if(IsInvalid(length))
-		{	readPtr = 0;
+		{	Invalidate();
 			return false;
 		}
-		memcpy(data,readPtr,length);
-		readPtr+=length;
+		memcpy(data,buffer+readOffset,length);
+		readOffset+=length;
 		return true;
 	}
 	bool Read(unsigned& data)
@@ -159,12 +159,14 @@ public:
 	{	if(IsInvalid() || IsEmpty())
 		{	return false;
 		}
+		const char* readPtr = buffer+readOffset;
 		const char* p = readPtr;
-		const char* endPtr = GetEndPtr();
+		const char* endPtr = buffer+GetDirtySize();
 		while(p<endPtr)
 		{	if('\n' == *p)
-			{	s=std::string(readPtr,p-readPtr);
-				readPtr = p+1;
+			{	const unsigned length = p-readPtr;
+				s=std::string(readPtr,length);
+				readOffset+=length+1;
 				return true;
 			}
 			p++;
@@ -176,13 +178,14 @@ public:
 	{	if(IsInvalid() || IsEmpty())
 		{	return false;
 		}
+		const char* readPtr = buffer+readOffset;
 		const char* p = readPtr;
-		const char* endPtr = GetEndPtr();
+		const char* endPtr = buffer+GetDirtySize();
 		while(p<endPtr)
 		{	if('\n' == *p)
-			{	s=readPtr;
-				length=p-readPtr;
-				readPtr = p+1;
+			{	length=p-readPtr;
+				s = readPtr;
+				readOffset+=length+1;
 				return true;
 			}
 			p++;

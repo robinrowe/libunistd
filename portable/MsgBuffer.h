@@ -22,7 +22,7 @@ public:
 	void Reset()
 	{	buffer[0]=0;
 	}
-	const char* Get() const
+	operator const char*() const
 	{	return buffer;
 	}
 	const char* GetSystemError() 

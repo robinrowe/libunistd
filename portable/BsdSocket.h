@@ -26,10 +26,11 @@ class BsdSocket
 	SOCKET newsockfd;
 	std::unique_ptr<char[]> buffer;
 	unsigned bufsize;
+	int receiveLength;
 	bool isGo;
 	bool isTcp;
 	bool isClient;
-	sockaddr_in sin;
+	sockaddr_in server_sockaddr;
 	std::thread worker;
 	int OpenSocket(bool isTcp)
 	{	if(isTcp)
@@ -77,12 +78,17 @@ class BsdSocket
 		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
-		memset((char *) &sin, 0, sizeof(sin));
-		sin.sin_family = AF_INET;
-		sin.sin_port = htons((u_short) serverPort);  
-//		sin.sin_addr.S_un.S_addr = inet_addr(serverName);
-		if(1!=inet_pton(AF_INET,serverName,&sin.sin_addr))
+		memset((char *) &server_sockaddr, 0, sizeof(server_sockaddr));
+		server_sockaddr.sin_family = AF_INET;
+		server_sockaddr.sin_port = htons((u_short) serverPort);  
+//		server_sockaddr.sin_addr.S_un.S_addr = inet_addr(serverName);
+		if(1!=inet_pton(AF_INET,serverName,&server_sockaddr.sin_addr))
 		{	puts(errorMsg.GetSocketError());
+			return false;
+		}
+		const int ok = connect(socketfd, (struct sockaddr*)&server_sockaddr, sizeof(server_sockaddr));
+		if(ok<0) 
+		{	perror("ERROR connecting");
 			return false;
 		}
 		return true;
@@ -93,10 +99,10 @@ class BsdSocket
 		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
-		sin.sin_family = AF_INET;
-		sin.sin_port = htons((u_short) serverPort);
-		sin.sin_addr.s_addr = htonl(INADDR_ANY);
-		if(bind(socketfd, (struct sockaddr*)&sin,sizeof(sin)) == -1)
+		server_sockaddr.sin_family = AF_INET;
+		server_sockaddr.sin_port = htons((u_short) serverPort);
+		server_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+		if(::bind(socketfd, (struct sockaddr*)&server_sockaddr,sizeof(server_sockaddr)) == -1)
 		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
@@ -116,6 +122,7 @@ public:
 	,	isGo(false)
 	,	isTcp(true)
 	,	isClient(true)
+	,	receiveLength(0)
 	{}
 	void Resize(unsigned bufsize)
 	{	if(!bufsize)
@@ -159,7 +166,7 @@ public:
 		{	return false;
 		}
 		int slen = sizeof(sockaddr_in);
-		if(sendto(socketfd,msg,len,0,(struct sockaddr *)&sin,slen)==-1)
+		if(sendto(socketfd,msg,len,0,(struct sockaddr *)&server_sockaddr,slen)==-1)
 		{	puts(errorMsg.GetSocketError());
 			return false;
 		}
@@ -173,14 +180,13 @@ public:
 		{	return false;
 		}
 		int slen = sizeof(sockaddr_in);
-		int length = -1;
 		if(isClient)
-		{	length = recvfrom(socketfd,buffer.get(),bufsize,0,(struct sockaddr *)&sin,&slen);
+		{	receiveLength = recvfrom(socketfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen);
 		}
 		else
-		{	length = recvfrom(newsockfd,buffer.get(),bufsize,0,(struct sockaddr *)&sin,&slen); 
+		{	receiveLength = recvfrom(newsockfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen); 
 		}
-		if(length == -1)
+		if(receiveLength == -1)
 		{	puts(errorMsg.GetSocketError());
 //			printf("Received packet from %socketfd:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
 			return false;
