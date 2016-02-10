@@ -12,16 +12,16 @@ namespace portable
 {
 
 class PacketMarker
-{	char *buffer;
+{	friend class Packet;
+	char *buffer;
 	unsigned offset;
-public:
 	PacketMarker(char* buffer,unsigned offset)
 	:	buffer(buffer)
 	,	offset(offset)
 	{}
 	void Set(unsigned size)
 	{	offset = size - offset;
-		memcpy(buffer,&size,sizeof(unsigned));
+		memcpy(buffer,&offset,sizeof(unsigned));
 	}
 };
 
@@ -43,15 +43,25 @@ public:
 	}
 };
 
+struct Vec3d
+{	double x;
+	double y;
+	double z;
+	int size() const
+	{	const int bytes = sizeof(*this);
+		return bytes;
+	}
+	operator char* ()
+	{	return (char*) &x;
+	}
+};
+
 class Packet
 {	char* buffer;
 	typedef unsigned T;
 	T* packetSize;
 	unsigned bufsize;
 	unsigned readOffset;
-	unsigned GetDirtySize() const
-	{	return sizeof(*packetSize)+*packetSize;
-	}
 public:
 	Packet(const PacketSizer& sizer,bool isReset=true)
 	{	buffer=sizer.buffer;
@@ -64,12 +74,15 @@ public:
 	void Rewind()
 	{	readOffset = sizeof(T);
 	}
+	void Rewind(unsigned size)
+	{	readOffset-=size;
+	}
 	void Reset()
 	{	*packetSize=sizeof(T);
 		buffer[*packetSize]=0;
 	}
-	bool IsInvalid(unsigned length) const
-	{	return readOffset > GetDirtySize();
+	bool IsInvalid(unsigned size) const
+	{	return readOffset + size > length();
 	}
 	bool IsInvalid() const
 	{	return !readOffset;
@@ -89,7 +102,10 @@ public:
 	unsigned capacity() const
 	{	return bufsize;
 	}
-	bool Append(const char* data,unsigned length)
+	const char* GetPutPtr() const
+	{	return buffer+*packetSize;
+	}
+	bool Write(const char* data,unsigned length)
 	{	if (*packetSize + length > bufsize)
 		{	return false;
 		}
@@ -102,40 +118,54 @@ public:
 		*packetSize+=sizeof(T);
 		return PacketMarker(p,*packetSize);
 	}
-	bool Append(const std::string& s)
+	void SetMarker(PacketMarker& packetMarker)
+	{	packetMarker.Set(length());
+	}
+	bool Write(const std::string& s)
 	{	const unsigned length = (unsigned) s.length()+1;
-		if(!Append(s.c_str(),length))
+		if(!Write(s.c_str(),length))
 		{	return false;
 		}
 		buffer[*packetSize-1]='\n';
 		return true;
 	}
-	bool Append(const char* s)
+	bool Write(const char* s)
 	{	if(!s)
 		{	return false;
 		}
 		const unsigned length = (unsigned) strlen(s)+1;
-		if(!Append(s,length))
+		if(!Write(s,length))
 		{	return false;
 		}
 		buffer[*packetSize-1]='\n';
 		return true;
 	}
-	bool Append(unsigned data)
+	bool Write(unsigned data)
 	{	const char* p = (const char*) &data;
-		return Append(p,sizeof(data));
+		return Write(p,sizeof(data));
 	}
-	bool Append(long long data)
+	bool Write(long long data)
 	{	const char* p = (const char*) &data;
-		return Append(p,sizeof(data));
+		return Write(p,sizeof(data));
+	}
+	bool Write(unsigned long long data)
+	{	const char* p = (const char*) &data;
+		return Write(p,sizeof(data));
 	}
 #if 0
-	bool Append(char c)
-	{	return Append(*this,data);
+	bool Write(char c)
+	{	return Write(*this,data);
 	}
 #endif
 	bool IsEmpty() const
-	{	return readOffset ? readOffset>=GetDirtySize():true;
+	{	if(!readOffset)
+		{	return true;
+		}
+		const unsigned size = length();
+		if(readOffset>=size)
+		{	return true;
+		}
+		return false;
 	}
 	bool Read(char* data,unsigned length)
 	{	if(!readOffset)
@@ -161,12 +191,12 @@ public:
 		}
 		const char* readPtr = buffer+readOffset;
 		const char* p = readPtr;
-		const char* endPtr = buffer+GetDirtySize();
+		const char* endPtr = buffer+length();
 		while(p<endPtr)
 		{	if('\n' == *p)
-			{	const unsigned length = p-readPtr;
-				s=std::string(readPtr,length);
-				readOffset+=length+1;
+			{	const unsigned size = p-readPtr;
+				s=std::move(std::string(readPtr,size));
+				readOffset+=size+1;
 				return true;
 			}
 			p++;
@@ -174,24 +204,27 @@ public:
 		Invalidate();
 		return false;
 	}
-	bool Read(const char*& s,unsigned& length)
+	bool Read(const char*& s,unsigned& size)
 	{	if(IsInvalid() || IsEmpty())
 		{	return false;
 		}
 		const char* readPtr = buffer+readOffset;
 		const char* p = readPtr;
-		const char* endPtr = buffer+GetDirtySize();
+		const char* endPtr = buffer+length();
 		while(p<endPtr)
 		{	if('\n' == *p)
-			{	length=p-readPtr;
+			{	size=p-readPtr;
 				s = readPtr;
-				readOffset+=length+1;
+				readOffset+=size+1;
 				return true;
 			}
 			p++;
 		}
 		Invalidate();
 		return false;
+	}
+	bool Read(Vec3d& v)
+	{	return Read(v,v.size());
 	}
 };
 

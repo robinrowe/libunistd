@@ -39,7 +39,7 @@ class BsdSocket
 		else
 		{	return (int) socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	}	}
-	bool ListenServer()
+	bool ListenAccept()
 	{   const int backlog = 1; //point-to-point, not SOMAXCONN;
 		listen(socketfd,backlog); 
 		sockaddr_in cli_addr;
@@ -52,19 +52,15 @@ class BsdSocket
 		}
 		return true;
 	}   
-	bool Listen()
-	{	if(socketfd<=0)
-		{	errorMsg.Set("Socket not open");
-			return false;
-		}
-		return RecvFrom();
-	}
 	void Run()
 	{	PacketSizer packetSizer(buffer.get(),bufsize);
 		Packet packet(packetSizer);
-		ListenServer();
 		while(isGo)
-		{	const bool isGood = Listen();
+		{	if(!isClient && newsockfd<=0)
+			{	ListenAccept();
+			}
+			const bool isGood = RecvFrom();
+			packet.Rewind();
 			OnPacket(isGood,packet);
 		}
 		OnStop();
@@ -176,15 +172,20 @@ public:
 	{	return SendTo(packet.get(),packet.length());
 	}
 	bool RecvFrom()
-	{	if(socketfd<=0)
-		{	return false;
-		}
-		int slen = sizeof(sockaddr_in);
+	{	int slen = sizeof(sockaddr_in);
 		if(isClient)
-		{	receiveLength = recvfrom(socketfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen);
+		{	if(socketfd<=0)
+			{	errorMsg.Set("Socket not open");
+				return false;
+			}	
+			receiveLength = recvfrom(socketfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen);
 		}
 		else
-		{	receiveLength = recvfrom(newsockfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen); 
+		{	if(newsockfd<=0)
+			{	errorMsg.Set("Socket not open");
+				return false;
+			}	
+			receiveLength = recvfrom(newsockfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen); 
 		}
 		if(receiveLength == -1)
 		{	puts(errorMsg.GetSocketError());
