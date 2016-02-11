@@ -7,15 +7,16 @@
 #define BsdSocket_h
 
 #include <thread>
-#include <unistd.h>
 #include <memory.h> 
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <string>
 #include <memory>
 #include "MsgBuffer.h"
 #include "Packet.h"
+
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 namespace portable 
 {

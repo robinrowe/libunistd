@@ -5,7 +5,7 @@
 #ifndef UnrealLogger_h
 #define UnrealLogger_h
 
-#include "UnrealLogger.h"
+#include <Runtime/CoreUObject/Public/UObject/ObjectBase.h>
 
 class UnrealLogger
 {	FString s;
@@ -29,5 +29,10 @@ public:
 		s.Reset();
 	}
 };
+
+extern UnrealLogger logger;
+
+#define LogMsg(msg) logger.Log(__FILE__, __LINE__,msg)
+#define LogError(msg) logger.Error(__FILE__, __LINE__,msg)
 
 #endif
