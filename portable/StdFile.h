@@ -84,8 +84,34 @@ public:
 		rewind(fp);
 		buffer.resize(size);
 		char* data=&buffer[0];
-		const size_t readSize=Read(data,size);
-		return size==readSize;
+		bytes=Read(data,size);
+		return size==bytes;
+	}
+	bool Slurp(std::vector<std::string>& line)
+	{	std::vector<char> buffer;
+		if(!Slurp(buffer))
+		{	return false;
+		}
+		const char* p = &buffer[0];
+		const char* end = p+bytes;
+		const char* word = p;
+		while(p<end)
+		{	switch(*p)
+			{default:
+				break;
+			case '\r':
+			case '\n':
+				line.push_back(std::move(std::string(word,p-word)));
+				if('\r'==*p)
+				{	word=p+2;
+				}
+				else
+				{	word=p+1;
+				}			
+			}
+			p++;
+		}
+		return true;
 	}
 	void Close()
 	{	if(fp>0)
