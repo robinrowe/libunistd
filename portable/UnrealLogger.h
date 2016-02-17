@@ -6,12 +6,14 @@
 #define UnrealLogger_h
 
 #include <Runtime/CoreUObject/Public/UObject/ObjectBase.h>
+#include <portable/Counter.h>
 
 class UnrealLogger
 {	FString s;
 	FName categoryName;
+	Counter c;
 	void Puts(const char* filename,int lineNo,const char* msg,ELogVerbosity::Type t)
-	{	s=msg;
+	{	s=c(msg);
 		FMsg::Logf_Internal(filename, lineNo,  categoryName, t, *s); 
 		s.Reset();
 	}
