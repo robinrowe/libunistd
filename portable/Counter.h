@@ -15,7 +15,7 @@ public:
 	:	count(0)
 	{}
 	const char* operator ()(const char* msg) 
-	{	count;
+	{	count++;
 		s=std::to_string(count);
 		s.append(": ");
 		s.append(msg);
