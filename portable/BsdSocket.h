@@ -45,7 +45,7 @@ class BsdSocket
 		listen(socketfd,backlog); 
 		sockaddr_in cli_addr;
 		int clilen = sizeof(cli_addr);
-		puts("Listening...");
+		puts("\nListening...");
 		newsockfd = accept(socketfd, (struct sockaddr *)&cli_addr, &clilen);
 		if (newsockfd < 0) 
 		{	perror("ERROR on accept");

@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 inline
-void Log(const char* msg)
+void LogMsg(const char* msg)
 {	puts(msg);
 }
 
