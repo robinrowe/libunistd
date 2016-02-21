@@ -12,9 +12,31 @@
 #pragma comment(lib, "Ws2_32.lib")
 #endif 
 
+namespace portable
+{
+
 template<unsigned bufsize>
 class MsgBuffer
 {	char buffer[bufsize];
+	void MsgBuffer::SetPerErrno()
+	{	char* p=strerror(errno);
+		Append(p);
+	}
+	void MsgBuffer::SetPerLastError()
+	{	const unsigned len=length();
+#ifdef _WIN32
+		const DWORD num = FormatMessageA(
+			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			WSAGetLastError(),
+			0,
+			buffer+len,
+			bufsize-len-1,
+			NULL);
+#else
+		SetBufferErrno();
+#endif
+	}
 public:
 	MsgBuffer()
 	{	Reset();
@@ -22,12 +44,12 @@ public:
 	void Reset()
 	{	buffer[0]=0;
 	}
-	const char* GetSystemError() 
-	{	SetBufferErrno();
+	const char* GetErrnoError() 
+	{	SetPerErrno();
 		return buffer;
 	}
-	const char* GetSocketError()
-	{	SetBufferSocketError();
+	const char* GetLastError()
+	{	SetPerLastError();
 		return buffer;
 	}
 	int GetErrno() 
@@ -54,25 +76,7 @@ public:
 #pragma warning (default : 4996)
 		buffer[bufsize-1]=0;
 	}
-	void MsgBuffer::SetBufferErrno()
-	{	char* p=strerror(errno);
-		Append(p);
-	}
-	void MsgBuffer::SetBufferSocketError()
-	{	const unsigned len=length();
-#ifdef _WIN32
-		const DWORD num = FormatMessageA(
-			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			WSAGetLastError(),
-			0,
-			buffer+len,
-			bufsize-len-1,
-			NULL);
-#else
-		SetBufferErrno();
-#endif
-	}
 };
 
+}
 #endif

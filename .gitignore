@@ -28,7 +28,7 @@
 *.app
 
 bak
-vcpp/Backup
-vcpp/Release
-vcpp/Debug
+Backup
+Release
+Debug
 *.sdf

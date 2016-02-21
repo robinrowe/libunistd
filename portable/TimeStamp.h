@@ -98,11 +98,11 @@ class TimeStamp
 		return buffer;
 	}
 public:
-	TimeStamp(Micros epoch=0)
+	TimeStamp(Micros epoch)
 	:	microseconds(epoch)
 	{	buffer[0]=0;
 	}
-	TimeStamp(bool isSetNow)
+	TimeStamp(bool isSetNow=true)
 	:	microseconds(0)
 	{	buffer[0]=0;
 		if(isSetNow)
