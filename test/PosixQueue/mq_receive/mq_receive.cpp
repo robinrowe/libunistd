@@ -1,3 +1,7 @@
+// mq_receive.cpp
+// Copyright 2016 Robin.Rowe@Cinepaint.org
+// License open source MIT
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

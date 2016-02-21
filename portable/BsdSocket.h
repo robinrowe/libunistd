@@ -6,17 +6,16 @@
 #ifndef BsdSocket_h
 #define BsdSocket_h
 
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <thread>
 #include <memory.h> 
 #include <string>
 #include <memory>
 #include "MsgBuffer.h"
 #include "Packet.h"
-
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 
 namespace portable 
 {
@@ -33,6 +32,10 @@ class BsdSocket
 	bool isClient;
 	sockaddr_in server_sockaddr;
 	std::thread worker;
+	static void Main(BsdSocket* self)
+    {   self->Run();
+    }
+private:
 	int OpenSocket(bool isTcp)
 	{	if(isTcp)
 		{	return (int) socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
@@ -66,13 +69,10 @@ class BsdSocket
 		}
 		OnStop();
 	}
-    static void Main(BsdSocket* self)
-    {   self->Run();
-    }
 	bool OpenClient(const char* serverName,int serverPort)
 	{	socketfd= OpenSocket(isTcp);
 		if(socketfd == -1)			
-		{	puts(errorMsg.GetSocketError());
+		{	puts(errorMsg.GetLastError());
 			return false;
 		}
 		memset((char *) &server_sockaddr, 0, sizeof(server_sockaddr));
@@ -80,7 +80,7 @@ class BsdSocket
 		server_sockaddr.sin_port = htons((u_short) serverPort);  
 //		server_sockaddr.sin_addr.S_un.S_addr = inet_addr(serverName);
 		if(1!=inet_pton(AF_INET,serverName,&server_sockaddr.sin_addr))
-		{	puts(errorMsg.GetSocketError());
+		{	puts(errorMsg.GetLastError());
 			return false;
 		}
 		const int ok = connect(socketfd, (struct sockaddr*)&server_sockaddr, sizeof(server_sockaddr));
@@ -93,19 +93,21 @@ class BsdSocket
 	bool OpenServer(const char* ,int serverPort)
 	{	socketfd=OpenSocket(isTcp);
 		if(socketfd == -1)
-		{	puts(errorMsg.GetSocketError());
+		{	puts(errorMsg.GetLastError());
 			return false;
 		}
 		server_sockaddr.sin_family = AF_INET;
 		server_sockaddr.sin_port = htons((u_short) serverPort);
 		server_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 		if(::bind(socketfd, (struct sockaddr*)&server_sockaddr,sizeof(server_sockaddr)) == -1)
-		{	puts(errorMsg.GetSocketError());
+		{	puts(errorMsg.GetLastError());
 			return false;
 		}
 		isGo=true;
 		return true;
 	}
+	BsdSocket(BsdSocket&);
+	void operator=(BsdSocket&);
 public:
 	MsgBuffer<120> errorMsg;
 	virtual ~BsdSocket()
@@ -114,7 +116,6 @@ public:
 	BsdSocket()
 	:	socketfd(0)
 	,	newsockfd(0)
-	,	buffer(0)
 	,	bufsize(bufsize)
 	,	isGo(false)
 	,	isTcp(true)
@@ -164,7 +165,7 @@ public:
 		}
 		int slen = sizeof(sockaddr_in);
 		if(sendto(socketfd,msg,len,0,(struct sockaddr *)&server_sockaddr,slen)==-1)
-		{	puts(errorMsg.GetSocketError());
+		{	puts(errorMsg.GetLastError());
 			return false;
 		}
 		return true;
@@ -189,7 +190,7 @@ public:
 			receiveLength = recvfrom(newsockfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen); 
 		}
 		if(receiveLength == -1)
-		{	puts(errorMsg.GetSocketError());
+		{	puts(errorMsg.GetLastError());
 //			printf("Received packet from %socketfd:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
 			return false;
 		}
