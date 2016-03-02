@@ -57,29 +57,28 @@ struct Vec3d
 };
 
 class Packet
-{	char* buffer;
+{	char* const buffer;
 	typedef unsigned T;
 	T* packetSize;
-	unsigned bufsize;
+	const unsigned bufsize;
 	unsigned readOffset;
 public:
 	Packet(const PacketSizer& sizer,bool isReset=true)
-	{	buffer=sizer.buffer;
-		bufsize=sizer.bufsize;
-		packetSize=(unsigned*) buffer;
+	:	buffer(sizer.buffer)
+	,	bufsize(sizer.bufsize)
+	{	packetSize=(unsigned*) buffer;
 		Rewind();
 		if(isReset)
 		{	Reset();
 	}	}
+	void Reset()
+	{	*packetSize=sizeof(T);
+	}
 	void Rewind()
 	{	readOffset = sizeof(T);
 	}
 	void Rewind(unsigned size)
 	{	readOffset-=size;
-	}
-	void Reset()
-	{	*packetSize=sizeof(T);
-		buffer[*packetSize]=0;
 	}
 	bool IsInvalid(unsigned size) const
 	{	return readOffset + size > length();
@@ -144,19 +143,18 @@ public:
 	{	const char* p = (const char*) &data;
 		return Write(p,sizeof(data));
 	}
-	bool Write(long long data)
-	{	const char* p = (const char*) &data;
-		return Write(p,sizeof(data));
-	}
 	bool Write(unsigned long long data)
 	{	const char* p = (const char*) &data;
 		return Write(p,sizeof(data));
 	}
-#if 0
-	bool Write(char c)
-	{	return Write(*this,data);
+	bool Write(float data)
+	{	const char* p = (const char*) &data;
+		return Write(p,sizeof(data));
 	}
-#endif
+	bool Write(double data)
+	{	const char* p = (const char*) &data;
+		return Write(p,sizeof(data));
+	}
 	bool IsEmpty() const
 	{	if(!readOffset)
 		{	return true;

@@ -26,7 +26,6 @@ class BsdSocket
 	SOCKET newsockfd;
 	std::unique_ptr<char[]> buffer;
 	unsigned bufsize;
-	int receiveLength;
 	bool isGo;
 	bool isTcp;
 	bool isClient;
@@ -56,6 +55,21 @@ private:
 		}
 		return true;
 	}   
+	int RecvFrom()
+	{	int slen = sizeof(sockaddr_in);
+		if(isClient)
+		{	if(socketfd<=0)
+			{	errorMsg.Set("Socket not open");
+				return -1;
+			}	
+			return recvfrom(socketfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen);
+		}
+		if(newsockfd<=0)
+		{	errorMsg.Set("Socket not open");
+			return -1;
+		}	
+		return recvfrom(newsockfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen); 
+	}
 	void Run()
 	{	PacketSizer packetSizer(buffer.get(),bufsize);
 		Packet packet(packetSizer);
@@ -63,9 +77,9 @@ private:
 		{	if(!isClient && newsockfd<=0)
 			{	ListenAccept();
 			}
-			const bool isGood = RecvFrom();
+			const int bytes = RecvFrom();
 			packet.Rewind();
-			OnPacket(isGood,packet);
+			OnPacket(bytes,packet);
 		}
 		OnStop();
 	}
@@ -120,7 +134,6 @@ public:
 	,	isGo(false)
 	,	isTcp(true)
 	,	isClient(true)
-	,	receiveLength(0)
 	{}
 	void Resize(unsigned bufsize)
 	{	if(!bufsize)
@@ -173,51 +186,10 @@ public:
 	bool SendTo(Packet& packet)
 	{	return SendTo(packet.get(),packet.length());
 	}
-	bool RecvFrom()
-	{	int slen = sizeof(sockaddr_in);
-		if(isClient)
-		{	if(socketfd<=0)
-			{	errorMsg.Set("Socket not open");
-				return false;
-			}	
-			receiveLength = recvfrom(socketfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen);
-		}
-		else
-		{	if(newsockfd<=0)
-			{	errorMsg.Set("Socket not open");
-				return false;
-			}	
-			receiveLength = recvfrom(newsockfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen); 
-		}
-		if(receiveLength == -1)
-		{	puts(errorMsg.GetLastError());
-//			printf("Received packet from %socketfd:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-			return false;
-		}
-		return true;
-	}
 	const char* GetString() const
 	{	return buffer.get();
 	}
-#if 0
-	bool Append(const char* data,unsigned length)
-	{	if (this->length + length > bufsize)
-		{	return false;
-		}
-		memcpy(buffer.get()+this->length,data,length);
-		this->length+=length;
-		return true;
-	}
-	bool SendBuffer()
-	{	if(!length)
-		{	return true;
-		}
-		const bool ok=SendTo(buffer.get(),length);
-		length=0;
-		return ok;
-	}
-#endif
-	virtual void OnPacket(bool /* isGood */,Packet&)
+	virtual void OnPacket(int ,Packet&)
 	{}
 	virtual void OnStop() const
 	{}

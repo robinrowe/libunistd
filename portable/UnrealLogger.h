@@ -7,6 +7,7 @@
 
 #include <Runtime/CoreUObject/Public/UObject/ObjectBase.h>
 #include <portable/Counter.h>
+#include <crtdbg.h>
 
 class UnrealLogger
 {	FString s;
@@ -17,12 +18,22 @@ class UnrealLogger
 		FMsg::Logf_Internal(filename, lineNo,  categoryName, t, *s); 
 		s.Reset();
 	}
+	void OutputWindow(const char* filename,int lineNo,const char* msg)
+	{//OutputDebugStringA("My output string.");
+		//_RPTF2(_CRT_WARN, "In NameOfThisFunc( )," " someVar= %d, otherVar= %d\n", someVar, otherVar );
+		//_CRT_WARN, _CRT_ERROR, and _CRT_ASSERT.
+#ifdef _DEBUG
+		_CrtDbgReport( _CRT_WARN,filename,lineNo,msg,NULL);
+#endif
+	}
 public:
 	UnrealLogger(const char* loggerName)
 	{	categoryName = loggerName;
+		OutputWindow(loggerName,0,"_CrtDbgReport enabled");
 	}
 	void Log(const char* filename,int lineNo,const char* msg)
-	{	Puts(filename,lineNo,msg,ELogVerbosity::Display);
+	{	OutputWindow(filename,lineNo,msg);
+		Puts(filename,lineNo,msg,ELogVerbosity::Display);
 	}
 	void Error(const char* filename,int lineNo,const char* msg)
 	{	s="LogError: ";
