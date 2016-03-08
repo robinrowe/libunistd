@@ -2,6 +2,18 @@
 // Copyright 2016 Robin.Rowe@CinePaint.org
 // Open source license MIT
 
+/* Add this to your UE project header:
+
+DECLARE_LOG_CATEGORY_EXTERN(homStream, Log, All);
+
+Add to project source file:
+
+#include <portable/Logger.h>
+DEFINE_LOG_CATEGORY(your_plugin_name);
+UnrealLogger logger("your_plugin_name");
+
+*/
+
 #ifndef UnrealLogger_h
 #define UnrealLogger_h
 
@@ -49,3 +61,4 @@ extern UnrealLogger logger;
 #define LogError(msg) logger.Error(__FILE__, __LINE__,msg)
 
 #endif
+

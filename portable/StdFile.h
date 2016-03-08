@@ -62,6 +62,9 @@ public:
 		bytes=fwrite(data,1,length,fp);
 		return bytes==length;
 	}
+	bool Write(char c)
+	{	return Write(&c,1);
+	}
 	bool Write(const char* string)
 	{	if(!string)
 		{	return false;
