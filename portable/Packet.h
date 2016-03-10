@@ -48,13 +48,11 @@ struct Vec3d
 	double y;
 	double z;
 	int size() const
-	{	const int bytes = sizeof(*this);
-		return bytes;
-	}
-	operator char* ()
-	{	return (char*) &x;
+	{	return sizeof(*this) == 3*sizeof(double) ? sizeof(*this) : 0;
 	}
 };
+
+
 
 class Packet
 {	char* const buffer;
@@ -97,6 +95,9 @@ public:
 	}
 	unsigned length() const
 	{	return *packetSize;
+	}
+	unsigned ReadOffset() const
+	{	return readOffset;
 	}
 	unsigned capacity() const
 	{	return bufsize;
@@ -143,6 +144,10 @@ public:
 	{	const char* p = (const char*) &data;
 		return Write(p,sizeof(data));
 	}
+	bool Write(int data)
+	{	const char* p = (const char*) &data;
+		return Write(p,sizeof(data));
+	}
 	bool Write(unsigned long long data)
 	{	const char* p = (const char*) &data;
 		return Write(p,sizeof(data));
@@ -152,6 +157,10 @@ public:
 		return Write(p,sizeof(data));
 	}
 	bool Write(double data)
+	{	const char* p = (const char*) &data;
+		return Write(p,sizeof(data));
+	}
+	bool Write(const Vec3d& data)
 	{	const char* p = (const char*) &data;
 		return Write(p,sizeof(data));
 	}
@@ -222,7 +231,7 @@ public:
 		return false;
 	}
 	bool Read(Vec3d& v)
-	{	return Read(v,v.size());
+	{	return Read((char*)&v,sizeof(v));
 	}
 };
 

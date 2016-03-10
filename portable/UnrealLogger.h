@@ -27,6 +27,7 @@ class UnrealLogger
 	Counter c;
 	void Puts(const char* filename,int lineNo,const char* msg,ELogVerbosity::Type t)
 	{	s=c(msg);
+		puts(msg);
 		FMsg::Logf_Internal(filename, lineNo,  categoryName, t, *s); 
 		s.Reset();
 	}
