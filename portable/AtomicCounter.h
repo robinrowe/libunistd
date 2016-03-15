@@ -6,6 +6,9 @@
 
 #include <atomic>
 
+namespace portable
+{
+
 template<typename T>
 class AtomicCounter
 {	std::atomic<T> n;
@@ -50,6 +53,8 @@ public:
 	{	return n;
 	}
 };
+
+}
 
 #endif
  

@@ -69,6 +69,9 @@ public:
 		if(isReset)
 		{	Reset();
 	}	}
+	const char* GetEnd() const
+	{	return buffer+*packetSize;
+	}
 	void Reset()
 	{	*packetSize=sizeof(T);
 	}
