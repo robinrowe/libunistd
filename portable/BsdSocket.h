@@ -77,7 +77,7 @@ private:
 	}
 	void Run()
 	{	PacketSizer packetSizer(buffer.get(),bufsize);
-		Packet packet(packetSizer);
+		PacketReader packet(packetSizer);
 		while(isGo)
 		{	if(!isClient && newsockfd<=0)
 			{	ListenAccept();
@@ -189,12 +189,12 @@ public:
 		return true;
 	}
 	bool SendTo(Packet& packet)
-	{	return SendTo(packet.get(),packet.length());
+	{	return SendTo(packet.GetPacket(),packet.GetPacketSize());
 	}
 	const char* GetString() const
 	{	return buffer.get();
 	}
-	virtual void OnPacket(int ,Packet&)
+	virtual void OnPacket(int ,PacketReader&)
 	{}
 	virtual void OnStop() const
 	{}

@@ -24,4 +24,10 @@ void LogError(const char* msg)
 }
 
 #endif
+
+#ifdef LOGGER_QUIET
+#undef LogMsg
+#define LogMsg(msg)
+#endif
+
 #endif
