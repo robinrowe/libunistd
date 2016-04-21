@@ -107,6 +107,7 @@ private:
 		{	perror("ERROR connecting");
 			return false;
 		}
+		isGo=true;
 		return true;
 	}
 	bool OpenServer(const char* ,int serverPort)
@@ -140,6 +141,9 @@ public:
 	,	isTcp(true)
 	,	isClient(true)
 	{}
+	bool IsOpen() const
+	{	return isGo;
+	}
 	void Resize(unsigned bufsize)
 	{	if(!bufsize)
 		{	this->bufsize = 0;
