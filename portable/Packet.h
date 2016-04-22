@@ -301,6 +301,13 @@ PacketWriter& operator<<(PacketWriter& packet,T data)
 	return packet;
 }
 
+inline
+PacketWriter& operator<<(PacketWriter& packet,std::string& data)
+{	const bool ok = packet.Write(data);
+//	std::cout<<"read string" << std::endl;
+	return packet;
+}
+
 }
 
 #endif
