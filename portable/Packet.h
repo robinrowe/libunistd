@@ -8,6 +8,7 @@
 #include <memory.h>
 #include <string>
 #include <stdio.h>
+#include <vector>
 
 #ifdef _DEBUG
 #define TRACE(msg) puts("ERROR: " msg)
@@ -41,15 +42,28 @@ struct PacketSizer
 	,	bufsize(bufsize)
 	{}
 };
-
+#if 0
 template <unsigned bufsize>
-class PacketBuffer
+class PacketBufferStack
 {	char buffer[bufsize];
 public:
 	operator PacketSizer()
 	{	return PacketSizer(buffer,bufsize);
 	}
 };
+
+template <unsigned bufsize>
+class PacketBufferHeap
+{	std::unique_ptr<char[]> buffer;
+public:
+	PacketBufferHeap()
+	{	buffer=std::make_unique<char[]>(bufsize);
+	}
+	operator PacketSizer()
+	{	return PacketSizer(buffer.get(),bufsize);
+	}
+};
+#endif
 
 struct Vec3d
 {	double x;
@@ -136,9 +150,9 @@ protected:
 	{	packet[GetPacketSize()-1]='\n';
 	}
 public:			
-	Packet(const PacketSizer& sizer)
-	:	buffer(sizer.buffer)
-	,	bufsize(sizer.bufsize)
+	Packet(char* buffer,unsigned bufsize)
+	:	buffer(buffer)
+	,	bufsize(bufsize)
 	{	packet=buffer;
 		Rewind();
 	}
@@ -176,9 +190,14 @@ class PacketReader
 :	public Packet
 {
 public:
-	PacketReader(const PacketSizer& sizer)
-	:	Packet(sizer)
-	{}
+	PacketReader(std::vector<char>& buffer)
+	:	Packet(&buffer[0],buffer.size())
+	{	Reset();
+	}
+	PacketReader(char* buffer,unsigned size)
+	:	Packet(buffer,size)
+	{	Reset();
+	}
 	bool Read(char* data,unsigned length)
 	{	if(IsInvalid())
 		{	return false;
@@ -239,8 +258,18 @@ class PacketWriter
 :	public Packet
 {
 public:
+#if 0
 	PacketWriter(const PacketSizer& sizer)
 	:	Packet(sizer)
+	{	Reset();
+	}
+#endif
+	PacketWriter(std::vector<char>& buffer)
+	:	Packet(&buffer[0],buffer.size())
+	{	Reset();
+	}
+	PacketWriter(char* buffer,unsigned size)
+	:	Packet(buffer,size)
 	{	Reset();
 	}
 	PacketMarker GetMarker()
