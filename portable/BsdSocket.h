@@ -47,17 +47,13 @@ private:
 		listen(socketfd,backlog); 
 		sockaddr_in cli_addr;
 		int clilen = sizeof(cli_addr);
-#ifdef _DEBUG
-		puts("\nListening...");
-#endif
+//		puts("\nListening...");
 		newsockfd = accept(socketfd, (struct sockaddr *)&cli_addr, &clilen);
 		if (newsockfd < 0) 
 		{	perror("ERROR on accept");
 			return false;
 		}
-#ifdef _DEBUG
-		puts("connected");
-#endif
+		puts("Connected");
 		return true;
 	}   
 	int RecvFrom()
@@ -83,7 +79,7 @@ private:
 			{	ListenAccept();
 			}
 			const int bytes = RecvFrom();
-			packet.Rewind();
+			packet.Reset();
 			OnPacket(bytes,packet);
 		}
 		OnStop();
@@ -198,7 +194,7 @@ public:
 	const char* GetString() const
 	{	return buffer.get();
 	}
-	virtual void OnPacket(int ,PacketReader&)
+	virtual void OnPacket(unsigned ,PacketReader&)
 	{}
 	virtual void OnStop() const
 	{}
