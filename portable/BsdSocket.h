@@ -79,7 +79,7 @@ private:
 			{	ListenAccept();
 			}
 			const int bytes = RecvFrom();
-			packet.Reset();
+			packet.Init();
 			OnPacket(bytes,packet);
 		}
 		OnStop();
@@ -131,6 +131,14 @@ public:
 	}
 	BsdSocket()
 	:	socketfd(0)
+	,	newsockfd(0)
+	,	bufsize(bufsize)
+	,	isGo(false)
+	,	isTcp(true)
+	,	isClient(true)
+	{}
+	BsdSocket(SOCKET fd)
+	:	socketfd(fd)
 	,	newsockfd(0)
 	,	bufsize(bufsize)
 	,	isGo(false)

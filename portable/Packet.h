@@ -8,8 +8,10 @@
 #include <memory.h>
 #include <string>
 #include <stdio.h>
+#include <iostream>
+using namespace std;
 
-#ifdef _DEBUG
+#if 1
 #define TRACE(msg) puts("ERROR: " msg)
 #else
 #define TRACE(msg)
@@ -117,15 +119,15 @@ protected:
 	void SetEndl()
 	{	packet[GetPacketSize()-1]='\n';
 	}
-	void ResetPacket()
+	void Init()
 	{	packet=buffer;
-	}		
+		packetSize=(unsigned*) buffer;
+	}	
 public:			
 	Packet(const PacketSizer& sizer)
 	:	buffer(sizer.buffer)
 	,	bufsize(sizer.bufsize)
-	{	packet=buffer;
-		packetSize = (unsigned*) packet;
+	{	Init();
 	}
 	const char* GetPayload() const //data()
 	{	return packet+sizeof(*packetSize);
@@ -144,13 +146,13 @@ public:
 class PacketReader
 :	public Packet
 {	unsigned readOffset;
-#if 0
-	void Rewind(unsigned size)
-	{	readOffset-=size;
-	}
-#endif
-	bool IsOverflow(unsigned size) const
-	{	return readOffset + size > GetPacketSize();
+	bool IsOverflow(unsigned length) const
+	{	const unsigned size = GetPacketSize();
+		if(readOffset + length > size)
+		{	cout<<"ERROR: overflow "<<readOffset<<" "<<length<<" "<<size<<endl;
+			return true;
+		}
+		return false;
 	}
 	bool IsInvalid() const
 	{//	std::cout << "readOffset "<<readOffset << std::endl;
@@ -159,18 +161,22 @@ class PacketReader
 	char* GetReadPtr()
 	{	return packet+readOffset;
 	}
+	void InitReader()
+	{	readOffset=sizeof(T);
+	}
 public:
 	PacketReader(const PacketSizer& sizer)
 	:	Packet(sizer)
-	{	Rewind();
+	{	InitReader();
 	}
-	void Rewind()
-	{	readOffset=sizeof(T);
-		packetSize=(unsigned*) packet;
-	}
-	void Reset()
-	{	ResetPacket();
-		Rewind();
+	void Init()
+	{	Packet::Init();
+		InitReader();
+	}	
+	void NextInPipeline()
+	{	packet+=*packetSize;
+		packetSize=(unsigned*)packet;
+		InitReader();
 	}
 #if 0
 		const unsigned signature=1234567789;
@@ -180,12 +186,6 @@ public:
 		packetSize++;
 		readOffset+=sizeof(signature);
 #endif
-
-	bool NextInPipeline()
-	{	packet+=*packetSize;
-		Rewind();
-		return !IsEmpty();
-	}
 	unsigned GetReadOffset() const
 	{	return readOffset;
 	}
@@ -247,6 +247,13 @@ public:
 		Invalidate();
 		return false;
 	}
+	void Dump() const
+	{	const char* p=packet+readOffset;
+		cout <<"Packet dump: "<<packetSize[0]<<" "<<packetSize[1]<<" "<<packetSize[2]
+		<< " readOffset = " << readOffset
+		<< ", "<<packetSize[readOffset] << " - "
+		<< unsigned(p[0])<<" "<<unsigned(p[1])<<" "<<unsigned(p[2])<<" "<<unsigned(p[3])<<endl;
+	}
 };
 
 class PacketWriter
@@ -256,7 +263,6 @@ public:
 	PacketWriter(const PacketSizer& sizer)
 	:	Packet(sizer)
 	{	*packetSize=sizeof(T);
-		ResetPacket();
 	}
 	PacketMarker GetMarker()
 	{	char* p=GetEndPtr();
