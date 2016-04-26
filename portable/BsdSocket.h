@@ -56,29 +56,30 @@ private:
 		puts("Connected");
 		return true;
 	}   
-	int RecvFrom()
+	int RecvFrom(unsigned offset=0)
 	{	int slen = sizeof(sockaddr_in);
 		if(isClient)
 		{	if(socketfd<=0)
 			{	errorMsg.Set("Socket not open");
 				return -1;
 			}	
-			return recvfrom(socketfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen);
+			return recvfrom(socketfd,buffer.get()+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
 		}
 		if(newsockfd<=0)
 		{	errorMsg.Set("Socket not open");
 			return -1;
 		}	
-		return recvfrom(newsockfd,buffer.get(),bufsize,0,(struct sockaddr *)&server_sockaddr,&slen); 
+		return recvfrom(newsockfd,buffer.get()+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen); 
 	}
 	void Run()
 	{	PacketSizer packetSizer(buffer.get(),bufsize);
 		PacketReader packet(packetSizer);
+		unsigned offset=0;
 		while(isGo)
 		{	if(!isClient && newsockfd<=0)
 			{	ListenAccept();
 			}
-			const int bytes = RecvFrom();
+			const int bytes = RecvFrom(offset);
 			packet.Init();
 			OnPacket(bytes,packet);
 		}
@@ -202,8 +203,9 @@ public:
 	const char* GetString() const
 	{	return buffer.get();
 	}
-	virtual void OnPacket(unsigned ,PacketReader&)
-	{}
+	virtual unsigned OnPacket(unsigned ,PacketReader&)
+	{	return 0;
+	}
 	virtual void OnStop() const
 	{}
 };
