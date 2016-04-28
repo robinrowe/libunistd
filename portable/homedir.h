@@ -7,6 +7,9 @@
 
 #ifdef _WIN32
 
+#ifdef UNREAL_ENGINE
+#include <AllowWindowsPlatformTypes.h>
+#endif
 #include <windows.h>
 #include <shlobj.h>
 #include <stdio.h>
@@ -26,6 +29,10 @@ bool GetHomedir(std::string& path)
 	path = buffer;
 	return true;
 }
+
+#ifdef UNREAL_ENGINE
+#include <HideWindowsPlatformTypes.h>
+#endif
 
 #else
 

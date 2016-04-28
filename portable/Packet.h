@@ -191,7 +191,7 @@ class PacketReader
 {
 public:
 	PacketReader(std::vector<char>& buffer)
-	:	Packet(&buffer[0],buffer.size())
+	:	Packet(&buffer[0],(unsigned) buffer.size())
 	{	Reset();
 	}
 	PacketReader(char* buffer,unsigned size)
@@ -221,7 +221,7 @@ public:
 		const char* endPtr = GetEndPtr();
 		while(p<endPtr)
 		{	if('\n' == *p)
-			{	const unsigned size = p-readPtr;
+			{	const unsigned size = unsigned(p-readPtr);
 				s=std::move(std::string(readPtr,size));
 				readOffset+=size+1;
 				return true;
@@ -241,7 +241,7 @@ public:
 		const char* endPtr = GetEndPtr();
 		while(p<endPtr)
 		{	if('\n' == *p)
-			{	size=p-readPtr;
+			{	size=unsigned(p-readPtr);
 				s = readPtr;
 				readOffset+=size+1;
 				return true;
@@ -265,7 +265,7 @@ public:
 	}
 #endif
 	PacketWriter(std::vector<char>& buffer)
-	:	Packet(&buffer[0],buffer.size())
+	:	Packet(&buffer[0],unsigned(buffer.size()))
 	{	Reset();
 	}
 	PacketWriter(char* buffer,unsigned size)

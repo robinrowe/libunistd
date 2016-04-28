@@ -3,6 +3,8 @@
 // Copyright (c) 2015 Robin.Rowe@CinePaint.org
 // License open source MIT
 
+#pragma comment(lib, "libunistd.lib")
+
 #include "BsdSocket.h"
 
 namespace portable 
@@ -88,79 +90,20 @@ bool BsdSocketClient::Open(const char* serverName,int serverPort)
 	return true;
 }
 
-
-SOCKET BsdSocketServer::ListenAccept()
-{   const int backlog = 1; //point-to-point, not SOMAXCONN;
-	listen(socketfd,backlog); 
-	sockaddr_in cli_addr;
-	int clilen = sizeof(cli_addr);
-#ifdef _DEBUG
-	puts("\nListening...");
-#endif
-	SOCKET newsockfd = accept(socketfd, (struct sockaddr *)&cli_addr, &clilen);
-	if (newsockfd < 0) 
-	{	perror("ERROR on accept");
-	}
-#ifdef _DEBUG
-	else
-	{	puts("connected");
-	}
-#endif
-	return newsockfd;
-} 
-
-void BsdSocketServer::Run()
+void BsdSocketClient::Run()
 {	PacketReader packet(buffer.get(),bufsize);
 	while(isGo)
-	{	SOCKET fd = ListenAccept();
-		if(fd<=0)
-		{	continue;
-		}
-		Login(fd);
-#if 0
-		const int bytes = bug RecvFrom();
+	{	const int bytes = RecvFrom(buffer.get(),bufsize);
 		packet.Rewind();
 		OnPacket(bytes,packet);
-#endif
 	}
 	OnStop();
 }
 
-bool BsdSocketServer::Open(int serverPort,int maxStreams)
-{	//bug maxStreams = 
-	socketfd=OpenSocket();
-	if(socketfd == -1)
-	{	puts(errorMsg.GetLastError());
-		return false;
-	}
-	server_sockaddr.sin_family = AF_INET;
-	server_sockaddr.sin_port = htons((u_short) serverPort);
-	server_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	if(::bind(socketfd, (struct sockaddr*)&server_sockaddr,sizeof(server_sockaddr)) == -1)
-	{	puts(errorMsg.GetLastError());
-		return false;
-	}
-	isGo=true;
-	return true;
-}
-
-void BsdSocketServer::Start()
-{	worker=std::thread(Main,this);
-#if 0
-	if(isBlocking)
-	{	worker.join();
-	}
-	else
-#endif
-	{	worker.detach();
-}	}
-
-void BsdSocketServer::OnPacket(int bytes,portable::PacketReader& packet)
-{
-#if 0	
-//bug
-	if(byt	<0	
-	{	SocketReset("Socket closed")				return;
+void BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
+{	if(bytes<0)	
+	{	SocketReset("Socket closed");		
+		return;
 	}
 	if(bytes<=sizeof(unsigned))
 	{	SocketReset("Packet receive underflow");
@@ -196,7 +139,108 @@ void BsdSocketServer::OnPacket(int bytes,portable::PacketReader& packet)
 			return;
 		}	
 	}
+}
+
+SOCKET BsdSocketServer::ListenAccept()
+{   const int backlog = 1; //point-to-point, not SOMAXCONN;
+	listen(socketfd,backlog); 
+	sockaddr_in cli_addr;
+	int clilen = sizeof(cli_addr);
+#ifdef _DEBUG
+	puts("\nListening...");
 #endif
+	SOCKET newsockfd = accept(socketfd, (struct sockaddr *)&cli_addr, &clilen);
+	if (newsockfd < 0) 
+	{	perror("ERROR on accept");
+	}
+#ifdef _DEBUG
+	else
+	{	puts("connected");
+	}
+#endif
+	return newsockfd;
+} 
+
+void BsdSocketServer::Run()
+{	PacketReader packet(buffer.get(),bufsize);
+	while(isGo)
+	{	SOCKET fd = ListenAccept();
+		if(fd<=0)
+		{	continue;
+		}
+		Login(fd);
+	}
+	OnStop();
+}
+
+bool BsdSocketServer::Open(int serverPort,int maxStreams)
+{	//bug maxStreams = 
+	socketfd=OpenSocket();
+	if(socketfd == -1)
+	{	puts(errorMsg.GetLastError());
+		return false;
+	}
+	server_sockaddr.sin_family = AF_INET;
+	server_sockaddr.sin_port = htons((u_short) serverPort);
+	server_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	if(::bind(socketfd, (struct sockaddr*)&server_sockaddr,sizeof(server_sockaddr)) == -1)
+	{	puts(errorMsg.GetLastError());
+		return false;
+	}
+	isGo=true;
+	return true;
+}
+
+void BsdSocketServer::Start()
+{	worker=std::thread(Main,this);
+#if 0
+	if(isBlocking)
+	{	worker.join();
+	}
+	else
+#endif
+	{	worker.detach();
+}	}
+
+void BsdSocketServer::OnPacket(int bytes,portable::PacketReader& packet)
+{	if(bytes<0)	
+	{	SocketReset("Socket closed");		
+		return;
+	}
+	if(bytes<=sizeof(unsigned))
+	{	SocketReset("Packet receive underflow");
+		return;
+	}
+	int packetSize = (int) packet.GetPacketSize();
+	if(packetSize<sizeof(packetSize))
+	{	SocketReset("Packet size underflow");
+		return;
+	}	
+	//LogMsg("Receive packet");
+	for(;;)
+	{	if(bytes<packetSize)
+		{	SocketReset("Packet size overflow");
+			return;
+		}
+		if(packetSize>64*1024)
+		{	SocketReset("Packet size corrupted");
+			return;
+		}
+		ReadPacket();
+		bytes-=packetSize;
+		if(!bytes)
+		{	return;
+		}
+		if(bytes<=sizeof(unsigned))
+		{	SocketReset("Packet receive underflow");
+			return;
+		}
+		packet>>packetSize;
+		if(packetSize<sizeof(packetSize))
+		{	SocketReset("Packet size underflow");
+			return;
+		}	
+	}
 }
 
 }

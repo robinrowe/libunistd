@@ -6,6 +6,10 @@
 #ifndef BsdSocket_h
 #define BsdSocket_h
 
+#ifdef UNREAL_ENGINE
+#include <AllowWindowsPlatformTypes.h>
+#endif
+
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -42,6 +46,12 @@ class BsdSocket
 	bool isTcp;
 	sockaddr_in server_sockaddr;
 	int OpenSocket();
+	std::unique_ptr<char[]> buffer;
+	unsigned bufsize;
+	std::thread worker;
+protected:
+	virtual void Run()
+	{}
 public:
 	MsgBuffer<120> errorMsg;
 	virtual ~BsdSocket()
@@ -103,6 +113,19 @@ public:
 	{	socketfd=0;
 		puts(msg);
 	}
+	virtual void Stop()
+	{	if(isGo)
+		{	isGo=false;
+			SendTo("",0);
+	}	}
+	virtual void Start()
+	{}
+	virtual void OnPacket(int bytes,portable::PacketReader& packet)
+	{}
+	virtual void ReadPacket() 
+	{}
+	virtual void OnStop()
+	{}
 	void GetPeerName(std::string& s) const;
 };
 
@@ -117,7 +140,19 @@ class BsdSocketClient
 		}	
 		return recvfrom(socketfd,buffer,bufsize,0,(struct sockaddr *)&server_sockaddr,&slen);
 	}
+	static void Main(BsdSocketClient* self)
+    {   self->Run();
+    }
+protected:
+	void Run() override;
+	void OnPacket(int bytes,portable::PacketReader& packet) override;
 public:
+	void Close()
+	{	Stop();
+		if(socketfd)
+		{	closesocket(socketfd);
+			socketfd=0;
+	}	}
 	bool Open(const char* serverName,int serverPort);
 };
 
@@ -144,15 +179,13 @@ class BsdSocketServer
 {	SocketStartup socketStartup;
 protected:
 	BsdSocketPool pool;
-	std::unique_ptr<char[]> buffer;
-	unsigned bufsize;
-	std::thread worker;
 	unsigned maxStreams;
 	SOCKET ListenAccept();
 	static void Main(BsdSocketServer* self)
     {   self->Run();
     }
-	void Run();
+	void Start() override;
+	virtual void OnPacket(int bytes,portable::PacketReader& packet) override;
 public:
 	virtual ~BsdSocketServer()
 	{}
@@ -165,27 +198,22 @@ public:
 	}
 #endif
 	bool Open(int serverPort,int maxStreams);
-	void Stop()
-	{	if(isGo)
-		{	isGo=false;
-			SendTo("",0);
-	}	}
 	void Close()
 	{	Stop();
 		if(socketfd)
 		{	closesocket(socketfd);
 			socketfd=0;
 	}	}
-	void Start();
-	virtual void OnPacket(int bytes,portable::PacketReader& packet);
-	virtual void ReadPacket() 
-	{}
-	virtual void OnStop()
-	{}
 	virtual bool Login(SOCKET fd)
 	{	return false;
 	}
+	void Run() override;
 };
 
 }
+
+#ifdef UNREAL_ENGINE
+#include <HideWindowsPlatformTypes.h>
+#endif
+
 #endif
