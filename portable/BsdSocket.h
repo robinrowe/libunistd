@@ -40,14 +40,10 @@ public:
 class BsdSocket
 {protected:
 	SOCKET socketfd;
-//	char* buffer;
-//	unsigned bufsize;
 	bool isGo;
 	bool isTcp;
 	sockaddr_in server_sockaddr;
 	int OpenSocket();
-	std::unique_ptr<char[]> buffer;
-	unsigned bufsize;
 	std::thread worker;
 protected:
 	virtual void Run()
@@ -69,7 +65,6 @@ public:
 	,	isTcp(true)
 	{}
 	BsdSocket(const BsdSocket&) = default;
-//	void Resize(unsigned bufsize);
 	void SetIsTcp(bool tf)
 	{	isTcp=tf;
 	}
@@ -132,6 +127,9 @@ public:
 class BsdSocketClient
 :	public BsdSocket
 {	std::thread worker;
+//	std::unique_ptr<char[]> buffer;
+	char* buffer;
+	unsigned bufsize;
 	int RecvFrom(char* buffer,unsigned bufsize)
 	{	int slen = sizeof(sockaddr_in);
 		if(socketfd<=0)
@@ -147,6 +145,14 @@ protected:
 	void Run() override;
 	void OnPacket(int bytes,portable::PacketReader& packet) override;
 public:
+	BsdSocketClient()
+	:	buffer(0)
+	,	bufsize(0)
+	{}
+	BsdSocketClient(char* buffer,unsigned bufsize)
+	:	buffer(buffer)
+	,	bufsize(bufsize)
+	{}
 	void Close()
 	{	Stop();
 		if(socketfd)
@@ -154,6 +160,7 @@ public:
 			socketfd=0;
 	}	}
 	bool Open(const char* serverName,int serverPort);
+	void Start() override;
 };
 
 class BsdSocketPool

@@ -68,7 +68,11 @@ void BsdSocket::GetPeerName(std::string& s) const
 }
 
 bool BsdSocketClient::Open(const char* serverName,int serverPort)
-{	socketfd=OpenSocket();
+{	if(!serverName || !*serverName || !serverPort)
+	{	puts("No server to open specified");
+		return false;
+	}
+	socketfd=OpenSocket();
 	if(socketfd == -1)			
 	{	puts(errorMsg.GetLastError());
 		return false;
@@ -91,9 +95,12 @@ bool BsdSocketClient::Open(const char* serverName,int serverPort)
 }
 
 void BsdSocketClient::Run()
-{	PacketReader packet(buffer.get(),bufsize);
+{	PacketReader packet(buffer,bufsize);
+	if(!bufsize)
+	{	return;
+	}
 	while(isGo)
-	{	const int bytes = RecvFrom(buffer.get(),bufsize);
+	{	const int bytes = RecvFrom(buffer,bufsize);
 		packet.Rewind();
 		OnPacket(bytes,packet);
 	}
@@ -162,8 +169,7 @@ SOCKET BsdSocketServer::ListenAccept()
 } 
 
 void BsdSocketServer::Run()
-{	PacketReader packet(buffer.get(),bufsize);
-	while(isGo)
+{	while(isGo)
 	{	SOCKET fd = ListenAccept();
 		if(fd<=0)
 		{	continue;
@@ -191,7 +197,7 @@ bool BsdSocketServer::Open(int serverPort,int maxStreams)
 	return true;
 }
 
-void BsdSocketServer::Start()
+void BsdSocketClient::Start()
 {	worker=std::thread(Main,this);
 #if 0
 	if(isBlocking)
@@ -201,6 +207,12 @@ void BsdSocketServer::Start()
 #endif
 	{	worker.detach();
 }	}
+
+
+void BsdSocketServer::Start()
+{	worker=std::thread(Main,this);
+	worker.detach();
+}
 
 void BsdSocketServer::OnPacket(int bytes,portable::PacketReader& packet)
 {	if(bytes<0)	
