@@ -96,6 +96,7 @@ public:
 		{	closesocket(socketfd);
 			socketfd=0;
 	}	}
+#if 0
 	int RecvFrom(char* buffer,unsigned bufsize,sockaddr_in& server_sockaddr)
 	{	int slen = sizeof(sockaddr_in);
 		if(socketfd<=0)
@@ -103,7 +104,8 @@ public:
 			return -1;
 		}	
 		return recvfrom(socketfd,buffer,bufsize,0,(struct sockaddr *)&server_sockaddr,&slen); 
-	}	
+	}
+#endif
 	void SocketReset(const char* msg)
 	{	socketfd=0;
 		puts(msg);
@@ -130,6 +132,7 @@ class BsdSocketClient
 //	std::unique_ptr<char[]> buffer;
 	char* buffer;
 	unsigned bufsize;
+#if 0
 	int RecvFrom(char* buffer,unsigned bufsize)
 	{	int slen = sizeof(sockaddr_in);
 		if(socketfd<=0)
@@ -138,12 +141,20 @@ class BsdSocketClient
 		}	
 		return recvfrom(socketfd,buffer,bufsize,0,(struct sockaddr *)&server_sockaddr,&slen);
 	}
+#endif
+	int RecvFrom(char* buffer,unsigned bufsize,unsigned offset=0)
+	{	int slen = sizeof(sockaddr_in);
+		if(socketfd<=0)
+		{	errorMsg.Set("Socket not open");
+			return -1;
+		}	
+		return recvfrom(socketfd,buffer+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
+	}
 	static void Main(BsdSocketClient* self)
     {   self->Run();
     }
 protected:
 	void Run() override;
-	void OnPacket(int bytes,portable::PacketReader& packet) override;
 public:
 	BsdSocketClient()
 	:	buffer(0)
@@ -171,14 +182,6 @@ public:
 	{	socketfd.resize(size);
 		socketfd.assign(size,0);
 	}
-#if 0
-	BsdSocket Get(unsigned i)
-	{	if(i>=socketfd.size())
-		{	return BsdSocket(0);
-		}
-		return BsdSocket(socketfd[i]);
-	}
-#endif
 };
 
 class BsdSocketServer
@@ -192,7 +195,6 @@ protected:
     {   self->Run();
     }
 	void Start() override;
-	virtual void OnPacket(int bytes,portable::PacketReader& packet) override;
 public:
 	virtual ~BsdSocketServer()
 	{}

@@ -94,19 +94,6 @@ bool BsdSocketClient::Open(const char* serverName,int serverPort)
 	return true;
 }
 
-void BsdSocketClient::Run()
-{	PacketReader packet(buffer,bufsize);
-	if(!bufsize)
-	{	return;
-	}
-	while(isGo)
-	{	const int bytes = RecvFrom(buffer,bufsize);
-		packet.Rewind();
-		OnPacket(bytes,packet);
-	}
-	OnStop();
-}
-
 void BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 {	if(bytes<0)	
 	{	SocketReset("Socket closed");		
@@ -168,13 +155,29 @@ SOCKET BsdSocketServer::ListenAccept()
 	return newsockfd;
 } 
 
+void BsdSocketClient::Run()
+{	PacketReader packet(buffer,bufsize);
+	if(!bufsize)
+	{	return;
+	}
+	while(isGo)
+	{	const int bytes = RecvFrom(buffer,bufsize);
+		packet.Rewind();
+		OnPacket(bytes,packet);
+	}
+	OnStop();
+}
+
 void BsdSocketServer::Run()
-{	while(isGo)
-	{	SOCKET fd = ListenAccept();
-		if(fd<=0)
-		{	continue;
+{	PacketReader packet(buffer,bufsize);
+	unsigned offset=0;
+	while(isGo)
+	{	if(!isClient && newsockfd<=0)
+		{	ListenAccept();
 		}
-		Login(fd);
+		const int bytes = RecvFrom(offset);
+		packet.Init();
+		OnPacket(bytes,packet);
 	}
 	OnStop();
 }

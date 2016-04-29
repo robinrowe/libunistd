@@ -8,9 +8,10 @@
 #include <memory.h>
 #include <string>
 #include <stdio.h>
-#include <vector>
+#include <iostream>
+using namespace std;
 
-#ifdef _DEBUG
+#if 1
 #define TRACE(msg) puts("ERROR: " msg)
 #else
 #define TRACE(msg)
@@ -42,28 +43,15 @@ struct PacketSizer
 	,	bufsize(bufsize)
 	{}
 };
-#if 0
+
 template <unsigned bufsize>
-class PacketBufferStack
+class PacketBuffer
 {	char buffer[bufsize];
 public:
 	operator PacketSizer()
 	{	return PacketSizer(buffer,bufsize);
 	}
 };
-
-template <unsigned bufsize>
-class PacketBufferHeap
-{	std::unique_ptr<char[]> buffer;
-public:
-	PacketBufferHeap()
-	{	buffer=std::make_unique<char[]>(bufsize);
-	}
-	operator PacketSizer()
-	{	return PacketSizer(buffer.get(),bufsize);
-	}
-};
-#endif
 
 struct Vec3d
 {	double x;
@@ -108,14 +96,6 @@ protected:
 	typedef unsigned T;
 	T* packetSize;
 	const unsigned bufsize;
-	unsigned readOffset;
-	void Reset()
-	{	*packetSize=sizeof(T);
-		packet=buffer;
-	}
-	void Rewind(unsigned size)
-	{	readOffset-=size;
-	}
 	bool IsEmpty() const
 	{	const bool isEmpty = packet >= buffer + bufsize;
 //		std::cout << "isEmpty = "<<isEmpty << std::endl;
@@ -133,53 +113,34 @@ protected:
 		return false;
 	}
 #endif
-	bool IsOverflow(unsigned size) const
-	{	return readOffset + size > GetPacketSize();
-	}
-	bool IsInvalid() const
-	{//	std::cout << "readOffset "<<readOffset << std::endl;
-		return !readOffset;
-	}
 	unsigned GetCapacity() const//capacity()
 	{	return bufsize;
-	}
-	char* GetReadPtr()
-	{	return buffer+readOffset;
 	}
 	void SetEndl()
 	{	packet[GetPacketSize()-1]='\n';
 	}
+	void Init()
+	{	packet=buffer;
+		packetSize=(unsigned*) buffer;
+	}	
 public:			
+	Packet(const PacketSizer& sizer)
+	:	buffer(sizer.buffer)
+	,	bufsize(sizer.bufsize)
+	{	Init();
+	}
 	Packet(char* buffer,unsigned bufsize)
 	:	buffer(buffer)
 	,	bufsize(bufsize)
-	{	packet=buffer;
-		Rewind();
-	}
+	{}
 	const char* GetPayload() const //data()
 	{	return packet+sizeof(*packetSize);
 	}
 	unsigned GetPacketSize() const//length()
 	{	return *packetSize;
 	}
-	unsigned GetReadOffset() const
-	{	return readOffset;
-	}
-	void Rewind()
-	{	readOffset=sizeof(T);
-		packetSize=(unsigned*) packet;
-	}
-	bool NextInPipeline()
-	{	packet+=readOffset;
-		Rewind();
-		return !IsEmpty();
-	}
 	const char* GetPacket() const//get()
 	{	return packet;
-	}
-	void Invalidate()
-	{	readOffset=0;
-		TRACE("Packet Invalidated");
 	}
 	char* GetEndPtr() const
 	{	return packet+*packetSize;//buffer+length()
@@ -188,15 +149,57 @@ public:
 
 class PacketReader
 :	public Packet
-{
-public:
-	PacketReader(std::vector<char>& buffer)
-	:	Packet(&buffer[0],(unsigned) buffer.size())
-	{	Reset();
+{	unsigned readOffset;
+	bool IsOverflow(unsigned length) const
+	{	const unsigned size = GetPacketSize();
+		if(readOffset + length > size)
+		{	cout<<"ERROR: overflow "<<readOffset<<" "<<length<<" "<<size<<endl;
+			return true;
+		}
+		return false;
 	}
-	PacketReader(char* buffer,unsigned size)
-	:	Packet(buffer,size)
-	{	Reset();
+	bool IsInvalid() const
+	{//	std::cout << "readOffset "<<readOffset << std::endl;
+		return !readOffset;
+	}
+	char* GetReadPtr()
+	{	return packet+readOffset;
+	}
+	void InitReader()
+	{	readOffset=sizeof(T);
+	}
+public:
+	PacketReader(const PacketSizer& sizer)
+	:	Packet(sizer)
+	{	InitReader();
+	}
+	PacketReader(char* buffer,unsigned bufsize)
+	:	Packet(buffer,bufsize)
+	{	InitReader();
+	}
+	void Init()
+	{	Packet::Init();
+		InitReader();
+	}	
+	void NextInPipeline()
+	{	packet+=*packetSize;
+		packetSize=(unsigned*)packet;
+		InitReader();
+	}
+#if 0
+		const unsigned signature=1234567789;
+		if(*packetSize!=signature)
+		{	std::cout<<"Bad packet"<< std::endl;
+		}
+		packetSize++;
+		readOffset+=sizeof(signature);
+#endif
+	unsigned GetReadOffset() const
+	{	return readOffset;
+	}
+	void Invalidate()
+	{	readOffset=0;
+		TRACE("Packet Invalidated");
 	}
 	bool Read(char* data,unsigned length)
 	{	if(IsInvalid())
@@ -252,25 +255,22 @@ public:
 		Invalidate();
 		return false;
 	}
+	void Dump() const
+	{	const char* p=packet+readOffset;
+		cout <<"Packet dump: "<<packetSize[0]<<" "<<packetSize[1]<<" "<<packetSize[2]
+		<< " readOffset = " << readOffset
+		<< ", "<<packetSize[readOffset] << " - "
+		<< unsigned(p[0])<<" "<<unsigned(p[1])<<" "<<unsigned(p[2])<<" "<<unsigned(p[3])<<endl;
+	}
 };
 
 class PacketWriter
 :	public Packet
 {
 public:
-#if 0
 	PacketWriter(const PacketSizer& sizer)
 	:	Packet(sizer)
-	{	Reset();
-	}
-#endif
-	PacketWriter(std::vector<char>& buffer)
-	:	Packet(&buffer[0],unsigned(buffer.size()))
-	{	Reset();
-	}
-	PacketWriter(char* buffer,unsigned size)
-	:	Packet(buffer,size)
-	{	Reset();
+	{	*packetSize=sizeof(T);
 	}
 	PacketMarker GetMarker()
 	{	char* p=GetEndPtr();
@@ -307,6 +307,11 @@ public:
 		SetEndl();
 		return true;
 	}
+	void Duplicate()
+	{	char* end=GetEndPtr();
+		const unsigned size=GetPacketSize();
+		memcpy(end,packet,size);
+	}
 };
 
 template <typename T>
@@ -327,6 +332,13 @@ template <typename T>
 PacketWriter& operator<<(PacketWriter& packet,T data)
 {	const char* p = (const char*) &data;
 	const bool ok = packet.Write(p,sizeof(data));
+	return packet;
+}
+
+inline
+PacketWriter& operator<<(PacketWriter& packet,std::string& data)
+{	const bool ok = packet.Write(data);
+//	std::cout<<"read string" << std::endl;
 	return packet;
 }
 
