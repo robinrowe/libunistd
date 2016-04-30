@@ -41,12 +41,21 @@ class BsdSocket
 {protected:
 	SOCKET socketfd;
 	bool isGo;
-	bool isTcp;
 	sockaddr_in server_sockaddr;
-	int OpenSocket();
 	std::thread worker;
+	int OpenSocket(bool isTcp=true)
+	{	if(isTcp)
+		{	return (int) socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+		}
+		return (int) socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+	}
 protected:
 	virtual void Run()
+	{}
+	virtual unsigned OnPacket(unsigned bytes,portable::PacketReader& packet)
+	{	return 0;
+	}
+	virtual void OnStop()
 	{}
 public:
 	MsgBuffer<120> errorMsg;
@@ -54,20 +63,13 @@ public:
 	{}
 	BsdSocket()
 	:	socketfd(0)
-//	,	bufsize(0)
 	,	isGo(false)
-	,	isTcp(true)
 	{}
 	BsdSocket(SOCKET socketfd)
 	:	socketfd(socketfd)
-//	,	bufsize(0)
 	,	isGo(false)
-	,	isTcp(true)
 	{}
 	BsdSocket(const BsdSocket&) = default;
-	void SetIsTcp(bool tf)
-	{	isTcp=tf;
-	}
 	bool IsOpen() const
 	{	return isGo;
 	}
@@ -85,27 +87,20 @@ public:
 	bool SendTo(Packet& packet)
 	{	return SendTo(packet.GetPacket(),packet.GetPacketSize());
 	}
-#if 0
-	const char* GetBuffer() const
-	{	return buffer.get();
-	}
-#endif
 	void Close()
 	{	isGo=false;
 		if(socketfd)
 		{	closesocket(socketfd);
 			socketfd=0;
 	}	}
-#if 0
-	int RecvFrom(char* buffer,unsigned bufsize,sockaddr_in& server_sockaddr)
+	int RecvFrom(char* buffer,unsigned bufsize,unsigned offset=0)
 	{	int slen = sizeof(sockaddr_in);
 		if(socketfd<=0)
 		{	errorMsg.Set("Socket not open");
 			return -1;
 		}	
-		return recvfrom(socketfd,buffer,bufsize,0,(struct sockaddr *)&server_sockaddr,&slen); 
+		return recvfrom(socketfd,buffer+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
 	}
-#endif
 	void SocketReset(const char* msg)
 	{	socketfd=0;
 		puts(msg);
@@ -117,52 +112,21 @@ public:
 	}	}
 	virtual void Start()
 	{}
-	virtual void OnPacket(int bytes,portable::PacketReader& packet)
-	{}
-	virtual void ReadPacket() 
-	{}
-	virtual void OnStop()
-	{}
 	void GetPeerName(std::string& s) const;
 };
 
 class BsdSocketClient
 :	public BsdSocket
 {	std::thread worker;
-//	std::unique_ptr<char[]> buffer;
-	char* buffer;
-	unsigned bufsize;
-#if 0
-	int RecvFrom(char* buffer,unsigned bufsize)
-	{	int slen = sizeof(sockaddr_in);
-		if(socketfd<=0)
-		{	errorMsg.Set("Socket not open");
-			return -1;
-		}	
-		return recvfrom(socketfd,buffer,bufsize,0,(struct sockaddr *)&server_sockaddr,&slen);
-	}
-#endif
-	int RecvFrom(char* buffer,unsigned bufsize,unsigned offset=0)
-	{	int slen = sizeof(sockaddr_in);
-		if(socketfd<=0)
-		{	errorMsg.Set("Socket not open");
-			return -1;
-		}	
-		return recvfrom(socketfd,buffer+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
-	}
+	const unsigned bufsize;
 	static void Main(BsdSocketClient* self)
     {   self->Run();
     }
 protected:
 	void Run() override;
 public:
-	BsdSocketClient()
-	:	buffer(0)
-	,	bufsize(0)
-	{}
-	BsdSocketClient(char* buffer,unsigned bufsize)
-	:	buffer(buffer)
-	,	bufsize(bufsize)
+	BsdSocketClient(unsigned bufsize)
+	:	bufsize(bufsize)
 	{}
 	void Close()
 	{	Stop();
@@ -171,7 +135,10 @@ public:
 			socketfd=0;
 	}	}
 	bool Open(const char* serverName,int serverPort);
-	void Start() override;
+	void Start() override
+	{	worker=std::thread(Main,this);
+		worker.detach();
+	}
 };
 
 class BsdSocketPool
@@ -189,7 +156,7 @@ class BsdSocketServer
 {	SocketStartup socketStartup;
 protected:
 	BsdSocketPool pool;
-	unsigned maxStreams;
+	const unsigned bufsize;
 	SOCKET ListenAccept();
 	static void Main(BsdSocketServer* self)
     {   self->Run();
@@ -198,8 +165,8 @@ protected:
 public:
 	virtual ~BsdSocketServer()
 	{}
-	BsdSocketServer()
-	:	maxStreams(0)
+	BsdSocketServer(unsigned bufsize)
+	:	bufsize(bufsize)
 	{}
 #if 0
 	BsdSocket operator[](unsigned i)
