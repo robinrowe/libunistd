@@ -9,6 +9,7 @@
 #include <string>
 #include <stdio.h>
 #include <iostream>
+#include <vector>
 using namespace std;
 
 #if 1
@@ -132,7 +133,8 @@ public:
 	Packet(char* buffer,unsigned bufsize)
 	:	buffer(buffer)
 	,	bufsize(bufsize)
-	{}
+	{	Init();
+	}
 	const char* GetPayload() const //data()
 	{	return packet+sizeof(*packetSize);
 	}
@@ -270,6 +272,10 @@ class PacketWriter
 public:
 	PacketWriter(const PacketSizer& sizer)
 	:	Packet(sizer)
+	{	*packetSize=sizeof(T);
+	}
+	PacketWriter(std::vector<char>& v)
+	:	Packet(&v[0],unsigned(v.size()))
 	{	*packetSize=sizeof(T);
 	}
 	PacketMarker GetMarker()

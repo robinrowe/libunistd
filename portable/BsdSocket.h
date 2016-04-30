@@ -161,7 +161,7 @@ protected:
 	static void Main(BsdSocketServer* self)
     {   self->Run();
     }
-	void Start() override;
+//	void Start() override;
 public:
 	virtual ~BsdSocketServer()
 	{}
@@ -182,6 +182,10 @@ public:
 	}	}
 	virtual bool Login(SOCKET fd)
 	{	return false;
+	}
+	void Start() override
+	{	worker=std::thread(Main,this);
+		worker.detach();
 	}
 	void Run() override;
 };

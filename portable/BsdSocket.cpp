@@ -48,12 +48,12 @@ void BsdSocket::GetPeerName(std::string& s) const
 
 bool BsdSocketClient::Open(const char* serverName,int serverPort)
 {	if(!serverName || !*serverName || !serverPort)
-	{	puts("No server to open specified");
+	{	errorMsg.Set("No server to open specified");
 		return false;
 	}
 	socketfd=OpenSocket();
 	if(socketfd == -1)			
-	{	puts(errorMsg.GetLastError());
+	{	errorMsg.GetLastError();
 		return false;
 	}
 	memset((char *) &server_sockaddr, 0, sizeof(server_sockaddr));
@@ -61,12 +61,12 @@ bool BsdSocketClient::Open(const char* serverName,int serverPort)
 	server_sockaddr.sin_port = htons((u_short) serverPort);  
 //		server_sockaddr.sin_addr.S_un.S_addr = inet_addr(serverName);
 	if(1!=inet_pton(AF_INET,serverName,&server_sockaddr.sin_addr))
-	{	puts(errorMsg.GetLastError());
+	{	errorMsg.GetLastError();
 		return false;
 	}
 	const int ok = connect(socketfd, (struct sockaddr*)&server_sockaddr, sizeof(server_sockaddr));
 	if(ok<0) 
-	{	perror("ERROR connecting");
+	{	errorMsg.GetLastError();
 		return false;
 	}
 	isGo=true;
