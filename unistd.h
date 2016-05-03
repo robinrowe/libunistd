@@ -11,6 +11,8 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <WinSock2.h>
+#undef socklen_t
+#include <WS2tcpip.h>
 #include <windows.h>
 #include <fcntl.h>
 #include <process.h>
@@ -252,8 +254,71 @@ int fchmod(int, mode_t)
 {	return 0;
 }
 
+inline
+uid_t getuid()
+{	return 0;
+}
+
+inline
+uid_t geteuid()
+{	return 0;
+}
+
 #define PATH_MAX 255
 
+inline
+char* realpath(const char *path, char *resolved_path)
+{	if(!resolved_path)
+	{	return 0;
+	}
+	const DWORD  err = GetFullPathName(path,PATH_MAX,resolved_path,0);
+	if(err)
+	{	return 0;
+	}
+	return resolved_path;
+}
+
+
+// Serial Ports
+
+enum
+{	CS7,
+	PARENB,          
+	CS8, 
+	PARODD,
+	CSIZE,
+	CSTOPB
+};
+
+typedef int tcflag_t;
+typedef char cc_t;
+#define NCCS 255
+
+struct termios
+{	tcflag_t c_iflag;
+	tcflag_t c_oflag; 
+	tcflag_t c_cflag;
+	tcflag_t c_lflag; 
+	cc_t c_cc[NCCS];
+};
+
+inline
+int tcgetattr(int fd, struct termios *termios_p)
+{	return 0;
+}
+
+enum 
+{	O_NOCTTY,
+	O_NDELAY
+};
+
+struct SIO_CHAN2
+:	public SIO_CHAN
+{
+};
+
+#undef SIO_CHAN
+#define SIO_CHAN SIO_CHAN2
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
 
