@@ -21,89 +21,78 @@
  *
  */
 
-#ifndef	__STRICT_ANSI__
-
-#ifndef _DIRENT_H_
-#define _DIRENT_H_
+#ifndef dirent_h
+#define dirent_h
 
 #include <io.h>
-/*#include <gtypes.h>
-*/
-#define GLIB_VAR
-
-#ifndef RC_INVOKED
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct dirent
-{
-	long		d_ino;		/* Always zero. */
+{	long d_ino;		/* Always zero. */
 	unsigned short	d_reclen;	/* Always zero. */
 	unsigned short	d_namlen;	/* Length of name in d_name. */
-	char*		d_name;		/* File name. */
+	unsigned char  d_type;   /* type of file. */
+	char* d_name;		/* File name. */
 	/* NOTE: The name in the dirent structure points to the name in the
 	 *       finddata_t structure in the DIR. */
 };
 
-/*
- * This is an internal data structure. Good programmers will not use it
- * except as an argument to one of the functions below.
- */
 typedef struct
-{
-	/* disk transfer area for this dir */
+{	/* disk transfer area for this dir */
 	struct _finddata_t	dd_dta;
-
 	/* dirent struct to return from dir (NOTE: this makes this thread
 	 * safe as long as only one thread uses a particular DIR struct at
 	 * a time) */
-	struct dirent		dd_dir;
-
+	struct dirent dd_dir;
 	/* _findnext handle */
-	long			dd_handle;
-
+	long dd_handle;
 	/*
          * Status of search:
 	 *   0 = not started yet (next entry to read is first entry)
 	 *  -1 = off the end
 	 *   positive = 0 based index of next entry
 	 */
-	short			dd_stat;
-
+	short dd_stat;
+	unsigned char d_type;      /* type of file; not supported
+                                   by all file system types */
 	/* given path for dir with search pattern (struct is extended) */
-	char			dd_name[1];
+	char dd_name[1];
 } DIR;
 
 
-GLIB_VAR DIR*		opendir (const char*);
-GLIB_VAR struct dirent*	readdir (DIR*);
-GLIB_VAR int		closedir (DIR*);
-GLIB_VAR void		rewinddir (DIR*);
-GLIB_VAR long		telldir (DIR*);
-GLIB_VAR void		seekdir (DIR*, long);
-
 typedef int scandir_f(const struct dirent* d);
-typedef int scandir_alphasort(const void *a, const void *b);
+typedef int scandir_alphasort(dirent** a,dirent** b);
+
+DIR* opendir (const char*);
+struct dirent*	readdir (DIR*);
+int	closedir (DIR*);
+void rewinddir (DIR*);
+long telldir (DIR*);
+void seekdir (DIR*, long);
+int scandir(const char* buf, dirent** namelist, scandir_f sf, scandir_alphasort af);
 
 inline
-int alphasort(const void *a, const void *b)
-{	return 0;
+int alphasort(dirent** a, dirent** b)
+{	return strcmp((*a)->d_name,(*b)->d_name);
 }
 
-inline
-int scandir(const char* buf, struct dirent** namelist, scandir_f, scandir_alphasort)
-{	return 0;
-}
+enum
+{	DT_BLK,		// This is a block device.
+	DT_CHR,		// This is a character device.
+	DT_DIR,		// This is a directory.
+	DT_FIFO,	// This is a named pipe (FIFO).
+	DT_LNK,		// This is a symbolic link.
+	DT_REG,		// This is a regular file.
+	DT_SOCK,	// This is a UNIX domain socket.
+	DT_UNKNOWN	// The file type could not be determined.
+};
 
 #ifdef	__cplusplus
 }
 #endif
 
-#endif	/* Not RC_INVOKED */
-
-#endif	/* Not _DIRENT_H_ */
-
-#endif	/* Not __STRICT_ANSI__ */
-
+#endif

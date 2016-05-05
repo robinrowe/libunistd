@@ -21,6 +21,8 @@
 #include <io.h>
 #include <direct.h>
 #include "../dirent.h"
+#include <list>
+#include <string>
 
 
 #define WIN32_LEAN_AND_MEAN
@@ -314,4 +316,51 @@ seekdir (DIR * dirp, long lPos)
       while ((dirp->dd_stat < lPos) && readdir (dirp))
 	;
     }
+}
+
+struct DirEntry
+{	direct dir;
+	std::string name;
+public:
+	DirEntry(direc* dir,const char* name)
+	:	dir(dir)
+	,	name(name)
+	{	dir->d_name=&this->name[0];
+	}
+};
+
+struct DirCompare 
+{    bool operator()(const DirEntry& a, const DirEntry& b) const
+	{	return a.name<b.name;
+	}
+};
+
+int scandir(const char* buf, dirent** namelist, scandir_f select, scandir_alphasort dcomp)
+{
+#if 0
+	DIR* dirp = opendir(dirname);
+	if(!dirp)
+	{	return -1;
+	}
+	if(fstat(dirp->dd_fd, &stb) < 0)
+	{	return -1;
+	}
+	std::set<DirEntry,DirCompare> names;
+	struct dirent* d;
+	while ((d = readdir(dirp)) != NULL) 
+	{	if (select != NULL && !(*select)(d))
+		{	continue;
+		}
+		names.emplace(d,d->d_name);
+	}
+	closedir(dirp);
+	dirent** leak = (struct dirent **) malloc(names.size() * sizeof(struct dirent *));
+	for (auto it = names.begin(); it != names.end(); ++it)
+	{	leak
+}
+	*namelist = names;
+	return(nitems);
+#else
+		return 0;
+#endif
 }

@@ -11,6 +11,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <WinSock2.h>
+#include <winnt.h>
 #undef socklen_t
 #include <WS2tcpip.h>
 #include <windows.h>
@@ -33,6 +34,7 @@
 #include <mswsock.h> //for SO_UPDATE_ACCEPT_CONTEXT
 #include <Ws2tcpip.h>//for InetNtop
 #include <iostream>
+#include <ctype.h>
 //#define inet_ntop InetNtop
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -51,6 +53,23 @@ int fl_strlen(const char* s)
 #define strlen fl_strlen
 
 #endif
+
+#define STUB(functionName) { puts("STUB:" #functionName); }
+#define STUB0(functionName) { puts("STUB:" #functionName); return 0; }
+
+#if 0
+inline
+int nanosleep(const struct timespec *req, struct timespec *rem)
+{	long long delayInterval = req->tv_sec;
+	const long long billion = 1000000000LL;
+	delayInterval*=billion;
+    delayInterval+=req->tv_nsec;
+	BOOLEAN Alertable = true;
+// The units are in 100-nanosecond intervals.
+	NtDelayExecution(alertable, delayInterval);//ntdll
+	return 0;
+}
+#endif 
 
 #define sleep(x) Sleep(x)
 #define bzero(address,size) memset(address,0,size)
@@ -93,10 +112,10 @@ int kill(pid_t, int)
 {	return -1;
 }
 
-#define F_OK 0
-#define X_OK 0
+#define R_OK 4
 #define W_OK 2
-#define R_OK 1
+#define X_OK 0
+#define F_OK 0
 
 #ifndef S_ISREG
 #define S_ISREG(x) (_S_IFREG & x)
@@ -221,9 +240,16 @@ int close(int fd)
 }
 
 inline
-int open(const char* filename,int oflag)
+int uni_open(const char* filename,int oflag)
 {	return _open(filename,oflag,0);
 }
+
+inline
+int uni_open(const char* filename,unsigned oflag)
+{	return _open(filename,oflag,0);
+}
+
+#define open uni_open
 
 inline
 int read(int fd,void *buffer,unsigned int count)
@@ -234,6 +260,16 @@ inline
 int write(int fd,const void *buffer,unsigned int count)
 {	return _write(fd,buffer,count);
 }
+
+int fcntl(int handle,int mode,int mode2=0)
+{	return 0;
+}
+
+enum
+{	F_GETFL,
+	F_SETFL,
+	O_NONBLOCK
+};
 
 typedef int Atom;
 
@@ -251,18 +287,15 @@ int mkstemp(char *filename)
 
 inline
 int fchmod(int, mode_t)
-{	return 0;
-}
+STUB0(fchmod)
 
 inline
 uid_t getuid()
-{	return 0;
-}
+STUB0(getuid)
 
 inline
 uid_t geteuid()
-{	return 0;
-}
+STUB0(geteuid)
 
 #define PATH_MAX 255
 
@@ -271,54 +304,34 @@ char* realpath(const char *path, char *resolved_path)
 {	if(!resolved_path)
 	{	return 0;
 	}
-	const DWORD  err = GetFullPathName(path,PATH_MAX,resolved_path,0);
+	const DWORD  err = GetFullPathNameA(path,(DWORD) PATH_MAX,resolved_path,0);
 	if(err)
 	{	return 0;
 	}
 	return resolved_path;
 }
 
-
-// Serial Ports
-
-enum
-{	CS7,
-	PARENB,          
-	CS8, 
-	PARODD,
-	CSIZE,
-	CSTOPB
-};
-
-typedef int tcflag_t;
-typedef char cc_t;
-#define NCCS 255
-
-struct termios
-{	tcflag_t c_iflag;
-	tcflag_t c_oflag; 
-	tcflag_t c_cflag;
-	tcflag_t c_lflag; 
-	cc_t c_cc[NCCS];
-};
+#define strtok_r strtok_s
+#define strcasecmp _stricmp
 
 inline
-int tcgetattr(int fd, struct termios *termios_p)
-{	return 0;
+int strncasecmp(const char *s1, const char *s2, size_t n)
+{	for(unsigned i=0;i<n;i++)
+	{	if(s1[i] == 0 && s2[i] == 0)
+		{	return 0;
+		}
+		if(s1[i] == 0 || s2[i] == 0)
+		{	return s1[i]<s2[i] ? -1:1;
+		}
+		if(tolower(s1[i])!=tolower(s2[i]))
+		{	return s1[i]<s2[i] ? -1:1;
+	}	}
+	return 0;
 }
 
-enum 
-{	O_NOCTTY,
-	O_NDELAY
-};
+ssize_t readlink(const char *path, char *buf, size_t bufsiz)
+STUB0(readlink)
 
-struct SIO_CHAN2
-:	public SIO_CHAN
-{
-};
-
-#undef SIO_CHAN
-#define SIO_CHAN SIO_CHAN2
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
 
