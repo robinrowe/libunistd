@@ -26,21 +26,18 @@ SocketStartup::~SocketStartup()
 #endif
 }
 
-void BsdSocket::GetPeerName(std::string& s) const
+void BsdSocket::GetPeerName(SOCKET sock,std::string& s)
 {	struct sockaddr_storage addr;
 	char ipstr[INET6_ADDRSTRLEN];
-	int port;
 	socklen_t len = sizeof addr;
-	getpeername(socketfd, (struct sockaddr*)&addr, &len);
+	getpeername(sock, (struct sockaddr*)&addr, &len);
 	if (addr.ss_family == AF_INET) 
 	{	struct sockaddr_in *s = (struct sockaddr_in *)&addr;
-		port = ntohs(s->sin_port);
 		inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
 	}
 	else 
 	{ // AF_INET6
 		struct sockaddr_in6 *s = (struct sockaddr_in6 *)&addr;
-		port = ntohs(s->sin6_port);
 		inet_ntop(AF_INET6, &s->sin6_addr, ipstr, sizeof ipstr);
 	}
 	s=ipstr;
@@ -86,39 +83,6 @@ void BsdSocketClient::Run()
 	OnStop();
 }
 
-void BsdSocketServer::Run()
-{	std::unique_ptr<char[]> buffer(new char[bufsize]);
-	PacketReader packet(buffer.get(),bufsize);
-	unsigned offset=0;
-	while(isGo)
-	{	if(socketfd<=0)
-		{	ListenAccept();
-		}
-		const int bytes = RecvFrom(buffer.get(),bufsize,offset);
-		packet.Init();
-		offset=OnPacket(bytes,packet);
-	}
-	OnStop();
-}
-
-bool BsdSocketServer::Open(int serverPort,int maxStreams)
-{	//bug maxStreams = 
-	socketfd=OpenSocket();
-	if(socketfd == -1)
-	{	puts(errorMsg.GetLastError());
-		return false;
-	}
-	server_sockaddr.sin_family = AF_INET;
-	server_sockaddr.sin_port = htons((u_short) serverPort);
-	server_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	if(::bind(socketfd, (struct sockaddr*)&server_sockaddr,sizeof(server_sockaddr)) == -1)
-	{	puts(errorMsg.GetLastError());
-		return false;
-	}
-	isGo=true;
-	return true;
-}
-
 SOCKET BsdSocketServer::ListenAccept()
 {   const int backlog = 1; //point-to-point, not SOMAXCONN;
 	listen(socketfd,backlog); 
@@ -138,5 +102,62 @@ SOCKET BsdSocketServer::ListenAccept()
 #endif
 	return newsockfd;
 } 
+
+
+SOCKET* BsdSocketPool::GetSlot()
+{	for(unsigned i =0;i<socketfd.size();i++)
+	{	if(!socketfd[i])
+		{	return &socketfd[i];
+	}	}
+	return 0;
+}
+
+void BsdSocketServer::ListenRun()
+{	while(isGo)
+	{	if(socketfd>0)
+		{	SOCKET sock = ListenAccept();
+			SOCKET* s = pool.GetSlot();
+			if(!s)
+			{	puts("No slot");
+				continue;
+			}
+			if(!Login(sock))
+			{	continue;
+			}
+			*s = sock;
+		}
+	}
+	OnStop();
+}
+
+void BsdSocketServer::PacketRun()
+{	std::unique_ptr<char[]> buffer(new char[bufsize]);
+	PacketReader packet(buffer.get(),bufsize);
+	unsigned offset=0;
+	while(isGo)
+	{	const int bytes = RecvFrom(buffer.get(),bufsize,offset);
+		packet.Init();
+		offset=OnPacket(bytes,packet);
+	}
+	OnStop();
+}
+
+bool BsdSocketServer::Open(int serverPort,int maxStreams,bool isPacketRun)
+{	pool.Reset(maxStreams); 
+	socketfd=OpenSocket();
+	if(socketfd == -1)
+	{	puts(errorMsg.GetLastError());
+		return false;
+	}
+	server_sockaddr.sin_family = AF_INET;
+	server_sockaddr.sin_port = htons((u_short) serverPort);
+	server_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	if(::bind(socketfd, (struct sockaddr*)&server_sockaddr,sizeof(server_sockaddr)) == -1)
+	{	puts(errorMsg.GetLastError());
+		return false;
+	}
+	isGo=true;
+	return true;
+}
 
 }

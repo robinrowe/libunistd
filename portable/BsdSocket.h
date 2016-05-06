@@ -42,7 +42,7 @@ class BsdSocket
 	SOCKET socketfd;
 	bool isGo;
 	sockaddr_in server_sockaddr;
-	std::thread worker;
+	std::thread packetWorker;
 	int OpenSocket(bool isTcp=true)
 	{	if(isTcp)
 		{	return (int) socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
@@ -112,7 +112,10 @@ public:
 	}	}
 	virtual void Start()
 	{}
-	void GetPeerName(std::string& s) const;
+	static void GetPeerName(SOCKET sock,std::string& s); 
+	void GetPeerName(std::string& s) const
+	{	return GetPeerName(socketfd,s);
+	}
 };
 
 class BsdSocketClient
@@ -149,19 +152,24 @@ public:
 	{	socketfd.resize(size);
 		socketfd.assign(size,0);
 	}
+	SOCKET* GetSlot();
 };
 
 class BsdSocketServer
 :	public BsdSocket
 {	SocketStartup socketStartup;
 protected:
+	std::thread listenWorker;
 	BsdSocketPool pool;
 	const unsigned bufsize;
+	bool isPacketRun;
 	SOCKET ListenAccept();
-	static void Main(BsdSocketServer* self)
-    {   self->Run();
+	static void ListenMain(BsdSocketServer* self)
+    {   self->ListenRun();
     }
-//	void Start() override;
+	static void PacketMain(BsdSocketServer* self)
+    {   self->PacketRun();
+    }
 public:
 	virtual ~BsdSocketServer()
 	{}
@@ -173,7 +181,7 @@ public:
 	{	return pool.Get(i);
 	}
 #endif
-	bool Open(int serverPort,int maxStreams);
+	bool Open(int serverPort,int maxStreams,bool isPacketRun=true);
 	void Close()
 	{	Stop();
 		if(socketfd)
@@ -184,10 +192,14 @@ public:
 	{	return false;
 	}
 	void Start() override
-	{	worker=std::thread(Main,this);
-		worker.detach();
-	}
-	void Run() override;
+	{	listenWorker=std::thread(ListenMain,this);
+		listenWorker.detach();
+		if(isPacketRun)
+		{	packetWorker=std::thread(PacketMain,this);
+			packetWorker.detach();
+	}	}
+	virtual void ListenRun();
+	virtual void PacketRun();
 };
 
 }
