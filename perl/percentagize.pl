@@ -6,12 +6,10 @@
 use strict;
 use warnings;
 
-my $fileCount=0;
-my $goodCount=0;
+my $filename = 'data.txt';
 my $lastFile="";
-
-my $filenameList = 'perentagize_files.txt';
-my $fhl;
+my %built;
+my %notBuilt;
 
 sub ltrim 
 {	my $s = shift; 
@@ -85,22 +83,19 @@ sub Count
 	my $path=uc(substr($line,0,3));
 #	print("path=$path\n");
 	if($path eq 'C:\\')
-	{	$lastFile="";
+	{	if('' ne $lastFile)
+		{	$notBuilt{$lastFile}='1';
+		#	print("No: $lastFile");
+			$lastFile='';
+		}
 		return;
-	}
+	}	
 	# some_file.cpp
 	if('' ne $lastFile)
-	{	$goodCount++;
-#		print($fhl "$lastFile (done)");
-	}
-	else
-	{#	print($fhl "$lastFile");
+	{	$built{$lastFile}='1';
+		# print("Yes: $lastFile");
 	}
 	$lastFile=$line;
-	chomp($lastFile);
-	chomp($lastFile);
-	$fileCount++;
-	print($fhl "$lastFile");
 }
 
 sub main()
@@ -109,12 +104,7 @@ sub main()
 	{	print("Sorry, $^O operating system not supported\n");
 		return 1;
 	}
-	if(!open($fhl, '>', $filenameList)) 
-	{	print("Can't open file $filenameList\n");
-		return 1;
-	}
-	my $filename = 'data.txt';
-	my $fh;
+		my $fh;
 	if(!open($fh, '<:encoding(UTF-8)', $filename)) 
 	{	print("Can't open file $filename\nCopy the output window of Visual Studio to file.\n");
 		return 2;
@@ -123,16 +113,24 @@ sub main()
 	{	Count($line);
 #		print(".");
 	}
-	if('' ne $lastFile)
-	{	$goodCount++;
-		print($fhl "$lastFile (done)");
+	my $builtCount = keys %built;
+	my $notBuiltCount = keys %notBuilt;
+	my $fileCount = $builtCount + $notBuiltCount;
+	my $percent = 100*$builtCount/$fileCount;
+	printf("\nSummary: VC++ compiled %.1f %%, %s of %s source files.\n", $percent,$builtCount,$fileCount);
+	print("\n*** Built ($builtCount files) ***\n\n");
+	my $i=1;
+	foreach my $name (sort keys %built) 
+	{	print("$name");
+		$i++;
 	}
-	else
-	{	print($fhl "$lastFile");
+	print("\n*** Not Built ($notBuiltCount files) ***\n\n");
+	$i=1;
+	foreach my $name (sort keys %notBuilt) 
+	{	print("$name");
+		$i++;
 	}
-	my $percent = 100*$goodCount/$fileCount;
-	printf("\nPercertagize report: VC++ compiled %.1f %%, %s of %s files.\n", $percent,$goodCount,$fileCount);
-	printf($fhl "\n\nPercertagize report: VC++ compiled %.1f %%, %s of %s source files.\n", $percent,$goodCount,$fileCount);
+	print("\n###\n");
 	return 0;
 }
 

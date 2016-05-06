@@ -1,4 +1,4 @@
-/* win32/unistd.h: replaces *nix header of same name
+/* unistd.h: replaces *nix header of same name
 // Windows emulation of common *nix functions
 // Copyright Nov 10, 2002, Robin.Rowe@MovieEditor.com
 // License MIT (http://opensource.org/licenses/mit-license.php)
@@ -35,7 +35,9 @@
 #include <Ws2tcpip.h>//for InetNtop
 #include <iostream>
 #include <ctype.h>
-//#define inet_ntop InetNtop
+#include "uni_signal.h"
+#include "stub.h"
+
 #pragma comment(lib, "Ws2_32.lib")
 
 #ifndef __cplusplus
@@ -54,8 +56,7 @@ int fl_strlen(const char* s)
 
 #endif
 
-#define STUB(functionName) { puts("STUB:" #functionName); }
-#define STUB0(functionName) { puts("STUB:" #functionName); return 0; }
+//#define inet_ntop InetNtop
 
 #if 0
 inline
@@ -155,64 +156,9 @@ From WIN32 sys/stat.h:
 int ffs(int i);
 
 #define STDIN_FILENO fileno(stdin)
-
-/*
-SIGABRT Abnormal termination 
-SIGFPE Floating-point error 
-SIGILL Illegal instruction 
-SIGINT CTRL+C signal 
-SIGSEGV Illegal storage access 
-SIGTERM Termination request 
-*/
-
-#define SIGALRM NSIG+1
-#define SIGHUP NSIG+2
-#define SIGQUIT NSIG+3
-#define SIGBUS NSIG+4
-#define SIGPIPE NSIG+5
-#define SIGKILL SIGTERM
-#define SIGCHLD NSIG+6
-#define SIGUSR1 NSIG+7
-#define SIGUSR2 NSIG+8
-
-#define WNOHANG 0
-
-/* SIGTERM */
-/* SIGFPE */
-#if 0
-/* 7-1-06 rsr
-None of these POSIX signal handlers are implemented by libunistd.
-Included here only as potential future implementation effort */
-typedef int sigset_t;
-typedef int siginfo_t;
-#define SIG_SETMASK 0
-#define SIGTSTP 0
-int sigemptyset(sigset_t *set);
-int sigfillset(sigset_t *set);
-int sigaddset(sigset_t *set, int signum);
-int sigdelset(sigset_t *set, int signum);
-int sigismember(const sigset_t *set, int signum);
-int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
-int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
-int sigpending(sigset_t *set);
-int sigsuspend(const sigset_t *mask);
-int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
-int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
-int sigpending(sigset_t *set);
-int sigsuspend(const sigset_t *mask);
-
-struct sigaction 
-{	void (*sa_handler)(int);
-	void (*sa_sigaction)(int, siginfo_t *, void *);
-	sigset_t sa_mask;
-	int sa_flags;
-	void (*sa_restorer)(void);
-};
-#endif
-
 #define rint(x) floor ((x) + 0.5)
-
 #define getpid _getpid
+
 typedef int pid_t;
 typedef int gid_t;
 typedef int uid_t;
@@ -234,10 +180,7 @@ int setuid(uid_t )
 
 #pragma warning (disable : 4996)
 
-inline 
-int close(int fd)
-{	return _close(fd);
-}
+#define close _close
 
 inline
 int uni_open(const char* filename,int oflag)
@@ -250,9 +193,10 @@ int uni_open(const char* filename,unsigned oflag)
 }
 
 #define open uni_open
+#define read uni_read
 
 inline
-int read(int fd,void *buffer,unsigned int count)
+int uni_read(int fd,void *buffer,unsigned int count)
 {	return _read(fd,buffer,count);
 }
 
@@ -331,6 +275,31 @@ int strncasecmp(const char *s1, const char *s2, size_t n)
 
 ssize_t readlink(const char *path, char *buf, size_t bufsiz)
 STUB0(readlink)
+
+typedef int clockid_t;
+
+enum
+{	CLOCK_REALTIME,
+	CLOCK_MONOTONIC,
+	CLOCK_PROCESS_CPUTIME_ID,
+	CLOCK_THREAD_CPUTIME_ID
+};
+
+inline
+int clock_getres(clockid_t clk_id, struct timespec *res)
+STUB0(clock_getres)
+
+inline
+int clock_gettime(clockid_t clk_id, struct timespec *tp)
+STUB0(clock_gettime)
+
+inline
+int clock_settime(clockid_t clk_id, const struct timespec *tp)
+STUB0(clock_settime)
+
+
+
+
 
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
