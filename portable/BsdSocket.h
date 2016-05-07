@@ -24,6 +24,7 @@
 #include <vector>
 #include "MsgBuffer.h"
 #include "Packet.h"
+#include "AtomicCounter.h"
 
 #pragma warning(disable:4265)
 
@@ -148,11 +149,14 @@ class BsdSocketPool
 {	
 public:
 	std::vector<SOCKET> socketfd;
+	AtomicCounter<unsigned> counter;	
 	void Reset(unsigned size)
 	{	socketfd.resize(size);
 		socketfd.assign(size,0);
+		counter=0;
 	}
 	SOCKET* GetSlot();
+	bool ReleaseSlot(SOCKET* sock);
 };
 
 class BsdSocketServer
@@ -176,11 +180,9 @@ public:
 	BsdSocketServer(unsigned bufsize)
 	:	bufsize(bufsize)
 	{}
-#if 0
-	BsdSocket operator[](unsigned i)
-	{	return pool.Get(i);
+	unsigned GetConnectionCount() const
+	{	return pool.counter;
 	}
-#endif
 	bool Open(int serverPort,int maxStreams,bool isPacketRun=true);
 	void Close()
 	{	Stop();

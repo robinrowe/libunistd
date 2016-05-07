@@ -89,7 +89,7 @@ SOCKET BsdSocketServer::ListenAccept()
 	sockaddr_in cli_addr;
 	int clilen = sizeof(cli_addr);
 #ifdef _DEBUG
-	puts("\nListening...");
+	puts("\nAccepting connections...");
 #endif
 	SOCKET newsockfd = accept(socketfd, (struct sockaddr *)&cli_addr, &clilen);
 	if (newsockfd < 0) 
@@ -112,6 +112,16 @@ SOCKET* BsdSocketPool::GetSlot()
 	return 0;
 }
 
+
+bool BsdSocketPool::ReleaseSlot(SOCKET* sock)
+{	for(unsigned i =0;i<socketfd.size();i++)
+	{	if(sock == &socketfd[i])
+		{	socketfd[i]=0;
+			return true;
+	}	}
+	return false;
+}
+
 void BsdSocketServer::ListenRun()
 {	while(isGo)
 	{	if(socketfd>0)
@@ -124,6 +134,7 @@ void BsdSocketServer::ListenRun()
 			if(!Login(sock))
 			{	continue;
 			}
+			pool.counter++;
 			*s = sock;
 		}
 	}
