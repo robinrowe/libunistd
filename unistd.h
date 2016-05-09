@@ -35,6 +35,7 @@
 #include <Ws2tcpip.h>//for InetNtop
 #include <iostream>
 #include <ctype.h>
+#include <thread>
 #include "uni_signal.h"
 #include "stub.h"
 
@@ -58,19 +59,15 @@ int fl_strlen(const char* s)
 
 //#define inet_ntop InetNtop
 
-#if 0
 inline
 int nanosleep(const struct timespec *req, struct timespec *rem)
-{	long long delayInterval = req->tv_sec;
+{	long long delay = req->tv_sec;
 	const long long billion = 1000000000LL;
-	delayInterval*=billion;
-    delayInterval+=req->tv_nsec;
-	BOOLEAN Alertable = true;
-// The units are in 100-nanosecond intervals.
-	NtDelayExecution(alertable, delayInterval);//ntdll
+	delay*=billion;
+    delay+=req->tv_nsec;
+	std::this_thread::sleep_for(std::chrono::nanoseconds(delay));
 	return 0;
 }
-#endif 
 
 #define sleep(x) Sleep(x)
 #define bzero(address,size) memset(address,0,size)

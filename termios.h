@@ -6,6 +6,8 @@
 #ifndef termios_h
 #define termios_h
 
+#include "stub.h"
+
 enum
 {	CS7,
 	PARENB,          
@@ -26,16 +28,6 @@ struct termios
 	tcflag_t c_lflag; 
 	cc_t c_cc[NCCS];
 };
-
-inline
-int tcgetattr(int fd, struct termios *termios_p)
-{	return 0;
-}
-
-inline
-int tcsetattr(int fileDescriptor, int actions,struct termios *terminto)
-{	return 0;
-}
 
 #define O_NOCTTY 0
 #define O_NDELAY 0
@@ -123,49 +115,51 @@ enum
 
 typedef int speed_t;
 
-int tcgetattr(int fd, struct termios *termios_p);
-
-int tcsetattr(int fd, int optional_actions,const struct termios *termios_p);
-
-int tcsendbreak(int fd, int duration);
-
-int tcdrain(int fd);
-
-int tcflush(int fd, int queue_selector);
-
-int tcflow(int fd, int action);
-
-void cfmakeraw(struct termios *termios_p);
-
-speed_t cfgetispeed(const struct termios *termios_p);
-
-speed_t cfgetospeed(const struct termios *termios_p);
-
-int cfsetispeed(struct termios *termios_p, speed_t speed);
-
-int cfsetospeed(struct termios *termios_p, speed_t speed);
-
-int cfsetspeed(struct termios *termios_p, speed_t speed);
-
+inline
+int tcgetattr(int fd, struct termios *termios_p)
+STUB0(tcgetattr)
 
 inline
-int cfsetispeed(struct termios *termios_p, speed_t speed)
-{	return 0;
-}
+int tcsetattr(int fd, int optional_actions,const struct termios *termios_p)
+STUB0(tcsetattr)
 
 inline
-int cfsetospeed(struct termios *termios_p, speed_t speed)
-{	return 0;
-}
+int tcsendbreak(int fd, int duration)
+STUB0(tcsendbreak)
+
+inline
+int tcdrain(int fd)
+STUB0(tcdrain)
+
+inline
+int tcflush(int fd, int queue_selector)
+STUB0(tcflush)
+
+inline
+int tcflow(int fd, int action)
+STUB0(tcflow)
+
+inline
+void cfmakeraw(struct termios *termios_p)
+STUB(cfmakeraw)
 
 inline
 speed_t cfgetispeed(const struct termios *termios_p)
-{	return 0;
-}
+STUB0(cfgetispeed)
 
 inline
 speed_t cfgetospeed(const struct termios *termios_p)
-{	return 0;
-}
+STUB0(cfgetospeed)
+
+inline
+int cfsetispeed(struct termios *termios_p, speed_t speed)
+STUB0(cfsetispeed)
+
+inline
+int cfsetospeed(struct termios *termios_p, speed_t speed)
+STUB0(cfsetospeed)
+
+int cfsetspeed(struct termios *termios_p, speed_t speed)
+STUB0(cfsetspeed)
 
 #endif

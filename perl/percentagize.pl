@@ -10,6 +10,7 @@ my $filename = 'data.txt';
 my $lastFile="";
 my %built;
 my %notBuilt;
+my @msg;
 
 sub ltrim 
 {	my $s = shift; 
@@ -27,14 +28,14 @@ sub Count
 {	my $line = shift;
 	# ========== Rebuild All: 5 succeeded, 9 failed, 2 skipped ==========
 	if(substr($line,0,10) eq '==========')
-	{	print(substr($line,11,-12));
-		print("\n");
+	{	push(@msg,substr($line,11,-12));
 		return;
 	}
 	# 1>------ Build started: Project: lib_dir, Configuration: Debug Win32 ------
 	my $offset = index($line,'>');
 	if(-1==$offset)
-	{	print($line);
+	{	chomp($line);
+		push(@msg,$line);
 		return;
 	}
 	$line = substr($line,$offset+1);
@@ -44,8 +45,7 @@ sub Count
 	$line = ltrim($line);
 	# ------ Build started: Project: lib_dir, Configuration: Debug Win32 ------
 	if(Begins($line,'------'))
-	{	print(substr($line,7,-8));
-		print("\n");
+	{	push(@msg,substr($line,7,-8));
 		return;
 	}
 	#	print("line=$line\n");
@@ -80,6 +80,10 @@ sub Count
 	if(-1 != $offset)
 	{	return;
 	}	
+	$offset=index($line,'.obj : ');
+	if(-1 != $offset)
+	{	return;
+	}
 	my $path=uc(substr($line,0,3));
 #	print("path=$path\n");
 	if($path eq 'C:\\')
@@ -118,6 +122,7 @@ sub main()
 	my $fileCount = $builtCount + $notBuiltCount;
 	my $percent = 100*$builtCount/$fileCount;
 	printf("\nSummary: VC++ compiled %.1f %%, %s of %s source files.\n", $percent,$builtCount,$fileCount);
+
 	print("\n*** Built ($builtCount files) ***\n\n");
 	my $i=1;
 	foreach my $name (sort keys %built) 
