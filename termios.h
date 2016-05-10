@@ -159,6 +159,7 @@ inline
 int cfsetospeed(struct termios *termios_p, speed_t speed)
 STUB0(cfsetospeed)
 
+inline
 int cfsetspeed(struct termios *termios_p, speed_t speed)
 STUB0(cfsetspeed)
 

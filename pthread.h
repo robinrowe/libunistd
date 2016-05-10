@@ -10,11 +10,11 @@
 
 inline
 void pthread_cleanup_push(void (*routine)(void *),void *arg)
-{}
+STUB(pthread_cleanup_push)
 
 inline
 void pthread_cleanup_pop(int execute)
-{}
+STUB(pthread_cleanup_pop)
 
 struct pthread_attr_t
 {
@@ -69,23 +69,19 @@ int pthread_setschedparam(pthread_t pthread, int policy, const sched_param* para
 
 inline
 int pthread_attr_init(pthread_attr_t *attr)
-{	return 0;
-}
+STUB0(pthread_attr_init)
 
 inline
 int pthread_attr_destroy(pthread_attr_t *attr)
-{	return 0;
-}
+STUB0(pthread_attr_destroy)
 
 inline
 int pthread_attr_setinheritsched(pthread_attr_t *attr,int inheritsched)
-{	return 0;
-}
+STUB0(pthread_attr_setinheritsched)
 
 inline
 int pthread_attr_getinheritsched(const pthread_attr_t *attr,int *inheritsched)
-{	return 0;
-}
+STUB0(pthread_attr_getinheritsched)
 
 enum
 {	PTHREAD_INHERIT_SCHED,
@@ -95,23 +91,19 @@ enum
 
 inline
 int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy)
-{	return 0;
-}
+STUB0(pthread_attr_setschedpolicy)
 
 inline
 int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy)
-{	return 0;
-}
+STUB0(pthread_attr_getschedpolicy)
 
 inline
 int pthread_attr_setschedparam(pthread_attr_t *attr,const struct sched_param *param)
-{	return 0;
-}
+STUB0(pthread_attr_setschedparam)
 
 inline
 int pthread_attr_getschedparam(const pthread_attr_t *attr,struct sched_param *param)
-{	return 0;
-}
+STUB0(pthread_attr_getschedparam)
 
 inline
 int pthread_create(pthread_t *pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg)
@@ -122,13 +114,15 @@ int pthread_create(pthread_t *pthread, const pthread_attr_t *attr,void *(*start_
 
 inline
 int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate)
-{	return 0;
-}
+STUB0(pthread_attr_setdetachstate)
 
 inline
 int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate)
-{	return 0;
-}
+STUB0(pthread_attr_getdetachstate)
+
+inline
+int pthread_join(pthread_t thread, void **retval)
+STUB0(pthread_join)
 
 enum
 {	PTHREAD_CREATE_DETACHED,

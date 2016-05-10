@@ -92,30 +92,39 @@ enum
 #define SIG_SETMASK 0
 #define SIGTSTP 0
 
+inline
 int sigemptyset(sigset_t *set)
 STUB0(sigemptyset)
 
+inline
 int sigfillset(sigset_t *set)
 STUB0(sigfillset)
 
+inline
 int sigaddset(sigset_t *set, int signum)
 STUB0(sigaddset)
 
+inline
 int sigdelset(sigset_t *set, int signum)
 STUB0(sigdelset)
 
+inline
 int sigismember(const sigset_t *set, int signum)
 STUB0(sigismember)
 
+inline
 int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
 STUB0(sigaction)
 
+inline
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 STUB0(sigprocmask)
 
+inline
 int sigpending(sigset_t *set)
 STUB0(sigpending)
 
+inline
 int sigsuspend(const sigset_t *mask)
 STUB0(sigsuspend)
 

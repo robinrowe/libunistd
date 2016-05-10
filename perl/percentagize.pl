@@ -121,7 +121,7 @@ sub main()
 	my $notBuiltCount = keys %notBuilt;
 	my $fileCount = $builtCount + $notBuiltCount;
 	my $percent = 100*$builtCount/$fileCount;
-	printf("\nSummary: VC++ compiled %.1f %%, %s of %s source files.\n", $percent,$builtCount,$fileCount);
+	printf("\nSummary: VC++ compiled %.1f %%, %s of %s source files, not built %s.\n", $percent,$builtCount,$fileCount,$notBuiltCount);
 
 	print("\n*** Built ($builtCount files) ***\n\n");
 	my $i=1;

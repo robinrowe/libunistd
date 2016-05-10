@@ -41,6 +41,8 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
 #ifndef __cplusplus
 #define inline __inline
 #endif
@@ -59,15 +61,24 @@ int fl_strlen(const char* s)
 
 //#define inet_ntop InetNtop
 
+typedef long long useconds_t;
+
+inline
+int usleep(useconds_t delay)
+{	std::this_thread::sleep_for(std::chrono::nanoseconds(delay));
+	return 0;
+}
+
 inline
 int nanosleep(const struct timespec *req, struct timespec *rem)
 {	long long delay = req->tv_sec;
 	const long long billion = 1000000000LL;
 	delay*=billion;
     delay+=req->tv_nsec;
-	std::this_thread::sleep_for(std::chrono::nanoseconds(delay));
-	return 0;
+	return usleep(delay);
 }
+
+
 
 #define sleep(x) Sleep(x)
 #define bzero(address,size) memset(address,0,size)
@@ -134,6 +145,10 @@ int kill(pid_t, int)
 #define S_IRWXG 0
 #define S_IROTH 0
 #define S_IRGRP 0
+#define S_IRWXO 0
+
+#define O_DIRECTORY 0
+#define O_CLOEXEC 0
 
 /*
 
@@ -189,6 +204,11 @@ int uni_open(const char* filename,unsigned oflag)
 {	return _open(filename,oflag,0);
 }
 
+inline
+int uni_open(const char* filename,unsigned oflag,int mode)
+{	return _open(filename,oflag,mode);
+}
+
 #define open uni_open
 #define read uni_read
 
@@ -198,13 +218,16 @@ int uni_read(int fd,void *buffer,unsigned int count)
 }
 
 inline
-int write(int fd,const void *buffer,unsigned int count)
+int uni_write(int fd,const void *buffer,unsigned int count)
 {	return _write(fd,buffer,count);
 }
 
+#define write uni_write
+#define lseek _lseek
+
+inline
 int fcntl(int handle,int mode,int mode2=0)
-{	return 0;
-}
+STUB0(fcntl)
 
 enum
 {	F_GETFL,
@@ -216,8 +239,7 @@ typedef int Atom;
 
 inline
 const char* getsysconfdir()
-{	return 0;
-}
+STUB0(getsysconfdir)
 
 inline 
 int mkstemp(char *filename)
@@ -270,6 +292,7 @@ int strncasecmp(const char *s1, const char *s2, size_t n)
 	return 0;
 }
 
+inline
 ssize_t readlink(const char *path, char *buf, size_t bufsiz)
 STUB0(readlink)
 
@@ -294,9 +317,20 @@ inline
 int clock_settime(clockid_t clk_id, const struct timespec *tp)
 STUB0(clock_settime)
 
-
-
-
+inline
+int fsync (int fd)
+{	HANDLE h = (HANDLE) _get_osfhandle(fd);
+	if (h == INVALID_HANDLE_VALUE)
+	{	return -1;
+	}
+	if (!FlushFileBuffers (h))
+	{	return -1;
+	}
+	return 0;
+}
+#define O_NOCTTY 0
+#define EBADFD 200
+#define ESHUTDOWN 201
 
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
