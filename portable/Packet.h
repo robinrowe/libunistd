@@ -102,18 +102,6 @@ protected:
 //		std::cout << "isEmpty = "<<isEmpty << std::endl;
 		return isEmpty;
 	}
-#if 0
-	bool IsEmpty() const
-	{	if(IsInvalid())
-		{	return true;
-		}
-		const unsigned size = length();
-		if(readOffset>=size)
-		{	return true;
-		}
-		return false;
-	}
-#endif
 	unsigned GetCapacity() const//capacity()
 	{	return bufsize;
 	}
@@ -272,10 +260,13 @@ class PacketWriter
 public:
 	PacketWriter(const PacketSizer& sizer)
 	:	Packet(sizer)
-	{	*packetSize=sizeof(T);
+	{	Reset();
 	}
 	PacketWriter(std::vector<char>& v)
 	:	Packet(&v[0],unsigned(v.size()))
+	{	Reset();
+	}
+	void Reset()
 	{	*packetSize=sizeof(T);
 	}
 	PacketMarker GetMarker()
@@ -285,6 +276,13 @@ public:
 	}
 	void SetMarker(PacketMarker& packetMarker)
 	{	packetMarker.Set(GetPacketSize());
+	}
+	bool Skip(unsigned length)
+	{	if (*packetSize + length > bufsize)
+		{	return false;
+		}
+		*packetSize+=length;
+		return true;
 	}
 	bool Write(const char* data,unsigned length)
 	{	if (*packetSize + length > bufsize)
@@ -317,6 +315,33 @@ public:
 	{	char* end=GetEndPtr();
 		const unsigned size=GetPacketSize();
 		memcpy(end,packet,size);
+	}
+};
+
+class DoublePacketWriter
+{	std::vector<char> buffer1;
+	std::vector<char> buffer2;
+	PacketWriter packetWriter1;
+	PacketWriter packetWriter2;
+public:
+	volatile bool isOne;
+	DoublePacketWriter(unsigned bufSize)
+	:	isOne(true)
+	,	buffer1(bufSize)
+	,	buffer2(bufSize)
+	,	packetWriter1(buffer1)
+	,	packetWriter2(buffer2)
+	{}
+	void Toggle()
+	{	isOne=!isOne;
+		PacketWriter& p=GetBack();
+		p.Reset();
+	}
+	PacketWriter& GetFront()
+	{	return (isOne ? packetWriter1:packetWriter2);
+	}
+	PacketWriter& GetBack()
+	{	return (!isOne ? packetWriter1:packetWriter2);
 	}
 };
 
