@@ -117,6 +117,9 @@ public:
 	void GetPeerName(std::string& s) const
 	{	return GetPeerName(socketfd,s);
 	}
+	static bool SetReuse(SOCKET socketfd,int isReuse=1)
+	{	return setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, (const char*) &isReuse, sizeof(int)) > 0;
+	}
 };
 
 class BsdSocketClient
@@ -179,6 +182,7 @@ public:
 	{}
 	BsdSocketServer(unsigned bufsize)
 	:	bufsize(bufsize)
+	,	isPacketRun(true)
 	{}
 	unsigned GetConnectionCount() const
 	{	return pool.counter;

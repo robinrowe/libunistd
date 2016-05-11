@@ -50,7 +50,8 @@ bool BsdSocketClient::Open(const char* serverName,int serverPort)
 	}
 	socketfd=OpenSocket();
 	if(socketfd == -1)			
-	{	errorMsg.GetLastError();
+	{	puts("OpenSocket failed");
+		errorMsg.GetLastError();
 		return false;
 	}
 	memset((char *) &server_sockaddr, 0, sizeof(server_sockaddr));
@@ -58,14 +59,17 @@ bool BsdSocketClient::Open(const char* serverName,int serverPort)
 	server_sockaddr.sin_port = htons((u_short) serverPort);  
 //		server_sockaddr.sin_addr.S_un.S_addr = inet_addr(serverName);
 	if(1!=inet_pton(AF_INET,serverName,&server_sockaddr.sin_addr))
-	{	errorMsg.GetLastError();
+	{	puts("inet_pton failed");
+		errorMsg.GetLastError();
 		return false;
 	}
 	const int ok = connect(socketfd, (struct sockaddr*)&server_sockaddr, sizeof(server_sockaddr));
 	if(ok<0) 
-	{	errorMsg.GetLastError();
+	{	puts("connect failed");
+		errorMsg.GetLastError();
 		return false;
 	}
+	SetReuse(socketfd);
 	isGo=true;
 	Start();
 	return true;
@@ -154,7 +158,8 @@ void BsdSocketServer::PacketRun()
 }
 
 bool BsdSocketServer::Open(int serverPort,int maxStreams,bool isPacketRun)
-{	pool.Reset(maxStreams); 
+{	this->isPacketRun=isPacketRun;
+	pool.Reset(maxStreams); 
 	socketfd=OpenSocket();
 	if(socketfd == -1)
 	{	puts(errorMsg.GetLastError());
@@ -167,6 +172,7 @@ bool BsdSocketServer::Open(int serverPort,int maxStreams,bool isPacketRun)
 	{	puts(errorMsg.GetLastError());
 		return false;
 	}
+	SetReuse(socketfd);
 	isGo=true;
 	return true;
 }
