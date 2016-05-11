@@ -6,15 +6,28 @@
 #include <windows.h>
 #include <Mstcpip.h>
 #include <Ws2tcpip.h>
+#include <stdint.h>
 
-#pragma comment(lib, "Ws2_32.lib")
+typedef uint32_t sa_family_t;
 
-typedef int socklen_t;
-#if 0
-inline
-long inet_aton(const char* serverName, IN_ADDR* sin_addr)
-{	LPCSTR p;
-	return RtlIpv4StringToAddressA(serverName,1,&p,sin_addr);
-}
-#endif
+
+// The iovec structure shall be defined as described in <sys/uio.h> .
+
+struct iovec
+{	int junk;
+};
+
+struct msghdr 
+{	void* msg_name;
+	socklen_t msg_namelen;
+	struct iovec* msg_iov;
+	int msg_iovlen;
+	void* msg_control;
+	socklen_t msg_controllen;
+	int msg_flags;
+};
+
+
+typedef int caddr_t;
+
 #endif

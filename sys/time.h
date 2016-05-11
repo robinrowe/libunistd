@@ -5,6 +5,7 @@
 #ifndef sys_time_h
 #define sys_time_h
 
+#include "../unistd.h"
 #include <time.h>
 #include "../stub.h"
 
@@ -31,5 +32,35 @@ enum
 	ITIMER_VIRTUAL,
 	ITIMER_PROF
 };
+
+#if 0
+typedef struct _SYSTEMTIME {
+  WORD wYear;
+  WORD wMonth;
+  WORD wDayOfWeek;
+  WORD wDay;
+  WORD wHour;
+  WORD wMinute;
+  WORD wSecond;
+  WORD wMilliseconds;
+} SYSTEMTIME, *PSYSTEMTIME;
+#endif
+
+inline
+int gettimeofday(struct timeval *tv, struct timezone *tz)
+{	FILETIME ft;
+	GetSystemTimeAsFileTime(&ft);
+	ULARGE_INTEGER t;
+	t.LowPart=ft.dwLowDateTime;
+	t.HighPart=ft.dwHighDateTime;
+	ULONGLONG m=1000000;
+	tv->tv_sec=long(t.QuadPart/m);
+	tv->tv_usec=(long) t.QuadPart%m;
+	return 0;
+}
+
+inline
+int settimeofday(const struct timeval *tv, const struct timezone *tz)
+STUB0(0)
 
 #endif

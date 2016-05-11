@@ -26,6 +26,7 @@
 
 #include <io.h>
 #include <string.h>
+#include "stub.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,7 +66,7 @@ typedef struct
 
 
 typedef int scandir_f(const struct dirent* d);
-typedef int scandir_alphasort(dirent** a,dirent** b);
+typedef int scandir_alphasort(const dirent** a,const dirent** b);
 
 DIR* opendir (const char*);
 struct dirent*	readdir (DIR*);
@@ -76,7 +77,7 @@ void seekdir (DIR*, long);
 int scandir(const char* buf, dirent** namelist, scandir_f sf, scandir_alphasort af);
 
 inline
-int alphasort(dirent** a, dirent** b)
+int alphasort(const dirent** a,const dirent** b)
 {	return strcmp((*a)->d_name,(*b)->d_name);
 }
 

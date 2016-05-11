@@ -2,11 +2,13 @@
 // Copyright 2016 Robin.Rowe@MovieEditor.com
 // License open source MIT
 
-#ifndef ioctl_h
-#define iostl_h
+#ifndef sys_ioctl_h
+#define sys_ioctl_h
 
+#include "../stub.h"
+
+inline
 int ioctl(int fd, unsigned long request, ...)
-{	return 0;
-}
+STUB0(ioctl)
 
 #endif

@@ -35,6 +35,7 @@
 #include <Ws2tcpip.h>//for InetNtop
 #include <iostream>
 #include <ctype.h>
+#include <time.h>
 #include <thread>
 #include "uni_signal.h"
 #include "stub.h"
@@ -139,16 +140,18 @@ int kill(pid_t, int)
 #define S_IXUSR _S_IEXEC
 #define S_IRUSR _S_IREAD
 #define S_IWUSR _S_IWRITE
-#define S_IXOTH 0
-#define S_IXGRP 0
+#define S_IXOTH S_IEXEC
+#define S_IXGRP S_IEXEC
 #define S_IRWXU 0
 #define S_IRWXG 0
-#define S_IROTH 0
-#define S_IRGRP 0
+#define S_IROTH S_IREAD
+#define S_IRGRP S_IREAD
 #define S_IRWXO 0
-
-#define O_DIRECTORY 0
+#define S_IWGRP S_IWRITE
+#define S_IWOTH S_IWRITE
 #define O_CLOEXEC 0
+#define O_DIRECTORY _O_OBTAIN_DIR
+
 
 /*
 
@@ -167,7 +170,8 @@ From WIN32 sys/stat.h:
 /* strings.h */
 int ffs(int i);
 
-#define STDIN_FILENO fileno(stdin)
+#define fileno _fileno
+#define STDIN_FILENO _fileno(stdin)
 #define rint(x) floor ((x) + 0.5)
 #define getpid _getpid
 
@@ -328,9 +332,30 @@ int fsync (int fd)
 	}
 	return 0;
 }
+
+inline
+void sync()
+{	_flushall();
+}
+
+inline
+int syncfs(int fd)
+{	fsync(fd);
+}
+
+inline
+tm* localtime_r(const time_t* t,tm* result)
+{	tm* r=localtime(t);
+	*result=*r;
+	return result;
+}
+
 #define O_NOCTTY 0
 #define EBADFD 200
 #define ESHUTDOWN 201
+
+#define creat _creat
+#define chdir _chdir
 
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
