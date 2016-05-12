@@ -13,7 +13,7 @@
 using namespace std;
 
 #if 1
-#define TRACE(msg) puts("ERROR: " msg)
+#define TRACE(msg) puts("ERROR: " msg); Dump()
 #else
 #define TRACE(msg)
 #endif
@@ -30,9 +30,11 @@ public:
 	:	buffer(buffer)
 	,	offset(offset)
 	{}
-	void Set(unsigned size)
-	{	offset = size - offset;
-		memcpy(buffer,&offset,sizeof(unsigned));
+	void SetDelta(unsigned offset)
+	{	SetValue(offset - this->offset);
+	}
+	void SetValue(unsigned value)
+	{	memcpy(buffer,&value,sizeof(unsigned));
 	}
 };
 
@@ -102,9 +104,6 @@ protected:
 //		std::cout << "isEmpty = "<<isEmpty << std::endl;
 		return isEmpty;
 	}
-	unsigned GetCapacity() const//capacity()
-	{	return bufsize;
-	}
 	void SetEndl()
 	{	packet[GetPacketSize()-1]='\n';
 	}
@@ -123,17 +122,23 @@ public:
 	,	bufsize(bufsize)
 	{	Init();
 	}
-	const char* GetPayload() const //data()
+	const char* GetPayload() const 
 	{	return packet+sizeof(*packetSize);
 	}
-	unsigned GetPacketSize() const//length()
+	unsigned GetCapacity() const
+	{	return bufsize;
+	}
+	unsigned GetPacketSize() const
 	{	return *packetSize;
 	}
-	const char* GetPacket() const//get()
+	const char* GetPacket() const
 	{	return packet;
 	}
 	char* GetEndPtr() const
-	{	return packet+*packetSize;//buffer+length()
+	{	return packet+*packetSize;
+	}
+	void Dump() const
+	{	cout << "Dump Packet: size = "<<* packetSize <<", bufsize = "<< bufsize;
 	}
 };
 
@@ -167,6 +172,9 @@ public:
 	:	Packet(buffer,bufsize)
 	{	InitReader();
 	}
+	bool IsGood() const
+	{	return !IsInvalid();
+	}
 	void Init()
 	{	Packet::Init();
 		InitReader();
@@ -188,8 +196,8 @@ public:
 	{	return readOffset;
 	}
 	void Invalidate()
-	{	readOffset=0;
-		TRACE("Packet Invalidated");
+	{	TRACE("Packet Invalidated");
+		readOffset=0;
 	}
 	bool Read(char* data,unsigned length)
 	{	if(IsInvalid())
@@ -246,11 +254,10 @@ public:
 		return false;
 	}
 	void Dump() const
-	{	const char* p=packet+readOffset;
-		cout <<"Packet dump: "<<packetSize[0]<<" "<<packetSize[1]<<" "<<packetSize[2]
-		<< " readOffset = " << readOffset
-		<< ", "<<packetSize[readOffset] << " - "
-		<< unsigned(p[0])<<" "<<unsigned(p[1])<<" "<<unsigned(p[2])<<" "<<unsigned(p[3])<<endl;
+	{	Packet::Dump();
+		const char* p=packet+readOffset;
+		cout << ", readOffset = " << readOffset
+		<< ", reading: "<< unsigned(p[0])<<" "<<unsigned(p[1])<<" "<<unsigned(p[2])<<" "<<unsigned(p[3])<<endl;
 	}
 };
 
@@ -275,7 +282,7 @@ public:
 		return PacketMarker(p,*packetSize);
 	}
 	void SetMarker(PacketMarker& packetMarker)
-	{	packetMarker.Set(GetPacketSize());
+	{	packetMarker.SetDelta(GetPacketSize());
 	}
 	bool Skip(unsigned length)
 	{	if (*packetSize + length > bufsize)
@@ -367,7 +374,14 @@ PacketWriter& operator<<(PacketWriter& packet,T data)
 }
 
 inline
-PacketWriter& operator<<(PacketWriter& packet,std::string& data)
+PacketWriter& operator<<(PacketWriter& packet,const std::string& data)
+{	const bool ok = packet.Write(data);
+//	std::cout<<"read string" << std::endl;
+	return packet;
+}
+
+inline
+PacketWriter& operator<<(PacketWriter& packet,const char* data)
 {	const bool ok = packet.Write(data);
 //	std::cout<<"read string" << std::endl;
 	return packet;

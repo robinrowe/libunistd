@@ -145,6 +145,7 @@ public:
 	void Start() override
 	{	worker=std::thread(Main,this);
 		worker.detach();
+		puts("Started socket thread");
 	}
 };
 
