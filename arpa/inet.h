@@ -6,6 +6,13 @@
 #define arpa_inet_h
 
 #include "unistd.h"
+
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 typedef unsigned in_addr_t;
 
 inline 
@@ -18,5 +25,9 @@ in_addr_t uni_inet_addr(const char* ip)
 }
 
 #define inet_addr uni_inet_addr
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

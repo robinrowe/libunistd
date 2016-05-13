@@ -8,6 +8,12 @@
 #include <stdint.h>
 #include "ip.h"
 
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 struct icmp_ra_addr 
 {	uint32_t ira_addr;
 	uint32_t ira_preference;
@@ -128,5 +134,10 @@ enum
 	(type) == ICMP_TSTAMP || (type) == ICMP_TSTAMPREPLY || \
 	(type) == ICMP_IREQ || (type) == ICMP_IREQREPLY || \
 	(type) == ICMP_MASKREQ || (type) == ICMP_MASKREPLY)
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

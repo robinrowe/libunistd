@@ -12,6 +12,10 @@
 #pragma comment(lib, "Ws2_32.lib")
 #endif 
 
+#ifndef __cplusplus
+#error
+#endif
+
 namespace portable
 {
 

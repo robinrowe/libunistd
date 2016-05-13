@@ -5,6 +5,14 @@
 #ifndef resource_h
 #define resource_h
 
+#include "stub.h"
+
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 enum
 {	SCHED_OTHER,
 	SCHED_BATCH,
@@ -14,7 +22,6 @@ enum
 	RLIMIT_RTPRIO
 };
 
-
 typedef int rlim_t;
 
 struct rlimit 
@@ -22,7 +29,14 @@ struct rlimit
 	rlim_t rlim_max;  
 };
 
-int getrlimit(int resource, struct rlimit *rlim);
-int setrlimit(int resource, const struct rlimit *rlim);
+int getrlimit(int resource, struct rlimit *rlim)
+STUB0(getrlimit)
+
+int setrlimit(int resource, const struct rlimit *rlim)
+STUB0(setrlimit)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

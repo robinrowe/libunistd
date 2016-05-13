@@ -8,6 +8,12 @@
 
 #include "stub.h"
 
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 enum
 {	CS7,
 	PARENB,          
@@ -162,5 +168,9 @@ STUB0(cfsetospeed)
 inline
 int cfsetspeed(struct termios *termios_p, speed_t speed)
 STUB0(cfsetspeed)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

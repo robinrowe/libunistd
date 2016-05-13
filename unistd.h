@@ -15,6 +15,7 @@
 #undef socklen_t
 #include <WS2tcpip.h>
 #include <windows.h>
+#include <math.h>
 #include <fcntl.h>
 #include <process.h>
 #include <io.h>
@@ -28,41 +29,45 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <signal.h>
-#include <math.h>
-#include <memory>
-#include <Winerror.h>
+#include <winerror.h>
+#include <memory.h>
 #include <mswsock.h> //for SO_UPDATE_ACCEPT_CONTEXT
 #include <Ws2tcpip.h>//for InetNtop
-#include <iostream>
 #include <ctype.h>
 #include <time.h>
-#include <thread>
+#include <string.h>
 #include "uni_signal.h"
 #include "stub.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 
+#pragma warning (disable : 4996)
+
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
-#ifndef __cplusplus
-#define inline __inline
-#endif
+typedef long long useconds_t;
 
-#ifdef Fl_H
+#ifdef __cplusplus
+#include <thread>
 
-#include <string.h>
 inline 
-int fl_strlen(const char* s)
-{	return int (s ? strlen(s):0);
+int mkdir(const char* path,int)
+{	 return _mkdir(path);
 }
 
-#define strlen fl_strlen
+inline
+int uni_open(const char* filename,unsigned oflag)
+{	return _open(filename,oflag,0);
+}
 
-#endif
+inline
+int uni_open(const char* filename,unsigned oflag,int mode)
+{	return _open(filename,oflag,mode);
+}
 
-//#define inet_ntop InetNtop
-
-typedef long long useconds_t;
+inline
+int fcntl(int handle,int mode,int mode2)
+STUB0(fcntl)
 
 inline
 int usleep(useconds_t delay)
@@ -70,18 +75,30 @@ int usleep(useconds_t delay)
 	return 0;
 }
 
+extern "C" {
+#else
+#define inline __inline
+
 inline
-int nanosleep(const struct timespec *req, struct timespec *rem)
-{	long long delay = req->tv_sec;
-	const long long billion = 1000000000LL;
-	delay*=billion;
-    delay+=req->tv_nsec;
-	return usleep(delay);
+int usleep(useconds_t delay)
+STUB0(usleep)
+
+#endif
+
+inline 
+size_t safe_strlen(const char* s)
+{	if(!s)
+	{	puts("ERROR: strlen(null)");
+		return 0;
+	}
+	return (s ? strlen(s):0);
 }
 
+#define strlen safe_strlen
 
-
+//#define inet_ntop InetNtop
 #define sleep(x) Sleep(x)
+
 #define bzero(address,size) memset(address,0,size)
 #define pow10(x) pow(x,10)
 #define alloca _alloca
@@ -111,14 +128,14 @@ typedef int ssize_t;
 typedef unsigned short mode_t;
 
 inline 
-int mkdir(const char* path,int=0)
+int mkdir(const char* path)
 {	 return _mkdir(path);
 }
 
 typedef int pid_t;
 
 inline
-int kill(pid_t, int)
+int kill(pid_t p, int x)
 {	return -1;
 }
 
@@ -167,50 +184,35 @@ From WIN32 sys/stat.h:
 
 */
 
-/* strings.h */
-int ffs(int i);
-
-#define fileno _fileno
-#define STDIN_FILENO _fileno(stdin)
-#define rint(x) floor ((x) + 0.5)
-#define getpid _getpid
-
 typedef int pid_t;
 typedef int gid_t;
 typedef int uid_t;
 
+#define fileno _fileno
+#define STDIN_FILENO _fileno(stdin)
+
+// causes issues with math.h:
+//#define rint(x) floor ((x) + 0.5)
+//#define lround floor
+//#define roundl floor
+
+#define getpid _getpid
+
 inline 
-int setgid(gid_t )
+int setgid(gid_t g)
 {	return -1;
 }
 
 inline 
-int setuid(uid_t )
+int setuid(uid_t g)
 {	return -1;
 }
-
-#define lround floor
-#define roundl floor
-
-// Call this function before using Winsock in a console app!
-
-#pragma warning (disable : 4996)
 
 #define close _close
 
 inline
 int uni_open(const char* filename,int oflag)
 {	return _open(filename,oflag,0);
-}
-
-inline
-int uni_open(const char* filename,unsigned oflag)
-{	return _open(filename,oflag,0);
-}
-
-inline
-int uni_open(const char* filename,unsigned oflag,int mode)
-{	return _open(filename,oflag,mode);
 }
 
 #define open uni_open
@@ -229,15 +231,12 @@ int uni_write(int fd,const void *buffer,unsigned int count)
 #define write uni_write
 #define lseek _lseek
 
-inline
-int fcntl(int handle,int mode,int mode2=0)
-STUB0(fcntl)
-
 enum
 {	F_GETFL,
 	F_SETFL,
 	O_NONBLOCK
 };
+
 
 typedef int Atom;
 
@@ -253,7 +252,7 @@ int mkstemp(char *filename)
 }
 
 inline
-int fchmod(int, mode_t)
+int fchmod(int a, mode_t b)
 STUB0(fchmod)
 
 inline
@@ -277,7 +276,6 @@ char* realpath(const char *path, char *resolved_path)
 	}
 	return resolved_path;
 }
-
 #define strtok_r strtok_s
 #define strcasecmp _stricmp
 
@@ -344,8 +342,41 @@ int syncfs(int fd)
 }
 
 inline
-tm* localtime_r(const time_t* t,tm* result)
-{	tm* r=localtime(t);
+int fcntl(int handle,int mode)
+STUB0(fcntl)
+
+inline
+int nanosleep(const struct timespec *req, struct timespec *rem)
+{	long long delay = req->tv_sec;
+	const long long billion = 1000000000LL;
+	delay*=billion;
+    delay+=req->tv_nsec;
+	return usleep(delay);
+}
+
+inline
+int gettimeofday(struct timeval* tv, struct timezone* tz)
+{	FILETIME ft;
+	ULARGE_INTEGER t;
+	ULONGLONG x;
+	ULONGLONG m=1000000;
+	GetSystemTimeAsFileTime(&ft);
+	t.LowPart=ft.dwLowDateTime;
+	t.HighPart=ft.dwHighDateTime;
+	x=t.QuadPart/m;
+	tv->tv_sec=(long) x;
+	x=t.QuadPart%m;
+	tv->tv_usec=(long) x;
+	return 0;
+}
+
+inline
+int settimeofday(const struct timeval *tv, const struct timezone *tz)
+STUB0(0)
+
+inline
+struct tm* localtime_r(const time_t* t,struct tm* result)
+{	struct tm* r=localtime(t);
 	*result=*r;
 	return result;
 }
@@ -353,11 +384,22 @@ tm* localtime_r(const time_t* t,tm* result)
 #define O_NOCTTY 0
 #define EBADFD 200
 #define ESHUTDOWN 201
+#define SHUT_RD SD_RECEIVE
+#define SHUT_WR SD_SEND
+#define SHUT_RDWR SD_BOTH
 
 #define creat _creat
 #define chdir _chdir
+#define MSG_NOSIGNAL 0
+#define TCP_KEEPCNT 0
+#define access _access
 
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
+#pragma warning(default:4996)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

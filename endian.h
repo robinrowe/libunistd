@@ -7,6 +7,11 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
 
 unsigned short _byteswap_ushort (
    unsigned short val
@@ -77,5 +82,9 @@ inline
 uint64_t le64toh(uint64_t little_endian_64bits)
 {	return little_endian_64bits;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

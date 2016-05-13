@@ -9,6 +9,12 @@
 
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 inline
 const char* dirname(char *path)
 {	return "error";
@@ -36,5 +42,9 @@ const char* basename(char *path)
 	}
 	return last+1;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -7,6 +7,12 @@
 
 #include "stub.h"
 
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 #define SIGRTMIN 32
 #define SIGRTMAX 64
 
@@ -70,13 +76,13 @@ struct siginfo_t {
                                 (since Linux 3.5) */
 };
 
-struct sigaction 
+struct sigaction
 {	void (*sa_handler)(int);
-	void (*sa_sigaction)(int, siginfo_t *, void *);
+	void (*sa_sigaction)(int, struct siginfo_t *, void *);
 	sigset_t sa_mask;
 	int sa_flags;
 	void (*sa_restorer)(void);
-};
+} ;
 
 enum
 {	SA_NOCLDSTOP,
@@ -127,5 +133,9 @@ STUB0(sigpending)
 inline
 int sigsuspend(const sigset_t *mask)
 STUB0(sigsuspend)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -5,10 +5,17 @@
 #ifndef prctl_h
 #define prctl_h
 
+#include "stub.h"
+
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 inline
 int prctl(int option, unsigned long arg2, unsigned long arg3,unsigned long arg4, unsigned long arg5)
-{	return 0;
-}
+STUB0(prctl)
 
 enum
 {	PR_CAP_AMBIENT,
@@ -71,5 +78,9 @@ enum
 	PR_SET_UNALIGN,
 	PR_GET_UNALIGN
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

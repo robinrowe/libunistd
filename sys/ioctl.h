@@ -7,8 +7,18 @@
 
 #include "../stub.h"
 
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 inline
 int ioctl(int fd, unsigned long request, ...)
 STUB0(ioctl)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

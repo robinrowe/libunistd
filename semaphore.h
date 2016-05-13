@@ -8,6 +8,12 @@
 #include "stub.h"
 #include <time.h>
 
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 typedef int sem_t;
 
 inline
@@ -49,5 +55,9 @@ STUB0(sem_unlink)
 inline
 int sem_wait(sem_t *)
 STUB0(sem_wait)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

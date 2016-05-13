@@ -7,6 +7,12 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 struct ip
 {	uint8_t ip_hdr_len;
 	uint8_t ip_version;
@@ -20,5 +26,9 @@ struct ip
 	uint32_t ip_src;
 	uint32_t ip_dst;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

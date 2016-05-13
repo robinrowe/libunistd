@@ -7,6 +7,12 @@
 
 #include "../stub.h"
 
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 typedef unsigned long fsblkcnt_t;
 typedef unsigned long fsfilcnt_t;
 
@@ -43,5 +49,9 @@ STUB0(statvfs)
 
 int fstatvfs(int fd, struct statvfs *buf)
 STUB0(fstatvfs)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

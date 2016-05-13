@@ -8,6 +8,12 @@
 
 #include "stub.h"
 
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 #define ifa_broadaddr ifa_ifu.ifu_broadaddr
 #define ifa_dstaddr ifa_ifu.ifu_dstaddr
 
@@ -29,5 +35,9 @@ STUB0(getifaddrs)
 
 void freeifaddrs(struct ifaddrs *ifa)
 STUB(freeifaddrs)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

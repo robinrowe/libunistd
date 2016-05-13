@@ -8,6 +8,12 @@
 #include "sys/ioctl.h"
 #include "stub.h"
 
+#ifdef __cplusplus
+extern "C" {
+#else
+#define inline __inline
+#endif
+
 // The following ioctl(2) requests are defined on file descriptors connected to RTC devices: RTC_RD_TIME
 // Returns this RTC's time in the following structure:
 
@@ -46,5 +52,9 @@ struct rtc_wkalrm
 	unsigned char pending;
 	struct rtc_time time;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

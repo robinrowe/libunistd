@@ -11,6 +11,10 @@
 #include <fcntl.h>
 #include "portable/MsgBuffer.h"
 
+#ifndef __cplusplus
+#error
+#endif
+
 struct mq_attr
 {	int mq_flags;
 	int mq_maxmsg;
