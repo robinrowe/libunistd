@@ -120,8 +120,32 @@ size_t safe_strlen(const char* s)
 
 #undef MAX_PRIORITY /* remove winspool.h warning */
 
+#ifndef strcasecmp
 #define strcasecmp _stricmp
+#endif
 #define strncasecmp _strnicmp
+
+#define strtok_r strtok_s
+
+#ifndef strcasecmp 
+#define strcasecmp _stricmp
+#endif
+
+inline
+int strncasecmp(const char *s1, const char *s2, size_t n)
+{	for(unsigned i=0;i<n;i++)
+	{	if(s1[i] == 0 && s2[i] == 0)
+		{	return 0;
+		}
+		if(s1[i] == 0 || s2[i] == 0)
+		{	return s1[i]<s2[i] ? -1:1;
+		}
+		if(tolower(s1[i])!=tolower(s2[i]))
+		{	return s1[i]<s2[i] ? -1:1;
+	}	}
+	return 0;
+}
+
 
 #define popen _popen
 #define pclose _pclose
@@ -283,23 +307,6 @@ char* realpath(const char *path, char *resolved_path)
 	{	return 0;
 	}
 	return resolved_path;
-}
-#define strtok_r strtok_s
-#define strcasecmp _stricmp
-
-inline
-int strncasecmp(const char *s1, const char *s2, size_t n)
-{	for(unsigned i=0;i<n;i++)
-	{	if(s1[i] == 0 && s2[i] == 0)
-		{	return 0;
-		}
-		if(s1[i] == 0 || s2[i] == 0)
-		{	return s1[i]<s2[i] ? -1:1;
-		}
-		if(tolower(s1[i])!=tolower(s2[i]))
-		{	return s1[i]<s2[i] ? -1:1;
-	}	}
-	return 0;
 }
 
 inline
