@@ -29,9 +29,12 @@ struct timeval
 	suseconds_t tv_usec;        /* microseconds */
 };
 #endif
+
+inline
 int getitimer(int which, struct itimerval *curr_value)
 STUB0(getitimer)
 
+inline
 int setitimer(int which, const struct itimerval *new_value,struct itimerval *old_value)
 STUB0(setitimer)
 

@@ -29,9 +29,11 @@ struct rlimit
 	rlim_t rlim_max;  
 };
 
+inline
 int getrlimit(int resource, struct rlimit *rlim)
 STUB0(getrlimit)
 
+inline
 int setrlimit(int resource, const struct rlimit *rlim)
 STUB0(setrlimit)
 

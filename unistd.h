@@ -9,6 +9,11 @@
 #ifndef WIN32_UNISTD_H
 #define WIN32_UNISTD_H
 
+#define _CRT_SECURE_NO_DEPRECATE 
+#undef _CRT_SECURE_NO_WARNINGS
+#define _CRT_NONSTDC_NO_WARNINGS
+#include <vcruntime.h>
+#include <corecrt_io.h>
 #define WIN32_LEAN_AND_MEAN
 #include <WinSock2.h>
 #include <winnt.h>
@@ -208,28 +213,31 @@ int setuid(uid_t g)
 {	return -1;
 }
 
+#if 0
+#define open uni_open
 #define close _close
+#define read uni_read
+#define write uni_write
+#define lseek _lseek
+#define creat _creat
+#define chdir _chdir
 
 inline
-int uni_open(const char* filename,int oflag)
+int open(const char* filename,int oflag)
 {	return _open(filename,oflag,0);
 }
 
-#define open uni_open
-#define read uni_read
-
 inline
-int uni_read(int fd,void *buffer,unsigned int count)
+int read(int fd,void *buffer,unsigned int count)
 {	return _read(fd,buffer,count);
 }
 
 inline
-int uni_write(int fd,const void *buffer,unsigned int count)
+int write(int fd,const void *buffer,unsigned int count)
 {	return _write(fd,buffer,count);
 }
 
-#define write uni_write
-#define lseek _lseek
+#endif
 
 enum
 {	F_GETFL,
@@ -388,8 +396,6 @@ struct tm* localtime_r(const time_t* t,struct tm* result)
 #define SHUT_WR SD_SEND
 #define SHUT_RDWR SD_BOTH
 
-#define creat _creat
-#define chdir _chdir
 #define MSG_NOSIGNAL 0
 #define TCP_KEEPCNT 0
 #define access _access
