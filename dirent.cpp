@@ -20,7 +20,7 @@
 #include <string.h>
 #include <io.h>
 #include <direct.h>
-#include "../dirent.h"
+#include "dirent.h"
 #include <list>
 #include <string>
 
@@ -189,7 +189,7 @@ readdir (DIR * dirp)
       /* Successfully got an entry. Everything about the file is
        * already appropriately filled in except the length of the
        * file name. */
-      dirp->dd_dir.d_namlen = strlen (dirp->dd_dir.d_name);
+      dirp->dd_dir.d_namlen = (unsigned short) strlen (dirp->dd_dir.d_name);
       return &dirp->dd_dir;
     }
 
@@ -319,11 +319,11 @@ seekdir (DIR * dirp, long lPos)
 }
 
 struct DirEntry
-{	direct dir;
+{	dirent dir;
 	std::string name;
 public:
-	DirEntry(direc* dir,const char* name)
-	:	dir(dir)
+	DirEntry(dirent* dir,const char* name)
+	:	dir(*dir)
 	,	name(name)
 	{	dir->d_name=&this->name[0];
 	}
