@@ -29,7 +29,7 @@ int sem_getvalue(sem_t *restrict, int *restrict2)
 STUB0(sem_getvalue)
 
 inline
-int sem_init(sem_t *, int, unsigned)
+int sem_init(sem_t *sem, int pshared, unsigned int value)
 STUB0(sem_init)
 
 inline

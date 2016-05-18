@@ -30,4 +30,7 @@ void LogError(const char* msg)
 #define LogMsg(msg)
 #endif
 
+#define SYSMSG(msg) puts(msg)
+#define SYSLOG(msg) puts(msg)
+
 #endif
