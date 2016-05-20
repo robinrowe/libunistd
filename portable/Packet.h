@@ -263,15 +263,23 @@ public:
 
 class PacketWriter
 :	public Packet
-{
+{	unsigned packetId;
 public:
 	PacketWriter(const PacketSizer& sizer)
 	:	Packet(sizer)
+	,	packetId(0)
 	{	Reset();
 	}
 	PacketWriter(std::vector<char>& v)
 	:	Packet(&v[0],unsigned(v.size()))
+	,	packetId(0)
 	{	Reset();
+	}
+	unsigned GetPacketId() const
+	{	return packetId;
+	}
+	void SetPacketId(unsigned packetId)
+	{	this->packetId = packetId;
 	}
 	void Reset()
 	{	*packetSize=sizeof(T);

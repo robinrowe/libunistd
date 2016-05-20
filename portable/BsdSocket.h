@@ -53,7 +53,7 @@ class BsdSocket
 protected:
 	virtual void Run()
 	{}
-	virtual unsigned OnPacket(unsigned bytes,portable::PacketReader& packet)
+	virtual int OnPacket(int bytes,portable::PacketReader& packet)
 	{	return 0;
 	}
 	virtual void OnStop()

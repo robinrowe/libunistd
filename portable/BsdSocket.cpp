@@ -67,6 +67,7 @@ bool BsdSocketClient::Open(const char* serverName,int serverPort)
 	if(ok<0) 
 	{	puts("connect failed");
 		errorMsg.GetLastError();
+		isGo=false;
 		return false;
 	}
 	SetReuse(socketfd);
@@ -81,9 +82,13 @@ void BsdSocketClient::Run()
 	unsigned offset=0;
 	while(isGo)
 	{	const int bytes = RecvFrom(buffer.get(),bufsize,offset);
-		if(!bytes)
-		{	continue;
+#if 0
+		if(bytes<=0)
+		{	//if(!OnBadPacket(bytes))
+			offset = 0;
+			continue;
 		}
+#endif
 		packet.Init();
 		offset=OnPacket(bytes,packet);
 	}
