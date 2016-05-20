@@ -8,7 +8,6 @@
 
 #ifndef WIN32_UNISTD_H
 #define WIN32_UNISTD_H
-
 #define _CRT_SECURE_NO_DEPRECATE 
 #undef _CRT_SECURE_NO_WARNINGS
 #define _CRT_NONSTDC_NO_WARNINGS
@@ -25,15 +24,10 @@
 #include <process.h>
 #include <io.h>
 #include <malloc.h>
-#include <time.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <direct.h>
-#include <sys/utime.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <signal.h>
 #include <winerror.h>
 #include <memory.h>
 #include <mswsock.h> //for SO_UPDATE_ACCEPT_CONTEXT
@@ -41,6 +35,10 @@
 #include <ctype.h>
 #include <time.h>
 #include <string.h>
+#include <signal.h>
+#include <sys/utime.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "uni_signal.h"
 #include "stub.h"
 
@@ -213,7 +211,7 @@ From WIN32 sys/stat.h:
 
 */
 
-typedef int pid_t;
+typedef intptr_t pid_t;
 typedef int gid_t;
 typedef int uid_t;
 
@@ -326,9 +324,29 @@ inline
 int clock_getres(clockid_t clk_id, struct timespec *res)
 STUB0(clock_getres)
 
+// seconds and nanosecond count of the time since the Epoch (00:00 1 January, 1970 UTC).
+
 inline
 int clock_gettime(clockid_t clk_id, struct timespec *tp)
-STUB0(clock_gettime)
+{	if(CLOCK_REALTIME != clk_id)
+	{	return -1;
+	}
+	SYSTEMTIME systemTime;
+	GetSystemTime(&systemTime);
+	FILETIME fileTime;
+	SystemTimeToFileTime(&systemTime,&fileTime);
+	ULARGE_INTEGER now = *(ULARGE_INTEGER*) &fileTime;
+	memset(&systemTime,0,sizeof(systemTime));
+	systemTime.wYear = 1970;
+	systemTime.wMonth = 1;
+	systemTime.wDay = 1;
+	SystemTimeToFileTime(&systemTime,&fileTime);
+	ULARGE_INTEGER in1970 = *(ULARGE_INTEGER*) &fileTime;
+	const long long diff = now.QuadPart - in1970.QuadPart; //100-nanosecond intervals since January 1, 1970
+	tp->tv_sec = diff/10000000;  
+	tp->tv_nsec = 100 * diff%10000000;
+	return 0;
+}
 
 inline
 int clock_settime(clockid_t clk_id, const struct timespec *tp)

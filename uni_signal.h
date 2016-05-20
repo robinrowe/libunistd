@@ -5,6 +5,7 @@
 #ifndef uni_signal_h
 #define uni_signal_h
 
+#include <signal.h>
 #include "stub.h"
 
 #ifdef __cplusplus
@@ -100,7 +101,12 @@ enum
 
 inline
 int sigemptyset(sigset_t *set)
-STUB0(sigemptyset)
+{	if(!set)
+	{	return -1;
+	}
+	memset(set,sizeof(*set),0);
+	return 0;	
+}
 
 inline
 int sigfillset(sigset_t *set)
@@ -119,8 +125,26 @@ int sigismember(const sigset_t *set, int signum)
 STUB0(sigismember)
 
 inline
-int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
-STUB0(sigaction)
+int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact)
+{	if(!act && !oldact)
+	{	return -1;
+	}
+	void (*sa_handler)(int);	
+	if(!act)
+	{	sa_handler = signal(signum,SIG_IGN);
+		if(SIG_ERR==sa_handler)
+		{	return -1;
+		}
+		signal (signum,sa_handler);
+		oldact->sa_handler=sa_handler;
+		return 0;
+	}
+	sa_handler = signal(signum,act->sa_handler);
+	if(SIG_ERR==sa_handler)
+	{	return -1;
+	}
+	return 0;
+}
 
 inline
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
