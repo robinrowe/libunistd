@@ -186,11 +186,11 @@ int kill(pid_t p, int x)
 #define S_IWUSR _S_IWRITE
 #define S_IXOTH S_IEXEC
 #define S_IXGRP S_IEXEC
-#define S_IRWXU 0
-#define S_IRWXG 0
+#define S_IRWXU _S_IEXEC|_S_IREAD|_S_IWRITE
+#define S_IRWXG _S_IEXEC|_S_IREAD|_S_IWRITE
 #define S_IROTH S_IREAD
 #define S_IRGRP S_IREAD
-#define S_IRWXO 0
+#define S_IRWXO _S_IEXEC|_S_IREAD|_S_IWRITE
 #define S_IWGRP S_IWRITE
 #define S_IWOTH S_IWRITE
 #define O_CLOEXEC 0

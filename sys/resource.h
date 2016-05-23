@@ -31,7 +31,10 @@ struct rlimit
 
 inline
 int getrlimit(int resource, struct rlimit *rlim)
-STUB0(getrlimit)
+{	memset(rlim,0,sizeof(*rlim));
+	STUB_MSG(getrlimit);	
+	return 0;
+}
 
 inline
 int setrlimit(int resource, const struct rlimit *rlim)
