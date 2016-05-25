@@ -49,7 +49,8 @@ sub PrintStats($$$)
 	my $lines = shift;
 	my $fc = FormatNumber($count);
 	my $lc = FormatNumber($lines);
-	print("$name: $lc lines in $fc files\n");
+	my $ac = FormatNumber(int($lines/$count));
+	print("$name: $lc lines in $fc files ($ac on average)\n");
 }
 
 sub CountFiles()
