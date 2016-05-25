@@ -83,7 +83,7 @@ sub CountFiles()
 	PrintStats('.cpp',$cpp_count,$cpp_lines);	
 	my $totalFiles = FormatNumber($h_count + $c_count + $cpp_count);
 	my $totalLines = FormatNumber($h_lines + $c_lines + $cpp_lines);
-	print("$totalLines lines in $totalFiles files\n\n");
+	print("Total: $totalLines lines in $totalFiles files\n\n");
 	print("Klocer.pl by Robin.Rowe\@CinePaint.org\n");
 } 
 
