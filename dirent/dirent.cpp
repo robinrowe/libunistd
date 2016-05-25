@@ -319,11 +319,11 @@ seekdir (DIR * dirp, long lPos)
 }
 
 struct DirEntry
-{	direct dir;
+{	dirent dir;
 	std::string name;
 public:
-	DirEntry(direc* dir,const char* name)
-	:	dir(dir)
+	DirEntry(dirent* dir,const char* name)
+	:	dir(*dir)
 	,	name(name)
 	{	dir->d_name=&this->name[0];
 	}
