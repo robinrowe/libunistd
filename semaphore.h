@@ -20,17 +20,31 @@
 
 class sem_t
 {	bool isGood;
+	bool isLocked;
 	std::mutex m;
 	std::condition_variable cv;
 	std::unique_lock<std::mutex> lk;
 	std::atomic<int> v;
 	std::string name;
+	std::chrono::milliseconds GetDelay(const struct timespec* deadline)
+	{	struct timespec now;
+		if (!deadline || clock_gettime(CLOCK_REALTIME, &now) == -1)
+		{	return std::chrono::milliseconds(0);
+        }
+		time_t delay = 1000 * (deadline->tv_sec - now.tv_sec);
+		delay += (deadline->tv_nsec - now.tv_nsec) / (1000*1000);
+		if(delay<=0)
+		{	return std::chrono::milliseconds(0);
+        }
+		return std::chrono::milliseconds(delay);
+	}
 public:
 	~sem_t()
 	{}
 	sem_t()
 	:	v(0)
 	,	isGood(true)
+	,	isLocked(false)
 	,	lk(m,std::defer_lock_t())
 	{}
 	static sem_t* sem_open(const char *name, int oflag)
@@ -52,8 +66,8 @@ public:
 		v.exchange(value);
 		return 0;
 	}
-	static int sem_close(sem_t *sem)
-	{	delete sem;
+	static int sem_close(sem_t *st)
+	{	delete st;
 		return 0;
 	}
 	int sem_destroy()
@@ -64,37 +78,55 @@ public:
 		return v;
 	}
 	int sem_trywait()
-	{	const int prev = v.fetch_sub(1);
-		if(prev > 0)
+	{	return 0;
+#if 0
+		if(v>1)
 		{	return 0;
 		}
-		v.fetch_add(1);
+		if(lk.try_lock())
+		{	v.fetch_add(1);
+			isLocked = true;
+			return 0;
+		}
 		return -1;
+#endif
 	}
 	int sem_wait()
-	{	if(0==sem_trywait())
+	{
+#if 0
+		if(0==sem_trywait())
 		{	return 0;
 		}
-		lk.lock();
+#endif
 		cv.wait(lk);
+		isLocked = true;
 		return 0;
 	}
 	int sem_timedwait(const struct timespec* ts)
-	{	if(0==sem_trywait())
+	{
+#if 0
+		if(0==sem_trywait())
 		{	return 0;
 		}
+#endif
+		std::chrono::milliseconds delay(GetDelay(ts));
+		printf("wait_for(%d)\n",int(delay.count()));
 		lk.lock();
-		time_t delay = 1000*ts->tv_sec;
-		delay += (ts->tv_nsec)/1000;
-		std::chrono::milliseconds duration(delay);
-		cv.wait_for(lk,duration);
+		if(std::cv_status::no_timeout==cv.wait_for(lk,delay))
+		{	errno = EINTR;
+			lk.unlock();
+			return -1;
+		}
+		lk.unlock();
 		return 0;
 	}
 	int sem_post()
-	{	if(0!=sem_trywait())
-		{	return 0;
+	{	//if(0==v.fetch_add(1) && isLocked)
+		if(isLocked)		
+		{	lk.unlock();
+			isLocked = false;
+			cv.notify_one();
 		}
-		lk.unlock();
 		return 0;
 	}
 	static int sem_unlink(const char *)

@@ -52,6 +52,37 @@ typedef long long useconds_t;
 
 #ifdef __cplusplus
 #include <thread>
+#include <string>
+
+#if 0
+inline
+std::string Now()
+{	time_t now;
+	now = time(NULL);
+	return ctime(&now);
+}
+#endif
+
+inline
+std::string Now()
+{	FILETIME ft;
+	GetSystemTimeAsFileTime(&ft);
+	SYSTEMTIME st;
+	FileTimeToSystemTime(&ft,&st);
+// 2014-11-22 12:45:34.001
+	const unsigned BUFSIZE=30;
+	char buffer[BUFSIZE];
+	sprintf_s(buffer,BUFSIZE,"%04d-%02d-%02d %02d:%02d:%02d.%03d",
+		st.wYear,
+		st.wMonth,
+//		st.wDayOfWeek,
+		st.wDay,
+		st.wHour,
+		st.wMinute,
+		st.wSecond,
+		st.wMilliseconds);
+	return buffer;
+}
 
 inline 
 int mkdir(const char* path,int)
@@ -342,9 +373,11 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
 	systemTime.wDay = 1;
 	SystemTimeToFileTime(&systemTime,&fileTime);
 	ULARGE_INTEGER in1970 = *(ULARGE_INTEGER*) &fileTime;
-	const long long diff = now.QuadPart - in1970.QuadPart; //100-nanosecond intervals since January 1, 1970
-	tp->tv_sec = diff/10000000;  
-	tp->tv_nsec = 100 * diff%10000000;
+	long long diff = now.QuadPart - in1970.QuadPart; //100-nanosecond intervals since January 1, 1970
+	diff *= 100;//nanoseconds
+	const long long nanosPerSecond = 1000*1000*1000;
+	tp->tv_sec = diff/nanosPerSecond; // 31557600 seconds/year, * 35 years = 1,420,092,000, says 1,464,129,754
+	tp->tv_nsec = diff%nanosPerSecond; // says 126,000,000, / 1,000,000,000 = .126
 	return 0;
 }
 
