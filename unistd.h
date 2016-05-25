@@ -11,8 +11,10 @@
 #define _CRT_SECURE_NO_DEPRECATE 
 #undef _CRT_SECURE_NO_WARNINGS
 #define _CRT_NONSTDC_NO_WARNINGS
+#if _MSC_VER == 1900
 #include <vcruntime.h>
 #include <corecrt_io.h>
+#endif
 #define WIN32_LEAN_AND_MEAN
 #include <WinSock2.h>
 #include <winnt.h>
@@ -410,6 +412,15 @@ int syncfs(int fd)
 inline
 int fcntl(int handle,int mode)
 STUB0(fcntl)
+
+// std::chrono::high_resolution_clock
+
+#if _MSC_VER == 1800
+struct timespec {
+        time_t   tv_sec;        /* seconds */
+        long     tv_nsec;       /* nanoseconds */
+};
+#endif
 
 inline
 int nanosleep(const struct timespec *req, struct timespec *rem)

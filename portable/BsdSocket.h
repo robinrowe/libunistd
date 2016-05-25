@@ -56,21 +56,6 @@ private:
 		puts("Connected");
 		return true;
 	}   
-	int RecvFrom(unsigned offset=0)
-	{	int slen = sizeof(sockaddr_in);
-		if(isClient)
-		{	if(socketfd<=0)
-			{	errorMsg.Set("Socket not open");
-				return -1;
-			}	
-			return recvfrom(socketfd,buffer.get()+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
-		}
-		if(newsockfd<=0)
-		{	errorMsg.Set("Socket not open");
-			return -1;
-		}	
-		return recvfrom(newsockfd,buffer.get()+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen); 
-	}
 	void Run()
 	{	PacketSizer packetSizer(buffer.get(),bufsize);
 		PacketReader packet(packetSizer);
@@ -208,6 +193,21 @@ public:
 	}
 	virtual void OnStop() const
 	{}
+	int RecvFrom(unsigned offset=0)
+	{	int slen = sizeof(sockaddr_in);
+		if(isClient)
+		{	if(socketfd<=0)
+			{	errorMsg.Set("Socket not open");
+				return -1;
+			}	
+			return recvfrom(socketfd,buffer.get()+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
+		}
+		if(newsockfd<=0)
+		{	errorMsg.Set("Socket not open");
+			return -1;
+		}	
+		return recvfrom(newsockfd,buffer.get()+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen); 
+	}
 };
 
 }
