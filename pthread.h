@@ -179,6 +179,14 @@ inline
 int pthread_mutex_unlock(pthread_mutex_t *mutex)
 STUB0(pthread_mutex_unlock)
 
+inline
+void pthread_exit(void *retval)
+STUB(pthread_exit)
+
+inline
+int pthread_cancel(pthread_t thread)
+STUB0(pthread_cancel)
+
 #ifdef __cplusplus
 }
 #endif
