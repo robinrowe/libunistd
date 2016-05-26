@@ -22,8 +22,6 @@ enum
 	PTHREAD_CANCEL_DISABLE,
 	PTHREAD_CANCELED,
 	PTHREAD_COND_INITIALIZER,
-	PTHREAD_CREATE_DETACHED,
-	PTHREAD_CREATE_JOINABLE,
 	PTHREAD_EXPLICIT_SCHED,
 	PTHREAD_INHERIT_SCHED,
 	PTHREAD_MUTEX_DEFAULT,
@@ -41,7 +39,19 @@ enum
 	PTHREAD_SCOPE_SYSTEM
 };
 
-typedef int pthread_attr_t;
+enum ThreadState
+{	PTHREAD_CREATE_DETACHED,
+	PTHREAD_CREATE_JOINABLE
+};
+
+struct pthread_attr_t
+{	bool isJoinable;
+public:
+	pthread_attr_t()
+	:	isJoinable(true)
+	{}
+};
+
 typedef int pthread_barrier_t;
 typedef int pthread_barrierattr_t;
 typedef int pthread_cond_t;
@@ -81,10 +91,12 @@ struct sched_param
 
 class PortableThread 
 :	public std::thread
-{
+{	
 public:
+	pthread_attr_t attr;
 	PortableThread(const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg)
 	:	std::thread(start_routine,arg)
+	,	attr(*attr)
 	{}
 };
 
@@ -118,11 +130,13 @@ int pthread_equal(pthread_t t1, pthread_t t2)
 
 inline
 int pthread_attr_init(pthread_attr_t *attr)
-STUB0(pthread_attr_init)
+{	return 0;
+}
 
 inline
 int pthread_attr_destroy(pthread_attr_t *attr)
-STUB0(pthread_attr_destroy)
+{	return 0;
+}
 
 inline
 int pthread_attr_setinheritsched(pthread_attr_t *attr,int inheritsched)
@@ -149,23 +163,46 @@ int pthread_attr_getschedparam(const pthread_attr_t *attr,struct sched_param *pa
 STUB0(pthread_attr_getschedparam)
 
 inline
-int pthread_create(pthread_t *pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg)
+int pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg)
 {	PortableThread* t=new PortableThread(attr,start_routine,arg);
-	pthread=&t;
+	*pthread=t;
+	if(!t->attr.isJoinable)
+	{	t->detach();
+	}
 	return 0;
 }
 
 inline
-int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate)
-STUB0(pthread_attr_setdetachstate)
+int pthread_attr_setdetachstate(pthread_attr_t *attr, ThreadState detachstate)
+{	if(!attr)
+	{	return -1;
+	}
+	attr->isJoinable = (detachstate == PTHREAD_CREATE_JOINABLE);
+	return 0;
+}
 
 inline
 int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate)
-STUB0(pthread_attr_getdetachstate)
+{	if(!attr)
+	{	return -1;
+	}
+	if(attr->isJoinable)
+	{	*detachstate = (int) PTHREAD_CREATE_JOINABLE;
+		return true;
+	}
+	*detachstate = (int) PTHREAD_CREATE_DETACHED;
+	return 0;
+}
+
 
 inline
 int pthread_join(pthread_t thread, void **retval)
-STUB0(pthread_join)
+{	if(!thread)
+	{	return -1;
+	}
+	thread->join();
+	return 0;
+}
 
 inline
 int pthread_mutex_lock(pthread_mutex_t *mutex)
