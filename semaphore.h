@@ -19,11 +19,10 @@
 #include <chrono>
 
 class sem_t
-{	bool isGood;
-	bool isLocked;
-	std::mutex m;
+{	int isGood;
+//	bool isLocked;
+	std::mutex mut;
 	std::condition_variable cv;
-	std::unique_lock<std::mutex> lk;
 	std::atomic<int> v;
 	std::string name;
 	std::chrono::milliseconds GetDelay(const struct timespec* deadline)
@@ -40,12 +39,13 @@ class sem_t
 	}
 public:
 	~sem_t()
-	{}
+	{	isGood=0;
+	}
 	sem_t()
 	:	v(0)
-	,	isGood(true)
-	,	isLocked(false)
-	,	lk(m,std::defer_lock_t())
+	,	isGood(6009)
+//	,	isLocked(false)
+//	,	lk(m,std::defer_lock_t())
 	{}
 	static sem_t* sem_open(const char *name, int oflag)
 	{	sem_t* st = new sem_t;
@@ -92,14 +92,17 @@ public:
 #endif
 	}
 	int sem_wait()
-	{
+	{	
 #if 0
 		if(0==sem_trywait())
 		{	return 0;
 		}
 #endif
+//		lk.lock();
+		std::unique_lock<std::mutex> lk(mut);
+//		lk.lock();
 		cv.wait(lk);
-		isLocked = true;
+//		isLocked = true;
 		return 0;
 	}
 	int sem_timedwait(const struct timespec* ts)
@@ -109,22 +112,23 @@ public:
 		{	return 0;
 		}
 #endif
+		std::unique_lock<std::mutex> lk(mut);
 		std::chrono::milliseconds delay(GetDelay(ts));
 		printf("wait_for(%d)\n",int(delay.count()));
-		lk.lock();
+//		lk.lock();
 		if(std::cv_status::no_timeout==cv.wait_for(lk,delay))
 		{	errno = EINTR;
-			lk.unlock();
+			//lk.unlock();
 			return -1;
 		}
-		lk.unlock();
+		// lk.unlock();
 		return 0;
 	}
 	int sem_post()
 	{	//if(0==v.fetch_add(1) && isLocked)
-		if(isLocked)		
-		{	lk.unlock();
-			isLocked = false;
+//		if(isLocked)		
+		{//	lk.unlock();
+//			isLocked = false;
 			cv.notify_one();
 		}
 		return 0;
@@ -162,17 +166,26 @@ int sem_close(sem_t *st)
 
 inline
 int sem_destroy(sem_t *st)
-{	return st->sem_destroy();
+{	if(!st)
+	{	return -1;
+	}
+	return st->sem_destroy();
 }
 
 inline
 int sem_getvalue(sem_t *st, int *val)
-{	return st->sem_getvalue(st,val);
+{	if(!st)
+	{	return -1;
+	}
+	return st->sem_getvalue(st,val);
 }
 
 inline
 int sem_init(sem_t *st, int pshared, unsigned int value)
-{	return st->sem_init(pshared,value);
+{	if(!st)
+	{	return -1;
+	}
+	return st->sem_init(pshared,value);
 }
 
 inline
@@ -187,17 +200,26 @@ sem_t* sem_open(const char *name, int oflag,mode_t mode, unsigned int value)
 
 inline
 int sem_post(sem_t* st)
-{	return st->sem_post();
+{	if(!st)
+	{	return -1;
+	}
+	return st->sem_post();
 }
 
 inline
 int sem_timedwait(sem_t* st, const struct timespec* ts)
-{	return st->sem_timedwait(ts);
+{	if(!st)
+	{	return -1;
+	}
+	return st->sem_timedwait(ts);
 }
 
 inline
 int sem_trywait(sem_t* st)
-{	return st->sem_trywait();
+{	if(!st)
+	{	return -1;
+	}
+	return st->sem_trywait();
 }
 
 inline
@@ -207,7 +229,10 @@ int sem_unlink(const char* name)
 
 inline
 int sem_wait(sem_t* st)
-{	return st->sem_wait();
+{	if(!st)
+	{	return -1;
+	}
+	return st->sem_wait();
 }
 
 
