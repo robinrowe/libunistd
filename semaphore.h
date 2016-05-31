@@ -21,8 +21,8 @@
 class sem_t
 {	int isGood;
 //	bool isLocked;
-	std::mutex mut;
-	std::condition_variable cv;
+	std::mutex sem_mutex;
+	std::condition_variable sem_cv;
 	std::atomic<int> v;
 	std::string name;
 	std::chrono::milliseconds GetDelay(const struct timespec* deadline)
@@ -98,11 +98,8 @@ public:
 		{	return 0;
 		}
 #endif
-//		lk.lock();
-		std::unique_lock<std::mutex> lk(mut);
-//		lk.lock();
-		cv.wait(lk);
-//		isLocked = true;
+		std::unique_lock<std::mutex> lk(sem_mutex);
+		sem_cv.wait(lk);
 		return 0;
 	}
 	int sem_timedwait(const struct timespec* ts)
@@ -112,11 +109,10 @@ public:
 		{	return 0;
 		}
 #endif
-		std::unique_lock<std::mutex> lk(mut);
+		std::unique_lock<std::mutex> lk(sem_mutex);
 		std::chrono::milliseconds delay(GetDelay(ts));
 		printf("wait_for(%d)\n",int(delay.count()));
-//		lk.lock();
-		if(std::cv_status::no_timeout==cv.wait_for(lk,delay))
+		if(std::cv_status::no_timeout==sem_cv.wait_for(lk,delay))
 		{	errno = EINTR;
 			//lk.unlock();
 			return -1;
@@ -125,12 +121,9 @@ public:
 		return 0;
 	}
 	int sem_post()
-	{	//if(0==v.fetch_add(1) && isLocked)
-//		if(isLocked)		
-		{//	lk.unlock();
-//			isLocked = false;
-			cv.notify_one();
-		}
+	{	std::unique_lock<std::mutex> lk(sem_mutex);
+		lk.unlock();
+		sem_cv.notify_one();
 		return 0;
 	}
 	static int sem_unlink(const char *)
