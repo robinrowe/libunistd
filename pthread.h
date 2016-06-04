@@ -163,9 +163,10 @@ inline
 int pthread_attr_getschedparam(const pthread_attr_t *attr,struct sched_param *param)
 STUB0(pthread_attr_getschedparam)
 
+#ifdef VERBOSE_PTHREAD
 inline
 int uni_pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg,const char* name)
-{	SysLogMsg("Thread: ",name); 
+{	SysLogMsg("Thread",name); 
 	PortableThread* t=new PortableThread(attr,start_routine,arg);
 	*pthread=t;
 	if(!t->attr.isJoinable)
@@ -175,6 +176,17 @@ int uni_pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*st
 }
 
 #define pthread_create(t,at,f,arg) uni_pthread_create(t,at,f,arg,#f)
+#else
+inline
+int pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg)
+{	PortableThread* t=new PortableThread(attr,start_routine,arg);
+	*pthread=t;
+	if(!t->attr.isJoinable)
+	{	t->detach();
+	}
+	return 0;
+}
+#endif
 
 inline
 int pthread_attr_setdetachstate(pthread_attr_t *attr, ThreadState detachstate)

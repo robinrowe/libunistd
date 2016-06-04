@@ -20,7 +20,7 @@
 
 class sem_t
 {	int isGood;
-//	bool isLocked;
+	bool isDone;
 	std::mutex sem_mutex;
 	std::condition_variable sem_cv;
 	std::atomic<int> v;
@@ -44,9 +44,13 @@ public:
 	sem_t()
 	:	v(0)
 	,	isGood(6009)
-//	,	isLocked(false)
+	,	isDone(false)
 //	,	lk(m,std::defer_lock_t())
-	{}
+	{
+#ifdef TRACE_SEM_T
+		printf("Semaphore %x created\n",(int) this);
+#endif
+	}
 	static sem_t* sem_open(const char *name, int oflag)
 	{	sem_t* st = new sem_t;
 		st->name = name;
@@ -92,18 +96,26 @@ public:
 #endif
 	}
 	int sem_wait()
-	{	
+	{
+#ifdef TRACE_SEM_T
+		printf("Semaphore %x wait\n",(int) this);
+#endif
 #if 0
 		if(0==sem_trywait())
 		{	return 0;
 		}
 #endif
 		std::unique_lock<std::mutex> lk(sem_mutex);
-		sem_cv.wait(lk);
+		while(!isDone)
+		{	sem_cv.wait(lk);
+		}
 		return 0;
 	}
 	int sem_timedwait(const struct timespec* ts)
 	{
+#ifdef TRACE_SEM_T
+		printf("Semaphore %x wait\n",(int) this);
+#endif
 #if 0
 		if(0==sem_trywait())
 		{	return 0;
@@ -111,7 +123,9 @@ public:
 #endif
 		std::unique_lock<std::mutex> lk(sem_mutex);
 		std::chrono::milliseconds delay(GetDelay(ts));
+#ifdef TRACE_SEM_T
 		printf("wait_for(%d)\n",int(delay.count()));
+#endif
 		if(std::cv_status::no_timeout==sem_cv.wait_for(lk,delay))
 		{	errno = EINTR;
 			//lk.unlock();
@@ -121,8 +135,12 @@ public:
 		return 0;
 	}
 	int sem_post()
-	{	std::unique_lock<std::mutex> lk(sem_mutex);
-		lk.unlock();
+	{//	std::unique_lock<std::mutex> lk(sem_mutex);
+//		lk.unlock();
+#ifdef TRACE_SEM_T
+		printf("Semaphore %x post\n",(int) this);
+#endif
+		isDone=true;
 		sem_cv.notify_one();
 		return 0;
 	}
