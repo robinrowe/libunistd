@@ -16,7 +16,7 @@ extern "C" {
 
 inline
 void StubBug(const char* msg)
-{	puts(msg);
+{//	puts(msg);
 }
 
 #ifdef _DEBUG

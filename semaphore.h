@@ -23,7 +23,7 @@ class sem_t
 	bool isDone;
 	std::mutex sem_mutex;
 	std::condition_variable sem_cv;
-	std::atomic<int> v;
+	std::atomic<int> count;
 	std::string name;
 	std::chrono::milliseconds GetDelay(const struct timespec* deadline)
 	{	struct timespec now;
@@ -42,7 +42,7 @@ public:
 	{	isGood=0;
 	}
 	sem_t()
-	:	v(0)
+	:	count(0)
 	,	isGood(6009)
 	,	isDone(false)
 //	,	lk(m,std::defer_lock_t())
@@ -59,7 +59,7 @@ public:
 	static sem_t* sem_open(const char *name, int oflag,mode_t mode, unsigned int value)
 	{	sem_t* st = new sem_t;
 		st->name = name;
-		st->v.exchange(value);
+		st->count.exchange(value);
 		return st;
 	}
 	int sem_init(int pshared, unsigned int value)
@@ -67,7 +67,7 @@ public:
 		{	puts("ERROR: Windows sem_t clobbered by memset 0");
 			return -1;  
 		}
-		v.exchange(value);
+		count.exchange(value);
 		return 0;
 	}
 	static int sem_close(sem_t *st)
@@ -79,7 +79,7 @@ public:
 	}
 	int sem_getvalue(sem_t *restrict, int *restrict2)
 	{	*restrict2=0;
-		return v;
+		return count;
 	}
 	int sem_trywait()
 	{	return 0;
@@ -105,10 +105,15 @@ public:
 		{	return 0;
 		}
 #endif
+		const int i = count.fetch_sub(1);
+		if(i>0)
+		{	return 0;
+		}
 		std::unique_lock<std::mutex> lk(sem_mutex);
 		while(!isDone)
 		{	sem_cv.wait(lk);
 		}
+		count.fetch_add(1);
 		return 0;
 	}
 	int sem_timedwait(const struct timespec* ts)
@@ -121,6 +126,10 @@ public:
 		{	return 0;
 		}
 #endif
+		const int i = count.fetch_sub(1);
+		if(i>0)
+		{	return 0;
+		}
 		std::unique_lock<std::mutex> lk(sem_mutex);
 		std::chrono::milliseconds delay(GetDelay(ts));
 #ifdef TRACE_SEM_T

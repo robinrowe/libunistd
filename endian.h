@@ -6,22 +6,13 @@
 #define endian_h
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
 #else
 #define inline __inline
 #endif
-
-unsigned short _byteswap_ushort (
-   unsigned short val
-);
-unsigned long _byteswap_ulong (
-   unsigned long val
-);
-unsigned __int64 _byteswap_uint64 (
-   unsigned __int64 val
-);
 
 inline
 uint16_t htobe16(uint16_t host_16bits)

@@ -151,17 +151,6 @@ size_t safe_strlen(const char* s)
 
 #undef MAX_PRIORITY /* remove winspool.h warning */
 
-#ifndef strcasecmp
-#define strcasecmp _stricmp
-#endif
-#define strncasecmp _strnicmp
-
-#define strtok_r strtok_s
-
-#ifndef strcasecmp 
-#define strcasecmp _stricmp
-#endif
-
 inline
 int strncasecmp(const char *s1, const char *s2, size_t n)
 {	for(unsigned i=0;i<n;i++)
@@ -177,6 +166,12 @@ int strncasecmp(const char *s1, const char *s2, size_t n)
 	return 0;
 }
 
+#ifndef strcasecmp
+#define strcasecmp _stricmp
+#endif
+#define strncasecmp _strnicmp
+
+#define strtok_r strtok_s
 
 #define popen _popen
 #define pclose _pclose
