@@ -80,7 +80,7 @@ public:
 		}
 		int slen = sizeof(sockaddr_in);
 		if(sendto(socketfd,msg,len,0,(struct sockaddr *)&server_sockaddr,slen)==-1)
-		{	puts(errorMsg.GetLastError());
+		{	OnSocketError(msg,len);
 			return false;
 		}
 		return true;
@@ -119,6 +119,9 @@ public:
 	}
 	static bool SetReuse(SOCKET socketfd,int isReuse=1)
 	{	return setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, (const char*) &isReuse, sizeof(int)) > 0;
+	}
+	virtual void OnSocketError(const char* msg,unsigned len)
+	{	puts(errorMsg.GetLastError());
 	}
 };
 
@@ -160,7 +163,12 @@ public:
 		counter=0;
 	}
 	SOCKET* GetSlot();
+	SOCKET* GetZombieSlot();
 	bool ReleaseSlot(SOCKET* sock);
+	void BsdSocketPool::ReleaseSlot(unsigned slot)
+	{	if(slot < socketfd.size())
+		{	socketfd[slot]=0;
+	}	}
 };
 
 class BsdSocketServer
@@ -195,7 +203,7 @@ public:
 		{	closesocket(socketfd);
 			socketfd=0;
 	}	}
-	virtual bool Login(SOCKET fd)
+	virtual bool Login(SOCKET* slot,SOCKET fd)
 	{	return false;
 	}
 	void Start() override

@@ -121,7 +121,20 @@ SOCKET* BsdSocketPool::GetSlot()
 	{	if(!socketfd[i])
 		{	return &socketfd[i];
 	}	}
-	return 0;
+	return GetZombieSlot();
+}
+
+SOCKET* BsdSocketPool::GetZombieSlot()
+{	SOCKET* s = 0;
+	for(unsigned i =0;i<socketfd.size();i++)
+	{	if(socketfd[i])
+		{	BsdSocket bsdSocket(socketfd[i]);
+			if(!bsdSocket.SendTo("",0))
+			{	socketfd[i]=0;
+				if(!s)
+				{	s = &socketfd[i];
+	}	}	}	}
+	return s;
 }
 
 
@@ -139,11 +152,7 @@ void BsdSocketServer::ListenRun()
 	{	if(socketfd>0)
 		{	SOCKET sock = ListenAccept();
 			SOCKET* s = pool.GetSlot();
-			if(!s)
-			{	puts("No slot");
-				continue;
-			}
-			if(!Login(sock))
+			if(!Login(s,sock))
 			{	continue;
 			}
 			pool.counter++;
