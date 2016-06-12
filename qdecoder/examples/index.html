@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
+<!-------------------------------------------------------------->
+<!-- The qDecoder Project             http://www.qdecoder.org -->
+<!--                                                          -->
+<!--      Copyright (C) 2000-2010 The qDecoder Project        -->
+<!-------------------------------------------------------------->
+
+<html>
+<head>
+  <title>The qDecoder Project: qDecoder Examples</title>
+</head>
+
+<body>
+<p><h1>qDecoder CGI Examples</h1>
+
+<i>
+<p>qDecoder is a CGI/FastCGI library for C/C++.
+<p>The qDecoder Project
+<br><a href="http://www.qdecoder.org/">http://www.qdecoder.org</a>
+</i>
+
+<!-- ex) query.cgi -->
+<p><hr noshade>
+<h3>Example: <a href="query.c">query.c</a></h3>
+<form method="get" action="query.cgi">
+  GET method: application/x-www-form-urlencoded<br>
+  Type anything: <input type="text" name="query" value="">
+  <input type="submit" value="SUBMIT">
+</form>
+<form method="post" action="query.cgi">
+POST method: application/x-www-form-urlencoded<br>
+  Type anything: <input type="text" name="query" value="">
+  <input type="submit" value="SUBMIT">
+</form>
+<form method="post" enctype="multipart/form-data" action="query.cgi">
+  POST method: multipart/form-data<br>
+  Type anything: <input type="text" name="query" value="">
+  <input type="submit" value="SUBMIT">
+</form>
+
+<!-- ex) cookie.cgi -->
+<p><hr size="1" noshade>
+<h3>Example: <a href="cookie.c">cookie.c</a></h3>
+<form method="post" action="cookie.cgi">
+  <input type="hidden" name="mode" value="set">
+  <input type="text" name="cname" value="Name" size="10">
+  <input type="text" name="cvalue" value="Value">
+  <input type="submit" value="SET COOKIE">
+</form>
+<form method="post" action="cookie.cgi">
+  <input type="hidden" name="mode" value="remove">
+  <input type="text" name="cname" value="Name" size="10">
+  <input type="submit" value="REMOVE COOKIE">
+</form>
+<form method="post" action="cookie.cgi">
+  <input type="submit" value="VIEW COOKIES">
+</form>
+
+<!-- ex) multivalue.cgi -->
+<hr size="1" noshade>
+<h3>Example: <a href="multivalue.c">multivalue.c</a></h3>
+<form method="post" action="multivalue.cgi">
+  <input name="checklist" type=checkbox value="Kimchi" checked> Kimchi
+  <input name="checklist" type=checkbox value="Galbee" checked> Galbee
+  <input name="checklist" type=checkbox value="Nangmuyn"> Nangmuyn
+  <input name="checklist" type=checkbox value="Bulgogi"> Bulgogi
+  <input name="checklist" type=checkbox value="Bibimbap"> Bibimbap
+  <input type="submit" value="SUBMIT">
+</form>
+
+<!-- ex) upload.cgi -->
+<hr size="1" noshade>
+<h3>Example: <a href="upload.c">upload.c</a></h3>
+<form method="post" action="upload.cgi" enctype="multipart/form-data">
+  Input text: <input type="text" name="text">
+  <br>Select file: <input type="file" name="binary">
+  <br><input type="submit" value="UPLOAD FILE">
+</form>
+qDecoder stores the binary data of uploaded file into memory.
+Then upload.c saves it into disk. All most case this is useful.
+And also this is default mode for multipart/form-data decoding.
+
+<!-- ex) uploadfile.cgi -->
+<hr size="1" noshade>
+<h3>Example: <a href="uploadfile.c">uploadfile.c</a></h3>
+<h4>file mode example</h4>
+<form method="post" action="uploadfile.cgi" enctype="multipart/form-data">
+  Input text: <input type="text" name="text">
+  <br>Select file: <input type="file" name="binary1">
+  <br>Select file: <input type="file" name="binary2">
+  <br>Select file: <input type="file" name="binary3">
+  <br><input type="submit" value="UPLOAD FILE">
+</form>
+qDecoder stores the binary data of uploaded file into disk directly on the fly.
+So qDecoder uses smaller memory to handle huge size of file.
+
+<!-- ex) download.cgi -->
+<hr size="1" noshade>
+<h3>Example: <a href="download.c">download.c</a></h3>
+
+<form method="get" action="download.cgi">
+  <input type="submit" value="DOWNLOAD download.c">
+</form>
+
+<!-- ex) session.cgi -->
+<hr size="1" noshade>
+<h3>Example: <a href="session.c">session.c</a></h3>
+<form method="post" action="session.cgi">
+  <input type="hidden" name="mode" value="set">
+  <input type="text" name="name" value="Name" size="10">
+  <input type="text" name="value" value="Value">
+  <select name="expire">
+    <option value="5">5 sec
+    <option value="10">10 sec
+    <option value="30">30 sec
+    <option value="60">1 min
+    <option value="1800" selected>default (30 min)
+    <option value="3600">1 hour
+    <option value="86400">1 day
+    <option value="604800">1 week
+    <option value="2592000">1 month
+  </select>
+  <input type="submit" value="SET">
+</form>
+
+<form method="post" action="session.cgi">
+  <input type="hidden" name="mode" value="remove">
+  <input type="text" name="name" value="Name" size="10">
+  <input type="submit" value="REMOVE">
+</form>
+
+<form method="post" action="session.cgi">
+  <input type="hidden" name="mode" value="destroy">
+  <input type="submit" value="DESTROY/CLEAR SESSION">
+</form>
+
+<form method="post" action="session.cgi">
+  <input type="hidden" name="mode" value="view">
+  <input type="submit" value="VIEW SESSION">
+</form>
+
+<!-- End of examples -->
+<hr noshade>
+<center>
+<a href="http://www.qdecoder.org/">The qDecoder Project</a>
+</center>
+
+</body>
+</html>

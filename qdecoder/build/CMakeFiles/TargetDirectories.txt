@@ -1,0 +1,1 @@
+/media/sf_Code/lib/libqdecoder/build/CMakeFiles/qdecoder.dir

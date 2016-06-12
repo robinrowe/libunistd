@@ -348,6 +348,12 @@ enum
 	CLOCK_THREAD_CPUTIME_ID
 };
 
+#if _MSC_VER == 1800
+struct timespec {
+        time_t   tv_sec;        /* seconds */
+        long     tv_nsec;       /* nanoseconds */
+};
+
 inline
 int clock_getres(clockid_t clk_id, struct timespec *res)
 STUB0(clock_getres)
@@ -410,11 +416,7 @@ STUB0(fcntl)
 
 // std::chrono::high_resolution_clock
 
-#if _MSC_VER == 1800
-struct timespec {
-        time_t   tv_sec;        /* seconds */
-        long     tv_nsec;       /* nanoseconds */
-};
+
 #endif
 
 inline
