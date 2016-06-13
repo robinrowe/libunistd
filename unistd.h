@@ -354,6 +354,9 @@ struct timespec {
         long     tv_nsec;       /* nanoseconds */
 };
 
+// std::chrono::high_resolution_clock
+#endif
+
 inline
 int clock_getres(clockid_t clk_id, struct timespec *res)
 STUB0(clock_getres)
@@ -413,11 +416,6 @@ int syncfs(int fd)
 inline
 int fcntl(int handle,int mode)
 STUB0(fcntl)
-
-// std::chrono::high_resolution_clock
-
-
-#endif
 
 inline
 int nanosleep(const struct timespec *req, struct timespec *rem)

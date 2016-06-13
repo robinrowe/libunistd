@@ -97,8 +97,9 @@ public:
 	pthread_attr_t attr;
 	PortableThread(const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg)
 	:	std::thread(start_routine,arg)
-	,	attr(*attr)
-	{}
+	{	if(attr)
+		{	this->attr = *attr;
+	}	}
 };
 
 typedef PortableThread* pthread_t;

@@ -19,7 +19,9 @@
 #include <chrono>
 
 class sem_t
-{	std::mutex sem_mutex;
+{	unsigned flagOverwrite;
+	bool isDone;
+	std::mutex sem_mutex;
 	std::condition_variable sem_cv;
 	std::atomic<int> count;
 	std::string name;
@@ -37,13 +39,12 @@ class sem_t
 	}
 public:
 	~sem_t()
-	{	isGood=0;
+	{	flagOverwrite=0;
 	}
 	sem_t()
 	:	count(0)
-	,	isGood(6009)
-	,	isDone(false)
-//	,	lk(m,std::defer_lock_t())
+	,	flagOverwrite(6009)
+	,	isDone(true)
 	{
 #ifdef TRACE_SEM_T
 		printf("Semaphore %x created\n",(int) this);
@@ -61,8 +62,8 @@ public:
 		return st;
 	}
 	int sem_init(int pshared, unsigned int value)
-	{	if(!isGood)
-		{	puts("ERROR: Windows sem_t clobbered by memset 0");
+	{	if(6009 !=flagOverwrite)
+		{	puts("ERROR: Windows sem_t memory overwrite");
 			return -1;  
 		}
 		count.exchange(value);
@@ -97,12 +98,13 @@ public:
 		printf("Semaphore %x wait\n",(int) this);
 #endif
 		const int i = count.fetch_sub(1);
-		if(i>0)
+		if(i>=0)
 		{	return 0;
 		}
 		std::unique_lock<std::mutex> lk(sem_mutex);
+		isDone = false;
 		while(!isDone)
-		{	sem_cv.wait(lk);
+		{	sem_cv.wait(lk); // Restart if interrupted
 		}
 		return 0;
 	}
@@ -112,7 +114,7 @@ public:
 		printf("Semaphore %x wait\n",(int) this);
 #endif
 		const int i = count.fetch_sub(1);
-		if(i>0)
+		if(i>=0)
 		{	return 0;
 		}
 		std::unique_lock<std::mutex> lk(sem_mutex);
@@ -120,9 +122,13 @@ public:
 #ifdef TRACE_SEM_T
 		printf("wait_for(%d)\n",int(delay.count()));
 #endif
-		if(std::cv_status::no_timeout==sem_cv.wait_for(lk,delay))
-		{	errno = EINTR;
-			return -1;
+		while(delay.count())
+		{	if(std::cv_status::timeout==sem_cv.wait_for(lk,delay))
+			{	return 0;
+			}
+			delay = GetDelay(ts);
+// errno = EINTR;
+// return -1;
 		}
 		return 0;
 	}
@@ -133,8 +139,10 @@ public:
 #endif
 		const int i = count.fetch_add(1);
 		if(-1 == i)
-		{	sem_cv.notify_one();
+		{	return 0;
 		}
+		isDone = true;
+		sem_cv.notify_one();
 		return 0;
 	}
 	static int sem_unlink(const char *)
