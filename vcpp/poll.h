@@ -6,7 +6,7 @@
 #define poll_h
 
 #include "unistd.h"
-#include "stub.h"
+#include "../portable/stub.h"
 
 #ifdef __cplusplus
 extern "C" {

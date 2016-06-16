@@ -5,7 +5,7 @@
 #ifndef sys_ioctl_h
 #define sys_ioctl_h
 
-#include "../stub.h"
+#include "../../portable/stub.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -6,7 +6,7 @@
 #define sys_inotify_h
 
 #include <stdio.h>
-#include "../stub.h"
+#include "../../portable/stub.h"
 
 #ifdef __cplusplus
 extern "C" {

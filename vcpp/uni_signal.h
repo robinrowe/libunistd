@@ -6,7 +6,7 @@
 #define uni_signal_h
 
 #include <signal.h>
-#include "stub.h"
+#include "../portable/stub.h"
 
 #ifdef __cplusplus
 extern "C" {

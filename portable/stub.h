@@ -6,7 +6,7 @@
 #define stub_h
 
 #include <stdio.h>
-#include <process.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,8 +36,6 @@ void StubExit(int errorlevel,const char* file,const char* function,int line)
 {	printf("ERROR: %s exit(%i)\n%s:%i",function,errorlevel,file,line);
 	exit(errorlevel);
 }
-
-#define exit(x) StubExit(x,__FILE__, __FUNCTION__, __LINE__)
 
 #ifdef __cplusplus
 }

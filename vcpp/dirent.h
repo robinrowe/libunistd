@@ -26,7 +26,7 @@
 
 #include <io.h>
 #include <string.h>
-#include "stub.h"
+#include "../portable/stub.h"
 
 #ifdef __cplusplus
 extern "C" {

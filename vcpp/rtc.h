@@ -6,7 +6,7 @@
 #define rtc_h
 
 #include "sys/ioctl.h"
-#include "stub.h"
+#include "../portable/stub.h"
 
 #ifdef __cplusplus
 extern "C" {

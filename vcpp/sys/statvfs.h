@@ -5,7 +5,7 @@
 #ifndef sys_statvfs_h
 #define sys_statvfs_h
 
-#include "../stub.h"
+#include "../portable/stub.h"
 
 #ifdef __cplusplus
 extern "C" {

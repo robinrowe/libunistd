@@ -42,7 +42,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "uni_signal.h"
-#include "stub.h"
+#include "../portable/stub.h"
+
 
 #pragma comment(lib, "Ws2_32.lib")
 
