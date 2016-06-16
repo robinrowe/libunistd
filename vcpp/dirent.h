@@ -74,7 +74,7 @@ int	closedir (DIR*);
 void rewinddir (DIR*);
 long telldir (DIR*);
 void seekdir (DIR*, long);
-int scandir(const char* buf, dirent** namelist, scandir_f sf, scandir_alphasort af);
+int scandir(const char* buf, dirent*** namelist, scandir_f sf, scandir_alphasort af);
 
 inline
 int alphasort(const dirent** a,const dirent** b)

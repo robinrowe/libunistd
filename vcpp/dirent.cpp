@@ -335,7 +335,7 @@ struct DirCompare
 	}
 };
 
-int scandir(const char* buf, dirent** namelist, scandir_f select, scandir_alphasort dcomp)
+int scandir(const char* buf, dirent*** namelist, scandir_f select, scandir_alphasort dcomp)
 {
 #if 0
 	DIR* dirp = opendir(dirname);
