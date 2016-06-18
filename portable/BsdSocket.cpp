@@ -10,6 +10,23 @@
 namespace portable 
 {
 
+bool BsdSocket::GetIp(const char* hostname,std::string& ip)
+{	struct hostent *he;
+#pragma warning(disable:4996)
+	he = gethostbyname(hostname);
+	if(!he) 
+	{	return false;
+	}
+	struct in_addr **addr_list; 
+	addr_list = (struct in_addr **) he->h_addr_list;
+	if(!addr_list[0])
+	{	return false;
+	}
+	ip = inet_ntoa(*addr_list[0]);
+#pragma warning(default:4996)
+	return true;
+}
+
 SocketStartup::SocketStartup()
 {
 #ifdef _WIN32
@@ -58,7 +75,11 @@ bool BsdSocketClient::Open(const char* serverName,int serverPort)
 	server_sockaddr.sin_family = AF_INET;
 	server_sockaddr.sin_port = htons((u_short) serverPort);  
 //		server_sockaddr.sin_addr.S_un.S_addr = inet_addr(serverName);
-	if(1!=inet_pton(AF_INET,serverName,&server_sockaddr.sin_addr))
+	std::string hostname;
+	if(!GetIp(serverName,hostname))
+	{	hostname = serverName;
+	}
+	if(1!=inet_pton(AF_INET,hostname.c_str(),&server_sockaddr.sin_addr))
 	{	puts("inet_pton failed");
 		errorMsg.GetLastError();
 		return false;

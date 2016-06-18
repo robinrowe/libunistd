@@ -282,7 +282,8 @@ public:
 	{	this->packetId = packetId;
 	}
 	void Reset()
-	{	*packetSize=sizeof(T);
+	{	packetId = 0;
+		*packetSize=sizeof(T);
 	}
 	PacketMarker GetMarker()
 	{	char* p=GetEndPtr();

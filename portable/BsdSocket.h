@@ -123,6 +123,7 @@ public:
 	virtual void OnSocketError(const char* msg,unsigned len)
 	{	puts(errorMsg.GetLastError());
 	}
+	static bool GetIp(const char* hostname,std::string& ip);
 };
 
 class BsdSocketClient
