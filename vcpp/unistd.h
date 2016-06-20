@@ -427,21 +427,7 @@ int nanosleep(const struct timespec *req, struct timespec *rem)
 	return usleep(delay);
 }
 
-inline
-int gettimeofday(struct timeval* tv, struct timezone* tz)
-{	FILETIME ft;
-	ULARGE_INTEGER t;
-	ULONGLONG x;
-	ULONGLONG m=1000000;
-	GetSystemTimeAsFileTime(&ft);
-	t.LowPart=ft.dwLowDateTime;
-	t.HighPart=ft.dwHighDateTime;
-	x=t.QuadPart/m;
-	tv->tv_sec=(long) x;
-	x=t.QuadPart%m;
-	tv->tv_usec=(long) x;
-	return 0;
-}
+int gettimeofday(struct timeval* tv, struct timezone* tz);
 
 inline
 int settimeofday(const struct timeval *tv, const struct timezone *tz)
