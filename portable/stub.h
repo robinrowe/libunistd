@@ -14,18 +14,22 @@ extern "C" {
 #define inline __inline
 #endif
 
+#ifdef STUB_VERBOSE
 inline
 void StubBug(const char* msg)
-{//	puts(msg);
+{	puts(msg);
 }
 
-#ifdef _DEBUG
+#else
+inline
+void StubBug(const char* )
+{
+}
+
+#endif
+
 #define BUG(x)	StubBug("BUG: " x)
 #define TODO(x)	StubBug("TO-DO: " x)
-#else
-#define BUG(x)	"error" 
-#define TODO(x)	"error" 
-#endif
 
 #define STUB(functionName) { StubBug("STUB:" #functionName); }
 #define STUB0(functionName) { StubBug("STUB:" #functionName); return 0; }
