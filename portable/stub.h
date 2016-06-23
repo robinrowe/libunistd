@@ -35,12 +35,6 @@ void StubBug(const char* )
 #define STUB0(functionName) { StubBug("STUB:" #functionName); return 0; }
 #define STUB_MSG(functionName) StubBug("STUB:" #functionName)
 
-inline
-void StubExit(int errorlevel,const char* file,const char* function,int line)
-{	printf("ERROR: %s exit(%i)\n%s:%i",function,errorlevel,file,line);
-	exit(errorlevel);
-}
-
 #ifdef __cplusplus
 }
 #endif
