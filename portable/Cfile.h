@@ -16,7 +16,7 @@ public:
 	{	Close();
 	}
 	Cfile()
-	:	fp(0)
+	:	fp(nullptr)
 	{}
 	bool operator!() const
 	{	return !fp;
@@ -26,12 +26,12 @@ public:
 	}
 	bool Open(const char* filename,const char* mode)
 	{	fp=fopen(filename,mode);
-		return 0!=fp;
+		return nullptr!=fp;
 	}
 	void Close()
 	{	if(fp)
 		{	fclose(fp);
-			fp=0;
+			fp=nullptr;
 	}	}
 	operator FILE*()
 	{	return fp;
