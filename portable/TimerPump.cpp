@@ -5,6 +5,9 @@
 
 #include "TimerPump.h"
 
+namespace portable 
+{
+
 void TimerPump::Run()
 {//   qDebug()<<"Starting pump "<<object;
     Init();
@@ -17,9 +20,15 @@ void TimerPump::Run()
         else
         {   pumpCon.wait(lock);
         }
-        // qDebug()<<"Woke up";
+		if(!isWake)
+		{	continue;
+		}
+		isWake=false;
+		// qDebug()<<"Woke up";
         if(isGo)
         {   Action(isTimeout);
     }   }
 //    qDebug()<<"Stopping pump";
+}
+
 }

@@ -30,7 +30,7 @@ void LogMsg(const std::string& msg)
 }
 
 inline
-void LogError(const ::string& msg)
+void LogError(const std::string& msg)
 {	printf("ERROR: %s",msg.c_str());
 }
 

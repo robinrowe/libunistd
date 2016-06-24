@@ -1,15 +1,10 @@
-// BsdSocket.h
+// portable/BsdSocket.h
 // Created by Robin Rowe on 11/27/2015
 // Copyright (c) 2015 Robin.Rowe@CinePaint.org
 // License open source MIT
 
 #ifndef BsdSocket_h
 #define BsdSocket_h
-
-#ifdef UNREAL_ENGINE
-#include <AllowWindowsPlatformTypes.h>
-#endif
-
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -23,20 +18,13 @@
 #include <memory>
 #include <vector>
 #include "MsgBuffer.h"
-#include "Packet.h"
+#include "PacketReader.h"
 #include "AtomicCounter.h"
 
 #pragma warning(disable:4265)
 
 namespace portable 
 {
-
-class SocketStartup
-{
-public:
-	SocketStartup();
-	~SocketStartup();
-};
 
 class BsdSocket
 {protected:
@@ -126,102 +114,6 @@ public:
 	static bool GetIp(const char* hostname,std::string& ip);
 };
 
-class BsdSocketClient
-:	public BsdSocket
-{	std::thread worker;
-	const unsigned bufsize;
-	static void Main(BsdSocketClient* self)
-    {   self->Run();
-    }
-protected:
-	void Run() override;
-public:
-	BsdSocketClient(unsigned bufsize)
-	:	bufsize(bufsize)
-	{}
-	void Close()
-	{	Stop();
-		if(socketfd)
-		{	closesocket(socketfd);
-			socketfd=0;
-	}	}
-	bool Open(const char* serverName,int serverPort);
-	void Start() override
-	{	worker=std::thread(Main,this);
-		worker.detach();
-		puts("Started socket thread");
-	}
-};
-
-class BsdSocketPool
-{	
-public:
-	std::vector<SOCKET> socketfd;
-	AtomicCounter<unsigned> counter;	
-	void Reset(unsigned size)
-	{	socketfd.resize(size);
-		socketfd.assign(size,0);
-		counter=0;
-	}
-	SOCKET* GetSlot();
-	SOCKET* GetZombieSlot();
-	bool ReleaseSlot(SOCKET* sock);
-	void BsdSocketPool::ReleaseSlot(unsigned slot)
-	{	if(slot < socketfd.size())
-		{	socketfd[slot]=0;
-	}	}
-};
-
-class BsdSocketServer
-:	public BsdSocket
-{	SocketStartup socketStartup;
-protected:
-	std::thread listenWorker;
-	BsdSocketPool pool;
-	const unsigned bufsize;
-	bool isPacketRun;
-	SOCKET ListenAccept();
-	static void ListenMain(BsdSocketServer* self)
-    {   self->ListenRun();
-    }
-	static void PacketMain(BsdSocketServer* self)
-    {   self->PacketRun();
-    }
-public:
-	virtual ~BsdSocketServer()
-	{}
-	BsdSocketServer(unsigned bufsize)
-	:	bufsize(bufsize)
-	,	isPacketRun(true)
-	{}
-	unsigned GetConnectionCount() const
-	{	return pool.counter;
-	}
-	bool Open(int serverPort,int maxStreams,bool isPacketRun=true);
-	void Close()
-	{	Stop();
-		if(socketfd)
-		{	closesocket(socketfd);
-			socketfd=0;
-	}	}
-	virtual bool Login(SOCKET* slot,SOCKET fd)
-	{	return false;
-	}
-	void Start() override
-	{	listenWorker=std::thread(ListenMain,this);
-		listenWorker.detach();
-		if(isPacketRun)
-		{	packetWorker=std::thread(PacketMain,this);
-			packetWorker.detach();
-	}	}
-	virtual void ListenRun();
-	virtual void PacketRun();
-};
-
 }
-
-#ifdef UNREAL_ENGINE
-#include <HideWindowsPlatformTypes.h>
-#endif
 
 #endif

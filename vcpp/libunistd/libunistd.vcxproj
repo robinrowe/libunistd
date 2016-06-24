@@ -157,7 +157,11 @@
     <ClInclude Include="..\..\portable\UnrealLogger.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\portable\BsdPacketServer.cpp" />
     <ClCompile Include="..\..\portable\BsdSocket.cpp" />
+    <ClCompile Include="..\..\portable\BsdSocketClient.cpp" />
+    <ClCompile Include="..\..\portable\BsdSocketPool.cpp" />
+    <ClCompile Include="..\..\portable\BsdSocketServer.cpp" />
     <ClCompile Include="..\..\portable\TimerPump.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

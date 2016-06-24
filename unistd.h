@@ -9,6 +9,10 @@
 #ifndef WIN32_UNISTD_H
 #define WIN32_UNISTD_H
 
+#ifdef UNREAL_ENGINE
+#include <AllowWindowsPlatformTypes.h>
+#endif
+
 #define WIN32_LEAN_AND_MEAN
 #include <WinSock2.h>
 #include <windows.h>
@@ -31,7 +35,11 @@
 #include <mswsock.h> //for SO_UPDATE_ACCEPT_CONTEXT
 #include <Ws2tcpip.h>//for InetNtop
 #include <iostream>
-//#define inet_ntop InetNtop
+
+#ifdef UNREAL_ENGINE
+#include <HideWindowsPlatformTypes.h>
+#endif
+
 #pragma comment(lib, "Ws2_32.lib")
 
 #ifndef __cplusplus
