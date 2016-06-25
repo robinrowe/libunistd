@@ -4,7 +4,15 @@
 #ifndef AtomicMutex_h
 #define AtomicMutex_h
 
+#ifdef UNREAL_ENGINE
+#include <AllowWindowsPlatformTypes.h>
+#endif
+
 #include <atomic>
+
+#ifdef UNREAL_ENGINE
+#include <HideWindowsPlatformTypes.h>
+#endif
 
 namespace portable
 {

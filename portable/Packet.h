@@ -9,7 +9,9 @@
 #include <string>
 #include <stdio.h>
 #include "PacketSizer.h"
+#include "PacketMarker.h"
 #include "SoftLock.h"
+#include "../xxHash/xxhash.h"
 
 #if 1
 #define TRACE(msg) puts("ERROR: " msg); Dump()
@@ -77,6 +79,10 @@ public:
 	}
 	void Dump() const
 	{	printf("Dump Packet: size = %d, bufsize = %d",*packetSize,bufsize);
+	}
+	XXH64_hash_t  GetHash(const PacketMarker& marker,unsigned long long seed = 0)
+	{	const size_t length = GetEndPtr() - marker.buffer;
+		return XXH64(marker.buffer,length,seed);
 	}
 };
 

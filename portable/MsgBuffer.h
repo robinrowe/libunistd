@@ -5,6 +5,10 @@
 #ifndef MsgBuffer_h
 #define MsgBuffer_h
 
+#ifdef UNREAL_ENGINE
+#include <AllowWindowsPlatformTypes.h>
+#endif
+
 #include <string.h>
 #include <cerrno>
 #ifdef _WIN32
@@ -86,4 +90,9 @@ public:
 };
 
 }
+
+#ifdef UNREAL_ENGINE
+#include <HideWindowsPlatformTypes.h>
+#endif
+
 #endif

@@ -20,6 +20,10 @@ class BsdSocketClient
     }
 protected:
 	void Run() override;
+	virtual bool ReadHeader(portable::PacketReader& packet) = 0;
+	virtual bool ReadFrame(portable::PacketReader& packet,unsigned packetId) = 0;
+	virtual void SocketReset(const char* msg,portable::PacketReader& packet);
+	int OnPacket(int bytes,portable::PacketReader& packet) override;
 public:
 	BsdSocketClient(unsigned bufsize)
 	:	bufsize(bufsize)

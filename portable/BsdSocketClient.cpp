@@ -64,4 +64,101 @@ void BsdSocketClient::Run()
 	OnStop();
 }
 
+int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
+{	if(bytes<0)
+	{	SocketReset("Socket closed",packet);
+		return 0;
+	}
+	if(bytes<=sizeof(unsigned))
+	{	if(!bytes)
+		{	SocketReset("Connection lost",packet);
+			return 0;
+		}
+		SocketReset("Packet receive underflow",packet);
+		return 0;
+	}
+	int packetSize = (int) packet.GetPacketSize();
+	if(packetSize<sizeof(packetSize))
+	{	SocketReset("Packet size underflow",packet);
+		return 0;
+	}	
+	//LogMsg("Receive packet");
+	for(;;)
+	{	
+#if 0			
+		cout <<"bytes: "<<bytes<<" packet: "<<packetSize<<endl;
+#endif
+		if(bytes<packetSize)
+		{	puts("Packet fragment");
+			//SocketReset("Packet size overflow bytes",packet);
+			return bytes;
+		}
+		if(packetSize > (int) packet.GetCapacity())
+		{	SocketReset("Packet size corrupted",packet);
+			return 0;
+		}
+		unsigned packetId = 0;
+		packet>>packetId;
+		if(0==packetId)
+		{//	LogMsg("Reading header");
+			if(!ReadHeader(packet))
+			{	SocketReset("Packet header corrupted",packet);
+				return 0;
+		}	}
+		else
+		{//	LogMsg("Reading frame");
+			if(!ReadFrame(packet,packetId))
+			{	std::string s("Packet frame corrupted #");
+				s+=std::to_string(packetId);
+				SocketReset(s.c_str(),packet);
+				return 0;
+		}	}
+		const unsigned readOffset=packet.GetReadOffset();
+		if(readOffset!=packetSize || bytes<packetSize)
+		{	std::string s("readOffset/packetSize = ");
+			s+=std::to_string(readOffset);
+			s+="/";
+			s+=std::to_string(packetSize);
+			puts(s.c_str());
+		}
+		bytes-=packetSize;
+		if(!bytes)
+		{	return 0;
+		}
+		packet.NextInPipeline();
+#if 0
+		std::string msg("Pipelining #");
+		msg+=std::to_string(packetId);
+		msg+=": ";
+		msg+=std::to_string(bytes);
+		msg+=" of ";
+		msg+=std::to_string(packetSize);
+		puts(msg.c_str());
+#endif
+		if(bytes<=sizeof(unsigned))
+		{	SocketReset("Packet receive underflow bytes",packet);
+			return 0;
+		}
+//		packet>>packetSize;
+		packetSize=packet.GetPacketSize();
+#if 0
+		msg="Pipelined packetSize = ";
+		msg+=std::to_string(packetSize);
+		puts(msg.c_str());
+#endif
+		if(packetSize<sizeof(packetSize))
+		{	SocketReset("Packet size underflow packet",packet);
+			return 0;
+		}	
+	}
+}
+
+void BsdSocketClient::SocketReset(const char* msg,portable::PacketReader& packet)
+{	packet.Dump();
+	BsdSocket bsdSocket(socketfd);
+	bsdSocket.Close();
+	socketfd = 0;
+	Stop();
+}
+
 }

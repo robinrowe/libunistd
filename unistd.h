@@ -36,10 +36,6 @@
 #include <Ws2tcpip.h>//for InetNtop
 #include <iostream>
 
-#ifdef UNREAL_ENGINE
-#include <HideWindowsPlatformTypes.h>
-#endif
-
 #pragma comment(lib, "Ws2_32.lib")
 
 #ifndef __cplusplus
@@ -264,5 +260,10 @@ int fchmod(int, mode_t)
 
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
+
+
+#ifdef UNREAL_ENGINE
+#include <HideWindowsPlatformTypes.h>
+#endif
 
 #endif
