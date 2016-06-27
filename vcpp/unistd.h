@@ -87,11 +87,6 @@ std::string Now()
 	return buffer;
 }
 
-inline 
-int mkdir(const char* path,int)
-{	 return _mkdir(path);
-}
-
 inline
 int uni_open(const char* filename,unsigned oflag)
 {	return _open(filename,oflag,0);
@@ -102,9 +97,17 @@ int uni_open(const char* filename,unsigned oflag,int mode)
 {	return _open(filename,oflag,mode);
 }
 
+//overloaded C++ functions:
+inline 
+int mkdir(const char* path,int)
+{	 return _mkdir(path);
+}
+
 inline
 int fcntl(int handle,int mode,int mode2)
 STUB0(fcntl)
+
+extern "C" {
 
 inline
 int usleep(useconds_t delay)
@@ -112,7 +115,7 @@ int usleep(useconds_t delay)
 	return 0;
 }
 
-extern "C" {
+
 #else
 #define inline __inline
 
@@ -290,15 +293,6 @@ int write(int fd,const void *buffer,unsigned int count)
 
 #endif
 
-enum
-{	F_GETFL,
-	F_SETFL,
-	O_NONBLOCK
-};
-
-
-typedef int Atom;
-
 inline
 const char* getsysconfdir()
 STUB0(getsysconfdir)
@@ -450,6 +444,12 @@ struct tm* localtime_r(const time_t* t,struct tm* result)
 #define MSG_NOSIGNAL 0
 #define TCP_KEEPCNT 0
 #define access _access
+
+#define F_GETFL 0
+#define F_SETFL 0
+#define O_NONBLOCK 0
+
+typedef int Atom;
 
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
