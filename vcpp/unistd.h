@@ -434,7 +434,6 @@ struct tm* localtime_r(const time_t* t,struct tm* result)
 	return result;
 }
 
-#define O_NOCTTY 0
 #define EBADFD 200
 #define ESHUTDOWN 201
 #define SHUT_RD SD_RECEIVE
@@ -448,6 +447,8 @@ struct tm* localtime_r(const time_t* t,struct tm* result)
 #define F_GETFL 0
 #define F_SETFL 0
 #define O_NONBLOCK 0
+#define O_SYNC 0
+#define O_NOCTTY 0
 
 typedef int Atom;
 
