@@ -49,12 +49,18 @@ public:
 	~BsdPacketServer()
 	{}
 	void MulticastHeaderPacket()
-	{	multicast.SetHeaderPacket(&headerPacket);
+	{	if(pool.IsEmpty())
+		{	return;
+		}
+		multicast.SetHeaderPacket(&headerPacket);
 		multicast.SetFramePacket(&framePacket.GetBaked());
 		multicast.Wake();
 	}
 	void MulticastFramePacket()
-	{	multicast.SetFramePacket(&framePacket.GetBaked());
+	{	if(pool.IsEmpty())
+		{	return;
+		}
+		multicast.SetFramePacket(&framePacket.GetBaked());
 		multicast.Wake();
 	}
 	bool SendFramePacket(SOCKET fd)

@@ -45,6 +45,7 @@ int BsdSocketPool::DirectMulticast(Packet& packet)
 	{	return -1;
 	}
 	SoftLock softlock(packet.ownership);
+	if(!softlock)
 	{	return -1;
 	}
 	const unsigned maxShowPacketId = 10;

@@ -134,8 +134,5 @@
     <ClCompile Include="..\..\portable\BsdSocketServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\portable\SoftLock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

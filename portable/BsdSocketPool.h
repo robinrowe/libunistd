@@ -22,6 +22,9 @@ public:
 		socketfd.assign(size,0);
 		counter=0;
 	}
+	bool IsEmpty() const
+	{	return 0==counter;
+	}
 	SOCKET* GetSlot();
 	SOCKET* GetZombieSlot();
 	bool ReleaseSlot(SOCKET* sock);

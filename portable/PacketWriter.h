@@ -31,9 +31,9 @@ public:
 	{	packetId = 0;
 		*packetSize=sizeof(T);
 	}
-	PacketMarker GetMarker()
+	PacketMarker GetMarker() const
 	{	char* p=GetEndPtr();
-		*packetSize+=sizeof(T);
+//		*packetSize+=sizeof(T);
 		return PacketMarker(p,*packetSize);
 	}
 	void SetMarker(PacketMarker& packetMarker)

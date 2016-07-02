@@ -25,10 +25,12 @@ public:
 	void SetValue(unsigned value)
 	{	memcpy(buffer,&value,sizeof(unsigned));
 	}
+/*
 	template <typename T>
 	void SetValue(T value)
 	{	memcpy(buffer,&value,sizeof(T));
 	}
+*/
 };
 
 

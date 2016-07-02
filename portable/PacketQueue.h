@@ -13,7 +13,7 @@ namespace portable
 template <size_t bufsize>
 class PacketQueue
 {	static const size_t depth = 3;
-	char buffer[bufsize][depth];
+	char buffer[bufsize*depth];
 	PacketWriter packetWriter0;
 	PacketWriter packetWriter1;
 	PacketWriter packetWriter2;
@@ -22,13 +22,14 @@ class PacketQueue
 	PacketWriter* fresh;
 public:
 	PacketQueue(unsigned bufSize)
-	:	packetWriter0(buffer[0],bufsize)
-	,	packetWriter1(buffer[1],bufsize)
-	,	packetWriter2(buffer[2],bufsize)
-	{	baked = &packetWriter0;
+	:	packetWriter0(buffer,bufsize)
+	,	packetWriter1(buffer+bufsize,bufsize)
+	,	packetWriter2(buffer+2*bufsize,bufsize)
+	{	const unsigned size = sizeof(buffer);
+		memset(buffer,0,size);
+		baked = &packetWriter0;
 		dirty = &packetWriter1;
 		fresh = &packetWriter2;
-		memset(buffer,0,sizeof(buffer));
 	}
 	void Advance()
 	{	PacketWriter* oldBaked = baked;
