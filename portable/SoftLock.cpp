@@ -4,6 +4,9 @@
 #include "SoftLock.h"
 #include "AtomicMutex.h"
 
+namespace portable
+{
+
 SoftLock::~SoftLock()
 {	if(isLocked)
 	{	atomicMutex.Unlock();
@@ -14,4 +17,5 @@ SoftLock::SoftLock(AtomicMutex& atomicMutex)
 	isLocked(atomicMutex.Lock())
 {}
 
+}
 

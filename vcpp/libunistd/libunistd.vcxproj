@@ -142,19 +142,36 @@
   <ItemGroup>
     <ClInclude Include="..\..\dirent\dirent.h" />
     <ClInclude Include="..\..\portable\AtomicCounter.h" />
+    <ClInclude Include="..\..\portable\AtomicMutex.h" />
+    <ClInclude Include="..\..\portable\BsdMulticast.h" />
+    <ClInclude Include="..\..\portable\BSdPacketServer.h" />
     <ClInclude Include="..\..\portable\BsdSocket.h" />
+    <ClInclude Include="..\..\portable\BsdSocketClient.h" />
+    <ClInclude Include="..\..\portable\BsdSocketPool.h" />
+    <ClInclude Include="..\..\portable\BsdSocketServer.h" />
+    <ClInclude Include="..\..\portable\BsdSocketStartup.h" />
     <ClInclude Include="..\..\portable\Buffer.h" />
     <ClInclude Include="..\..\portable\Counter.h" />
     <ClInclude Include="..\..\portable\CppTypes.h" />
+    <ClInclude Include="..\..\portable\Folder.h" />
     <ClInclude Include="..\..\portable\homedir.h" />
     <ClInclude Include="..\..\portable\Logger.h" />
     <ClInclude Include="..\..\portable\MsgBuffer.h" />
     <ClInclude Include="..\..\portable\Packet.h" />
+    <ClInclude Include="..\..\portable\PacketBuffer.h" />
+    <ClInclude Include="..\..\portable\PacketMarker.h" />
+    <ClInclude Include="..\..\portable\PacketQueue.h" />
+    <ClInclude Include="..\..\portable\PacketReader.h" />
+    <ClInclude Include="..\..\portable\PacketSizer.h" />
+    <ClInclude Include="..\..\portable\PacketWriter.h" />
+    <ClInclude Include="..\..\portable\SoftLock.h" />
     <ClInclude Include="..\..\portable\StdFile.h" />
     <ClInclude Include="..\..\portable\StdPipe.h" />
+    <ClInclude Include="..\..\portable\Timecode.h" />
     <ClInclude Include="..\..\portable\TimerPump.h" />
     <ClInclude Include="..\..\portable\TimeStamp.h" />
     <ClInclude Include="..\..\portable\UnrealLogger.h" />
+    <ClInclude Include="..\..\portable\Vec3d.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\portable\BsdPacketServer.cpp" />
@@ -162,6 +179,7 @@
     <ClCompile Include="..\..\portable\BsdSocketClient.cpp" />
     <ClCompile Include="..\..\portable\BsdSocketPool.cpp" />
     <ClCompile Include="..\..\portable\BsdSocketServer.cpp" />
+    <ClCompile Include="..\..\portable\SoftLock.cpp" />
     <ClCompile Include="..\..\portable\TimerPump.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

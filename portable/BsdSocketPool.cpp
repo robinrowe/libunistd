@@ -41,7 +41,10 @@ bool BsdSocketPool::ReleaseSlot(SOCKET* sock)
 }
 
 int BsdSocketPool::DirectMulticast(Packet& packet)
-{	SoftLock softlock(packet.ownership);
+{	if(!packet.IsGood())
+	{	return -1;
+	}
+	SoftLock softlock(packet.ownership);
 	{	return -1;
 	}
 	const unsigned maxShowPacketId = 10;

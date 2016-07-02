@@ -22,11 +22,9 @@ protected:
     virtual void Action(bool isTimeout) override
 	{	if(headerPacket)
 		{	socketPool.DirectMulticast(*headerPacket);
-			headerPacket=nullptr;
 		}
 		if(framePacket)
 		{	socketPool.DirectMulticast(*framePacket);
-			framePacket=nullptr;
 		}
 	}
 public:

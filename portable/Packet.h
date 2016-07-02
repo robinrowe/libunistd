@@ -71,6 +71,15 @@ public:
 	unsigned GetPacketSize() const
 	{	return *packetSize;
 	}
+	bool IsGood() const
+	{	if(GetPacketSize()>GetCapacity())
+		{	return false;
+		}
+		if(!GetPacketSize())
+		{	return false;
+		}
+		return true;
+	}
 	const char* GetPacket() const
 	{	return packet;
 	}

@@ -15,6 +15,10 @@ class PacketWriter
 :	public Packet
 {	
 public:
+	PacketWriter(char* buffer,unsigned bufsize)
+	:	Packet(buffer,bufsize)
+	{	Reset();
+	}
 	PacketWriter(const PacketSizer& sizer)
 	:	Packet(sizer)
 	{	Reset();

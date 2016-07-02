@@ -36,13 +36,13 @@ class BsdPacketServer
 	BsdMulticast multicast;
 public:
 	PacketWriter headerPacket;
-	PacketQueue framePacket;
+	PacketQueue<bufSize> framePacket;
 	BsdPacketServer(const char* programVersion)
 	:	isVerbose(false)
 	,	BsdSocketServer(bufsize)
 	,	programVersion(programVersion)
 	,	headerBuffer(bufSize)
-	,	headerPacket(headerBuffer)
+	,	headerPacket(&headerBuffer[0],bufSize)
 	,	framePacket(bufSize)
 	,	multicast(pool)
 	{}
@@ -50,25 +50,25 @@ public:
 	{}
 	void MulticastHeaderPacket()
 	{	multicast.SetHeaderPacket(&headerPacket);
-		multicast.SetFramePacket(&framePacket.GetFront());
+		multicast.SetFramePacket(&framePacket.GetBaked());
 		multicast.Wake();
 	}
 	void MulticastFramePacket()
-	{	multicast.SetFramePacket(&framePacket.GetFront());
+	{	multicast.SetFramePacket(&framePacket.GetBaked());
 		multicast.Wake();
 	}
 	bool SendFramePacket(SOCKET fd)
-	{	if(framePacket.GetFront().GetPacketSize()<=4)
+	{	if(framePacket.GetBaked().GetPacketSize()<=4)
 		{	puts("Packet not ready");
 			return false;
 		}
-		const unsigned packetId = framePacket.GetFront().GetPacketId();
+		const unsigned packetId = framePacket.GetBaked().GetPacketId();
 		if(!packetId)
 		{	puts("Frame packet has invalid packetID, not sent");
 			return false;
 		}
 		printf("Send Frame #%d\n",packetId);
-		return SendTo(framePacket.GetFront(),fd);
+		return SendTo(framePacket.GetBaked(),fd);
 	}
 	bool SendHeaderPacket(SOCKET fd)
 	{	if(headerPacket.GetPacketSize()<=4)
