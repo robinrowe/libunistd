@@ -38,5 +38,32 @@ int SystemCall(const char* cmd)
 #endif
 }
 
+namespace portable
+{
+
+template <typename T>
+bool memcopy(T& dest,const char* start,unsigned size)
+{	const_pointer p=nullptr;
+	size*=sizeof(char);
+	if(sizeof(*p)*dest.size() < size)
+	{	return false;
+	}
+	memcpy(dest.data(),start,size);
+	return true;
+}
+
+template <typename T>
+bool std_cpy(const char* start,const char* end,T& dest)
+{	const unsigned size = (end-start)*sizeof(char);
+	const_pointer p=nullptr;
+	if(sizeof(*p)*dest.size() < size)
+	{	return false;
+	}
+	memcpy(dest.data(),start,size);
+	return true;
+}
+
+} //portable
+
 #endif
 
