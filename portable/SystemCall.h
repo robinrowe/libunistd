@@ -19,12 +19,13 @@
 
 inline
 no_return 
-void StubExit(int errorlevel,const char* file,const char* function,int line)
-{	printf("ERROR: %s exit(%i)\n%s:%i",function,errorlevel,file,line);
+void StubExit(int errorlevel,const char* msg,const char* file,const char* function,int line)
+{	printf("ERROR: %s %s exit(%i)\n%s:%i",msg,function,errorlevel,file,line);
 	exit(errorlevel);
 }
 
-#define SystemExit(x) StubExit(x,__FILE__, __FUNCTION__, __LINE__)
+#define SystemExit(x) StubExit(x,"Exit ",__FILE__, __FUNCTION__, __LINE__)
+#define AssertExit(x) StubExit(x,#x,__FILE__, __FUNCTION__, __LINE__)
 
 inline
 int SystemCall(const char* cmd)
@@ -37,6 +38,8 @@ int SystemCall(const char* cmd)
 	return system(cmd);
 #endif
 }
+
+
 
 namespace portable
 {

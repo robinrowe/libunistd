@@ -1,6 +1,7 @@
 // StdFile.h
 // Created by Robin Rowe on 12/5/2015
 // Copyright (c) 2015 Robin.Rowe@CinePaint.org
+// License open source MIT
 
 #ifndef StdFile_h
 #define StdFile_h
@@ -48,73 +49,32 @@ public:
 	bool OpenAppend(const char* filename)
 	{	return Open(filename,"ab");
 	}
-	size_t Read(char* data,size_t length)
+	int Read(char* data,size_t length)
 	{	if(!fp)
 		{	return 0;
 		}
 		bytes=fread(data,1,length,fp);
 		return bytes;
 	}
-	bool Write(const char* data,size_t length)
+	int Write(const char* data,size_t length)
 	{	if(!data || !fp)
 		{	return false;
 		}
 		bytes=fwrite(data,1,length,fp);
 		return bytes==length;
 	}
-	bool Write(char c)
+	int Write(char c)
 	{	return Write(&c,1);
 	}
-	bool Write(const char* string)
+	int Write(const char* string)
 	{	if(!string)
 		{	return false;
 		}
 		const size_t length=strlen(string);	
 		return Write(string,length);
 	}
-	bool WriteNull()
+	int WriteNull()
 	{	return Write("",1);
-	}
-	bool Slurp(std::vector<char>& buffer)
-	{	if(!fp)
-		{	return false;
-		}
-		const int err=fseek(fp,0,SEEK_END);
-		if(err)
-		{	return false;
-		}
-		const long size=ftell(fp);
-		rewind(fp);
-		buffer.resize(size);
-		char* data=&buffer[0];
-		bytes=Read(data,size);
-		return size==bytes;
-	}
-	bool Slurp(std::vector<std::string>& line)
-	{	std::vector<char> buffer;
-		if(!Slurp(buffer))
-		{	return false;
-		}
-		const char* p = &buffer[0];
-		const char* end = p+bytes;
-		const char* word = p;
-		while(p<end)
-		{	switch(*p)
-			{default:
-				break;
-			case '\r':
-			case '\n':
-				line.push_back(std::move(std::string(word,p-word)));
-				if('\r'==*p)
-				{	word=p+2;
-				}
-				else
-				{	word=p+1;
-				}			
-			}
-			p++;
-		}
-		return true;
 	}
 	void Close()
 	{	if(fp>0)
@@ -122,7 +82,72 @@ public:
 		}
 		fp=0;
 	}
+	bool Seek(long offset)
+	{	if(!IsGood())
+		{	return false;
+		}
+		const int err=fseek(fd,0,offset);
+		if(err)
+		{	return false;
+		}
+		return true;
+	}
+	bool SeekEnd()
+	{	return Seek(SEEK_END);
+	}
+	long Tell() const
+	{	if(!IsGood())
+		{	return false;
+		}
+		const long size=ftell(fd);
+		return size;
+	}
+	void Rewind()
+	{	if(IsGood())
+		{	rewind(fd);
+	}	}
 };
+
+template <typename T>
+bool Slurp(T& file,std::vector<char>& buffer)
+{	if(!file.SeekEnd())
+	{	return false;
+	}
+	const long size=file.Tell();
+	file.Rewind();
+	buffer.resize(size);
+	char* data=&buffer[0];
+	bytes=file.Read(data,size);
+	return size==bytes;
+}
+
+template <typename T>
+bool Slurp(T& file,std::vector<std::string>& line)
+{	std::vector<char> buffer;
+	if(!Slurp(buffer))
+	{	return false;
+	}
+	const char* p = &buffer[0];
+	const char* end = p+bytes;
+	const char* word = p;
+	while(p<end)
+	{	switch(*p)
+		{default:
+			break;
+		case '\r':
+		case '\n':
+			line.push_back(std::move(std::string(word,p-word)));
+			if('\r'==*p)
+			{	word=p+2;
+			}
+			else
+			{	word=p+1;
+			}			
+		}
+		p++;
+	}
+	return true;
+}
 
 inline
 bool IsFile(const char* filename)
