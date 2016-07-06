@@ -180,7 +180,14 @@ int uni_pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*st
 #else
 inline
 int pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg)
-{	PortableThread* t=new PortableThread(attr,start_routine,arg);
+{	PortableThread* t=0;
+    try 
+	{	t = new PortableThread(attr,start_routine,arg);
+    } 
+	catch(const std::system_error& e) 
+	{	printf("Caught system_error %s\n",e.what());
+		return -1;
+    }
 	*pthread=t;
 	if(!t->attr.isJoinable)
 	{	t->detach();
@@ -217,7 +224,16 @@ int pthread_join(pthread_t thread, void **retval)
 {	if(!thread)
 	{	return -1;
 	}
-	thread->join();
+	if(!thread->attr.isJoinable)
+	{	return -1;
+	}
+    try 
+	{	thread->join();
+    } 
+	catch(const std::system_error& e) 
+	{	printf("Caught system_error %s\n",e.what());
+		return -1;
+    }
 	return 0;
 }
 

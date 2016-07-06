@@ -1,13 +1,14 @@
 /* unistd.h: replaces *nix header of same name
 // Windows emulation of common *nix functions
-// Copyright Nov 10, 2002, Robin.Rowe@MovieEditor.com
+// Copyright Nov 10, 2002, Robin.Rowe@CinePaint.org
 // License MIT (http://opensource.org/licenses/mit-license.php)
 */
 
-// link with Ws2_32.lib! 
+#ifndef unistd_h
+#define unistd_h
 
-#ifndef WIN32_UNISTD_H
-#define WIN32_UNISTD_H
+#pragma comment(lib, "Ws2_32.lib")
+
 #define _CRT_SECURE_NO_DEPRECATE 
 #undef _CRT_SECURE_NO_WARNINGS
 #define _CRT_NONSTDC_NO_WARNINGS
@@ -41,60 +42,29 @@
 #include <sys/utime.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <assert.h>
 #include "uni_signal.h"
 #include "../portable/stub.h"
 
-
-#pragma comment(lib, "Ws2_32.lib")
-
-#pragma warning (disable : 4996)
-
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
-typedef long long useconds_t;
-
 #ifdef __cplusplus
-#include <thread>
-#include <string>
-
-#if 0
-inline
-std::string Now()
-{	time_t now;
-	now = time(NULL);
-	return ctime(&now);
-}
-#endif
-
-inline
-std::string Now()
-{	FILETIME ft;
-	GetSystemTimeAsFileTime(&ft);
-	SYSTEMTIME st;
-	FileTimeToSystemTime(&ft,&st);
-// 2014-11-22 12:45:34.001
-	const unsigned BUFSIZE=30;
-	char buffer[BUFSIZE];
-	sprintf_s(buffer,BUFSIZE,"%04d-%02d-%02d %02d:%02d:%02d.%03d",
-		st.wYear,
-		st.wMonth,
-//		st.wDayOfWeek,
-		st.wDay,
-		st.wHour,
-		st.wMinute,
-		st.wSecond,
-		st.wMilliseconds);
-	return buffer;
-}
-
-inline
-int uni_open(const char* filename,unsigned oflag)
-{	return _open(filename,oflag,0);
-}
+#include "chrono.h"
+#pragma warning(disable : 4996)
 
 inline
 int uni_open(const char* filename,unsigned oflag,int mode)
 {	return _open(filename,oflag,mode);
+}
+
+#else
+#pragma warning(disable : 4996)
+#define inline __inline
+#endif
+
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
+inline
+int uni_open(const char* filename,unsigned oflag)
+{	return _open(filename,oflag,0);
 }
 
 //overloaded C++ functions:
@@ -106,24 +76,6 @@ int mkdir(const char* path,int)
 inline
 int fcntl(int handle,int mode,int mode2)
 STUB0(fcntl)
-
-extern "C" {
-
-inline
-int usleep(useconds_t delay)
-{	std::this_thread::sleep_for(std::chrono::nanoseconds(delay));
-	return 0;
-}
-
-
-#else
-#define inline __inline
-
-inline
-int usleep(useconds_t delay)
-STUB0(usleep)
-
-#endif
 
 inline 
 size_t safe_strlen(const char* s)
@@ -137,7 +89,6 @@ size_t safe_strlen(const char* s)
 #define strlen safe_strlen
 
 //#define inet_ntop InetNtop
-#define sleep(x) Sleep(x)
 
 #define bzero(address,size) memset(address,0,size)
 #define pow10(x) pow(x,10)
@@ -227,7 +178,6 @@ int kill(pid_t p, int x)
 #define S_IWOTH S_IWRITE
 #define O_CLOEXEC 0
 #define O_DIRECTORY _O_OBTAIN_DIR
-
 
 /*
 
@@ -334,58 +284,6 @@ inline
 ssize_t readlink(const char *path, char *buf, size_t bufsiz)
 STUB0(readlink)
 
-typedef int clockid_t;
-
-enum
-{	CLOCK_REALTIME,
-	CLOCK_MONOTONIC,
-	CLOCK_PROCESS_CPUTIME_ID,
-	CLOCK_THREAD_CPUTIME_ID
-};
-
-#if _MSC_VER == 1800
-struct timespec {
-        time_t   tv_sec;        /* seconds */
-        long     tv_nsec;       /* nanoseconds */
-};
-
-// std::chrono::high_resolution_clock
-#endif
-
-inline
-int clock_getres(clockid_t clk_id, struct timespec *res)
-STUB0(clock_getres)
-
-// seconds and nanosecond count of the time since the Epoch (00:00 1 January, 1970 UTC).
-
-inline
-int clock_gettime(clockid_t clk_id, struct timespec *tp)
-{	if(CLOCK_REALTIME != clk_id)
-	{	return -1;
-	}
-	SYSTEMTIME systemTime;
-	GetSystemTime(&systemTime);
-	FILETIME fileTime;
-	SystemTimeToFileTime(&systemTime,&fileTime);
-	ULARGE_INTEGER now = *(ULARGE_INTEGER*) &fileTime;
-	memset(&systemTime,0,sizeof(systemTime));
-	systemTime.wYear = 1970;
-	systemTime.wMonth = 1;
-	systemTime.wDay = 1;
-	SystemTimeToFileTime(&systemTime,&fileTime);
-	ULARGE_INTEGER in1970 = *(ULARGE_INTEGER*) &fileTime;
-	long long diff = now.QuadPart - in1970.QuadPart; //100-nanosecond intervals since January 1, 1970
-	diff *= 100;//nanoseconds
-	const long long nanosPerSecond = 1000*1000*1000;
-	tp->tv_sec = diff/nanosPerSecond; // 31557600 seconds/year, * 35 years = 1,420,092,000, says 1,464,129,754
-	tp->tv_nsec = diff%nanosPerSecond; // says 126,000,000, / 1,000,000,000 = .126
-	return 0;
-}
-
-inline
-int clock_settime(clockid_t clk_id, const struct timespec *tp)
-STUB0(clock_settime)
-
 inline
 int fsync (int fd)
 {	HANDLE h = (HANDLE) _get_osfhandle(fd);
@@ -412,28 +310,6 @@ inline
 int fcntl(int handle,int mode)
 STUB0(fcntl)
 
-inline
-int nanosleep(const struct timespec *req, struct timespec *rem)
-{	long long delay = req->tv_sec;
-	const long long billion = 1000000000LL;
-	delay*=billion;
-    delay+=req->tv_nsec;
-	return usleep(delay);
-}
-
-int gettimeofday(struct timeval* tv, struct timezone* tz);
-
-inline
-int settimeofday(const struct timeval *tv, const struct timezone *tz)
-STUB0(0)
-
-inline
-struct tm* localtime_r(const time_t* t,struct tm* result)
-{	struct tm* r=localtime(t);
-	*result=*r;
-	return result;
-}
-
 #define EBADFD 200
 #define ESHUTDOWN 201
 #define SHUT_RD SD_RECEIVE
@@ -455,9 +331,5 @@ typedef int Atom;
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
 #pragma warning(default:4996)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

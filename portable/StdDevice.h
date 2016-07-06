@@ -37,7 +37,7 @@ public:
 	bool IsGood() const
 	{	return 0 < fd;
 	}
-	operator bool() const
+	bool operator!() const
 	{	return !IsGood();
 	}
 // O_RDWR | O_NOCTTY | O_NDELAY...
