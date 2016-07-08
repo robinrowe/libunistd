@@ -10,6 +10,8 @@
 #else
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
+
 inline
 void SysLogMsg(const char* msg,const char* function)
 {	printf("TRACE: %s, %s\n",msg,function);

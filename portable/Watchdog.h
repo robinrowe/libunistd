@@ -15,10 +15,10 @@ namespace portable
 class Watchdog
 {   typedef std::unique_lock<std::mutex> Lock;
     typedef std::chrono::milliseconds milliseconds;
-    std::mutex m;
-    std::condition_variable cv;
     milliseconds delay;
     bool isGo;
+	std::mutex m;
+    std::condition_variable cv;
     void Run()
 	{	while(isGo && delay.count())
 		{   Lock lock(m);
@@ -31,12 +31,12 @@ class Watchdog
     }
 public:
     Watchdog()
-	:	isGo(false)
-	,	delay(0)
+	:	delay(0)
+	,	isGo(false)
 	{}
-	void Start(unsigned dalay)
+	void Start(unsigned delay)
     {	isGo =true;
-		this->delay = delay;
+		this->delay = milliseconds(delay);
 		std::thread worker(Main,this);
 		worker.detach();
     }

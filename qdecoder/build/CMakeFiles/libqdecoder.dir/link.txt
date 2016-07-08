@@ -1,2 +1,0 @@
-/usr/bin/ar cr liblibqdecoder.a  CMakeFiles/libqdecoder.dir/internal.cpp.o CMakeFiles/libqdecoder.dir/qcgireq.cpp.o CMakeFiles/libqdecoder.dir/qcgires.cpp.o CMakeFiles/libqdecoder.dir/qcgisess.cpp.o CMakeFiles/libqdecoder.dir/qentry.cpp.o
-/usr/bin/ranlib liblibqdecoder.a
