@@ -6,9 +6,11 @@
 #ifndef StdFile_h
 #define StdFile_h
 
+#include <unistd.h>
 #include <stdio.h>
 #include <sys/stat.h>
 #include <vector>
+#include <string.h>
 
 namespace portable
 {
@@ -19,7 +21,7 @@ class StdFile
 	size_t bytes;
 public:
 	StdFile()
-	:	fp(0)
+	:	fp(nullptr)
 	,	bytes(0)
 	{}
 	~StdFile()
@@ -29,7 +31,7 @@ public:
 	{	return fp;
 	}
 	bool IsGood() const
-	{	return fp>0;
+	{	return !fp;
 	}
 	bool Feof()
 	{	return IsGood()? 0!=feof(fp):true;
@@ -97,10 +99,10 @@ public:
 	{	return Write("",1);
 	}
 	void Close()
-	{	if(fp>0)
+	{	if(IsGood())
 		{	fclose(fp);
 		}
-		fp=0;
+		fp=nullptr;
 	}
 	bool Seek(long offset)
 	{	if(!IsGood())
@@ -128,6 +130,8 @@ public:
 	}	}
 };
 
+// Slurp StdFile or StdDevice:
+
 template <typename T>
 bool Slurp(T& file,std::vector<char>& buffer)
 {	if(!file.SeekEnd())
@@ -137,18 +141,18 @@ bool Slurp(T& file,std::vector<char>& buffer)
 	file.Rewind();
 	buffer.resize(size);
 	char* data=&buffer[0];
-	bytes=file.Read(data,size);
+	const auto bytes=file.Read(data,size);
 	return size==bytes;
 }
 
 template <typename T>
 bool Slurp(T& file,std::vector<std::string>& line)
 {	std::vector<char> buffer;
-	if(!Slurp(buffer))
+	if(!Slurp(file,buffer))
 	{	return false;
 	}
 	const char* p = &buffer[0];
-	const char* end = p+bytes;
+	const char* end = p+buffer.size();
 	const char* word = p;
 	while(p<end)
 	{	switch(*p)
@@ -156,7 +160,8 @@ bool Slurp(T& file,std::vector<std::string>& line)
 			break;
 		case '\r':
 		case '\n':
-			line.push_back(std::move(std::string(word,p-word)));
+			line.push_back(std::string(word,p-word));// not std::move(), "error: moving a temporary object prevents copy elision"
+
 			if('\r'==*p)
 			{	word=p+2;
 			}

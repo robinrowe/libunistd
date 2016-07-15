@@ -17,6 +17,8 @@ inline
 int ioctl(int fd, unsigned long request, ...)
 STUB0(ioctl)
 
+// include net/if.h if you need struct ifreq 
+
 #ifdef __cplusplus
 }
 #endif

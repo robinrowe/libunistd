@@ -42,6 +42,11 @@ struct IfInterface
 
 struct IfStat
 {	char ifname[10];
+	uint32_t address;
+	uint32_t netmask;
+	uint32_t broadcast;
+	int mtu;
+	uint64_t hw_address;
 	IfInterface in;
 	IfInterface out;
 	IfStat()
@@ -49,13 +54,18 @@ struct IfStat
 	}
 	void Reset()
 	{	ifname[0]=0;
+		address=0;
+		netmask=0;
+		broadcast=0;
+		mtu=0;
+		hw_address=0;
 		in.Reset();
 		out.Reset();
 	}
 };
 
 class Network
-{
+{	bool UpdateIoctls(IfStat* ifstat);
 public:
 	std::vector<IfStat> ifStats;
 	Network(unsigned interfaceCount)
