@@ -30,9 +30,11 @@ struct ifaddrs
 	void* ifa_data;    
 };
 
+inline
 int getifaddrs(struct ifaddrs **ifap)
 STUB0(getifaddrs)
 
+inline
 void freeifaddrs(struct ifaddrs *ifa)
 STUB(freeifaddrs)
 

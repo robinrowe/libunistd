@@ -4,7 +4,10 @@
 #ifndef Http_h
 #define Http_h
 
-#include "ostring.h"
+namespace portable
+{
+
+#include "String.h"
 
 class Http
 {	enum http_retcode
@@ -83,5 +86,7 @@ public:
 		return length;
 	}
 };
+
+}
 
 #endif

@@ -25,6 +25,15 @@ public:
 	~StdFile()
 	{	Close();
 	}
+	FILE* GetFp()
+	{	return fp;
+	}
+	bool IsGood() const
+	{	return fp>0;
+	}
+	bool Feof()
+	{	return IsGood()? 0!=feof(fp):true;
+	}
 /* flags:
 "r"	read only: file must exist
 "w"	write only: delete then create an empty 
@@ -37,7 +46,7 @@ public:
 #pragma warning (disable : 4996)
 	bool Open(const char* filename,const char* flags)
 	{	fp = fopen(filename,flags);
-		return 0!=fp;
+		return IsGood();
 	}
 #pragma warning (default : 4996)
 	bool OpenReadOnly(const char* filename)
@@ -50,14 +59,25 @@ public:
 	{	return Open(filename,"ab");
 	}
 	int Read(char* data,size_t length)
-	{	if(!fp)
+	{	if(!IsGood())
 		{	return 0;
 		}
 		bytes=fread(data,1,length,fp);
 		return bytes;
 	}
+	void SkipLine()
+	{	if(!IsGood())
+		{	return;
+		}
+		for(;;)
+		{	int ch = getc(fp);
+			bytes++;
+			if (ch == '\n' || ch == EOF)
+			{	return;
+		}	}
+	}	
 	int Write(const char* data,size_t length)
-	{	if(!data || !fp)
+	{	if(!data || !IsGood())
 		{	return false;
 		}
 		bytes=fwrite(data,1,length,fp);
@@ -86,7 +106,7 @@ public:
 	{	if(!IsGood())
 		{	return false;
 		}
-		const int err=fseek(fd,0,offset);
+		const int err=fseek(fp,0,offset);
 		if(err)
 		{	return false;
 		}
@@ -99,12 +119,12 @@ public:
 	{	if(!IsGood())
 		{	return false;
 		}
-		const long size=ftell(fd);
+		const long size=ftell(fp);
 		return size;
 	}
 	void Rewind()
 	{	if(IsGood())
-		{	rewind(fd);
+		{	rewind(fp);
 	}	}
 };
 
