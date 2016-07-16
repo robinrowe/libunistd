@@ -1,5 +1,5 @@
 // SystemCall_h
-// Copyright 2016 Robin.Rowe@CinePaint.org
+// Libunist Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT
 
 #ifndef SystemCall_h
@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
+#if 0
 #ifdef __clang__
 #include <stdnoreturn.h>
 #define no_return noreturn
@@ -17,9 +18,10 @@
 #elif _MSC_VER
 #define no_return
 #endif
+#endif
 
+[[ noreturn ]]
 inline
-no_return 
 void StubExit(int errorlevel,const char* msg,const char* file,const char* function,int line)
 {	printf("ERROR: %s %s exit(%i)\n%s:%i",msg,function,errorlevel,file,line);
 	exit(errorlevel);
@@ -39,8 +41,6 @@ int SystemCall(const char* cmd)
 	return system(cmd);
 #endif
 }
-
-
 
 namespace portable
 {

@@ -47,6 +47,7 @@ struct IfStat
 	uint32_t broadcast;
 	int mtu;
 	uint64_t hw_address;
+	uint32_t gateway;
 	IfInterface in;
 	IfInterface out;
 	IfStat()
@@ -59,6 +60,7 @@ struct IfStat
 		broadcast=0;
 		mtu=0;
 		hw_address=0;
+		gateway=0;
 		in.Reset();
 		out.Reset();
 	}
@@ -66,6 +68,7 @@ struct IfStat
 
 class Network
 {	bool UpdateIoctls(IfStat* ifstat);
+	void UpdateRoute();
 public:
 	std::vector<IfStat> ifStats;
 	Network(unsigned interfaceCount)

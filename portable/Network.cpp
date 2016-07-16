@@ -70,8 +70,66 @@ bool Network::UpdateIfStats()
 		}
 		UpdateIoctls(ifstat);
 	}
+	UpdateRoute();
 	return true;
 }
+/*
+$ cat /proc/net/route
+Iface	Destination	Gateway 	Flags	RefCnt	Use	Metric	Mask		MTU	Window	IRTT                                                       
+eth0	00000000	0202000A	0003	0	0	100	00000000	0	0	0                                                                           
+eth0	0002000A	00000000	0001	0	0	100	00FFFFFF	0	0	0                    
+*/
+
+void Network::UpdateRoute()
+{	StdFile proc_net_route;
+#ifdef WIN32
+	const char* filename = "C:/Users/rrowe/proc_net_route.txt";
+#else
+	const char* filename = "/proc/net/route";
+#endif
+	if(!proc_net_route.Open(filename, "r"))
+	{	return;
+	}
+	proc_net_route.SkipLine();
+	FILE* fd = proc_net_route.GetFp();
+	while(!proc_net_route.Feof())
+	{	char ifname[10];
+		unsigned destination;
+		unsigned gateway;
+		unsigned flags;
+		unsigned ref;
+		unsigned cnt;
+		unsigned use;
+		unsigned metric;
+		unsigned mask;
+		unsigned mtu;
+		unsigned window;
+		unsigned irtt;
+#pragma warning(disable:4996)
+		const int items = fscanf(fd,
+			" %s %u %u %u %u %u %u %u %u %u %u %u",
+			ifname,
+			&destination,
+			&gateway,
+			&flags,
+			&ref,
+			&cnt,
+			&use,
+			&metric,
+			&mask,
+			&mtu,
+			&window,
+			&irtt
+		);
+#pragma warning(default:4996)
+		if (items != 11) 
+		{	puts("Invalid data read");
+		}
+		if(gateway)
+		{	IfStat* ifStat=GetIfStat(ifname);
+			if(ifStat)
+			{	ifStat->gateway=gateway;
+}	}	}	}
 
 IfStat* Network::GetIfStat(const char* ifname)
 {	for(unsigned i=0;i<ifStats.size();i++)
