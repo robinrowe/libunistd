@@ -1,5 +1,5 @@
 // Network.cpp
-// Copyright 2016 Robin.Rowe@CinePaint.org
+// Libunistd Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT
 
 #include "Network.h"
@@ -11,6 +11,8 @@
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
+
+#define CHECK(var) if(var!=ifstat->var) isChanged = true
 
 namespace portable
 {
@@ -36,16 +38,17 @@ bool Network::UpdateIfStats()
 	proc_net_dev.SkipLine();
 	proc_net_dev.SkipLine();
 	FILE* fd = proc_net_dev.GetFp();
+	unsigned lineCount=3;
 	for(unsigned i=0;i<ifStats.size();i++)
-	{	IfStat* ifstat=&ifStats[i];
-		if(proc_net_dev.Feof())
-		{	ifstat->Reset();
-			continue;
+	{	if(proc_net_dev.Feof())
+		{	break;
 		}
+		IfStat* ifstat=&ifStats[i];
+		ifstat->Reset();
 #pragma warning(disable:4996)
 		const int items = fscanf(fd,
-			" %20[^:]:%llu %llu %llu %llu %llu %llu %llu %llu "
-			"%llu %llu %llu %llu %llu %llu %llu %llu",
+//			" %20[^:]:%llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu",
+			"%s %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu",
 			ifstat->ifname,
 			&ifstat->in.bytes,    
 			&ifstat->in.packets,
@@ -65,19 +68,52 @@ bool Network::UpdateIfStats()
 			&ifstat->out.out_carrier
 		);
 #pragma warning(default:4996)
-		if (items != 17) 
-		{	puts("Invalid data read");
+		if(-1==items)
+		{	break;
+		}
+		if(items != 17) 
+		{	printf("Invalid data read Network::UpdateIfStats() %u:%i\n",lineCount,items);
+			break;
 		}
 		UpdateIoctls(ifstat);
+		lineCount++;
 	}
 	UpdateRoute();
 	return true;
 }
+
+struct ProcNetRoute
+{	char ifname[10];
+	unsigned destination;
+	unsigned gateway;
+	unsigned flags;
+	unsigned refcnt;
+	unsigned use;
+	unsigned metric;
+	unsigned mask;
+	unsigned mtu;
+	unsigned window;
+	unsigned irtt;
+	void Reset()
+	{	ifname[0]=0;
+		destination=0;
+		gateway=0;
+		flags=0;
+		refcnt=0;
+		use=0;
+		metric=0;
+		mask=0;
+		mtu=0;
+		window=0;
+		irtt=0;
+	}
+};
+
 /*
 $ cat /proc/net/route
 Iface	Destination	Gateway 	Flags	RefCnt	Use	Metric	Mask		MTU	Window	IRTT                                                       
 eth0	00000000	0202000A	0003	0	0	100	00000000	0	0	0                                                                           
-eth0	0002000A	00000000	0001	0	0	100	00FFFFFF	0	0	0                    
+eth1	0002000A	00000000	0001	0	0	100	00FFFFFF	0	0	0                    
 */
 
 void Network::UpdateRoute()
@@ -92,44 +128,41 @@ void Network::UpdateRoute()
 	}
 	proc_net_route.SkipLine();
 	FILE* fd = proc_net_route.GetFp();
+	ProcNetRoute pnr;
+	unsigned lineCount = 2;
 	while(!proc_net_route.Feof())
-	{	char ifname[10];
-		unsigned destination;
-		unsigned gateway;
-		unsigned flags;
-		unsigned ref;
-		unsigned cnt;
-		unsigned use;
-		unsigned metric;
-		unsigned mask;
-		unsigned mtu;
-		unsigned window;
-		unsigned irtt;
+	{	pnr.Reset();
 #pragma warning(disable:4996)
 		const int items = fscanf(fd,
-			" %s %u %u %u %u %u %u %u %u %u %u %u",
-			ifname,
-			&destination,
-			&gateway,
-			&flags,
-			&ref,
-			&cnt,
-			&use,
-			&metric,
-			&mask,
-			&mtu,
-			&window,
-			&irtt
+			"%s %x %x %x %x %x %x %x %x %x %x",
+			pnr.ifname,
+			&pnr.destination,
+			&pnr.gateway,
+			&pnr.flags,
+			&pnr.refcnt,
+			&pnr.use,
+			&pnr.metric,
+			&pnr.mask,
+			&pnr.mtu,
+			&pnr.window,
+			&pnr.irtt
 		);
 #pragma warning(default:4996)
-		if (items != 11) 
-		{	puts("Invalid data read");
+		if(pnr.gateway)
+		{	IfStat* ifstat=GetIfStat(pnr.ifname);
+			if(ifstat)
+			{	const unsigned gateway = pnr.gateway;
+				CHECK(gateway);
+		}	}
+		if(-1==items)
+		{	break;
 		}
-		if(gateway)
-		{	IfStat* ifStat=GetIfStat(ifname);
-			if(ifStat)
-			{	ifStat->gateway=gateway;
-}	}	}	}
+		if(items != 11) 
+		{	printf("Invalid data read Network::UpdateRoute() %u:%i\n",lineCount,items);
+			break;
+		}
+		lineCount++;
+}	}
 
 IfStat* Network::GetIfStat(const char* ifname)
 {	for(unsigned i=0;i<ifStats.size();i++)
@@ -163,22 +196,24 @@ bool Network::UpdateIoctls(IfStat* ifstat)
 #pragma warning(default:4996)
 	req.ifr_name[IFNAMSIZ - 1] = 0;
 	int retval = ioctl(sock, SIOCGIFADDR, &req);
-	ifstat->address=GetQuad(&req.ifr_addr,IsGood(retval));
+	const uint32_t address=GetQuad(&req.ifr_addr,IsGood(retval));
+	CHECK(address);
 	retval = ioctl(sock, SIOCGIFNETMASK, &req);
-	ifstat->netmask=GetQuad(&req.ifr_addr,IsGood(retval));
+	const uint32_t netmask=GetQuad(&req.ifr_addr,IsGood(retval));;
+	CHECK(netmask);
 	retval = ioctl(sock, SIOCGIFBRDADDR, &req);
-	ifstat->broadcast=GetQuad(&req.ifr_addr,IsGood(retval));
+	const uint32_t broadcast=GetQuad(&req.ifr_addr,IsGood(retval));
+	CHECK(broadcast);
 	retval = ioctl(sock, SIOCGIFMTU, &req);
-	ifstat->mtu= -1!=retval ? req.ifr_mtu:0;
+	const int mtu = -1!=retval ? req.ifr_mtu:0;
+	CHECK(mtu);
 	retval = ioctl(sock, SIOCGIFHWADDR, &req);
-	if(-1==retval)
-	{	ifstat->hw_address = 0;
-	}
-	else
-	{	ifstat->hw_address = 0;
-		unsigned char* hwaddr = (unsigned char *) &req.ifr_hwaddr.sa_data;
+	uint64_t hw_address = 0;
+	if(-1!=retval)
+	{	unsigned char* hwaddr = (unsigned char *) &req.ifr_hwaddr.sa_data;
 		memcpy(&ifstat->hw_address,hwaddr,6);
 	}
+	CHECK(hw_address);
 #ifdef WIN32
 	closesocket(sock);
 #else
@@ -210,9 +245,7 @@ uint32_t GetInet4(SOCKET sock)
 	return r;
 }
 
-#endif
 
-/*
 f()
 {
    int s;
@@ -226,6 +259,6 @@ f()
    printf("Local IP address is: %s\n", inet_ntoa(sa.sin_add r));
    printf("Local port is: %d\n", (int) ntohs(sa.sin_port));
 }
-*/
+#endif
 
 }

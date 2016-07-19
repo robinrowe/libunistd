@@ -1,5 +1,5 @@
 // Network.h
-// Copyright 2016 Robin.Rowe@CinePaint.org
+// Libunistd Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT
 
 #ifndef Network_h
@@ -30,13 +30,14 @@ struct IfInterface
 	{	Reset();
 	}
 	void Reset()
-	{	bytes=0;
+	{	packets=0;
+		bytes=0;
 		errors=0;
 		drops=0;
 		overruns=0;
 		multicast=0;
 		in_frame=0;
-		in_compress=0;
+		out_colls=0;
 	}
 };
 
@@ -70,8 +71,10 @@ class Network
 {	bool UpdateIoctls(IfStat* ifstat);
 	void UpdateRoute();
 public:
+	bool isChanged;
 	std::vector<IfStat> ifStats;
 	Network(unsigned interfaceCount)
+	:	isChanged(false)
 	{	ifStats.resize(interfaceCount);
 	}
 	bool UpdateIfStats();

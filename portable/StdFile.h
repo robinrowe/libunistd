@@ -1,6 +1,6 @@
 // StdFile.h
 // Created by Robin Rowe on 12/5/2015
-// Copyright (c) 2015 Robin.Rowe@CinePaint.org
+// Libunistd Copyright (c) 2015 Robin.Rowe@CinePaint.org
 // License open source MIT
 
 #ifndef StdFile_h
@@ -31,7 +31,7 @@ public:
 	{	return fp;
 	}
 	bool IsGood() const
-	{	return !fp;
+	{	return nullptr!=fp;
 	}
 	bool Feof()
 	{	return IsGood()? 0!=feof(fp):true;

@@ -128,8 +128,19 @@ int strncasecmp(const char *s1, const char *s2, size_t n)
 
 #define strtok_r strtok_s
 
-#define popen _popen
-#define pclose _pclose
+inline
+FILE *popen(const char *command, const char *type)
+{	
+#ifdef _DEBUG
+	printf("popen(%s,%s)\n",command,type);
+#endif
+	return _popen(command,type);
+}
+
+inline
+int pclose(FILE *stream)
+{	return _pclose(stream);
+}
 
 //#define send send2
 typedef int ssize_t;

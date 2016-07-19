@@ -33,9 +33,11 @@ void StubExit(int errorlevel,const char* msg,const char* file,const char* functi
 inline
 int SystemCall(const char* cmd)
 {	
-#ifdef _WIN32
+#ifdef _DEBUG
 	static int i;
 	printf("[%i] system(%s)\n",++i,cmd);
+#endif
+#ifdef _WIN32
 	return 1;
 #else
 	return system(cmd);
