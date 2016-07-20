@@ -39,6 +39,15 @@ struct IfInterface
 		in_frame=0;
 		out_colls=0;
 	}
+	void Print(bool isIn)
+	{	if(isIn)
+		{	printf("packets=%llu bytes=%llu errors=%llu drops=%llu\n overruns==%llu multicast==%llu frame==%llu compress==%llu\n"
+				,packets,bytes,errors,drops,overruns,multicast,in_frame,in_compress);
+		}
+		else
+		{	printf("packets=%llu bytes=%llu errors=%llu drops=%llu\n overruns==%llu multicast==%llu colls==%llu carrier==%llu\n"
+				,packets,bytes,errors,drops,overruns,multicast,out_colls,out_carrier);
+	}	}
 };
 
 struct IfStat
@@ -79,6 +88,8 @@ public:
 	}
 	bool UpdateIfStats();
 	IfStat* GetIfStat(const char* ifname);
+	void PrintIfStat(IfStat* ifstat);
+	void PrintStats();
 };
 
 }

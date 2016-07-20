@@ -186,14 +186,21 @@ bool IsGood(int retval)
 }
 
 bool Network::UpdateIoctls(IfStat* ifstat)
-{	ifreq req;
+{
+#ifdef WIN32
+	ifstat->address=	0x7f000001;
+	ifstat->broadcast=	0x7f000000;
+	ifstat->gateway=	0x01020304;
+	ifstat->hw_address=0x0102030405060708ULL;
+	ifstat->mtu=32;
+	ifstat->netmask=0xffffff00;
+#else
 	const int sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 	if(-1 == sock) 
 	{	return false;
 	}	
-#pragma warning(disable:4996)
+#	ifreq req;
 	strncpy(req.ifr_name, ifstat->ifname, IFNAMSIZ);
-#pragma warning(default:4996)
 	req.ifr_name[IFNAMSIZ - 1] = 0;
 	int retval = ioctl(sock, SIOCGIFADDR, &req);
 	const uint32_t address=GetQuad(&req.ifr_addr,IsGood(retval));
@@ -214,12 +221,59 @@ bool Network::UpdateIoctls(IfStat* ifstat)
 		memcpy(&ifstat->hw_address,hwaddr,6);
 	}
 	CHECK(hw_address);
-#ifdef WIN32
-	closesocket(sock);
-#else
 	close(sock);
 #endif
 	return true;
+}
+
+void Network::PrintStats()
+{	printf("Network::PrintStats() isChanged = %i\n",isChanged);
+	for(unsigned i=0;i<ifStats.size();i++)
+	{	PrintIfStat(&ifStats[i]);
+}	}
+
+#pragma warning(disable:4996)
+class Ip4Address
+{	char data[4*4];
+public:
+	Ip4Address(uint32_t quad,char sep)
+	{	unsigned char* p = reinterpret_cast<unsigned char*>(&quad);
+		sprintf(data,"%i%c%i%C%i%c%i",unsigned(p[3]),sep,unsigned(p[2]),sep,unsigned(p[1]),sep,unsigned(p[0]));			
+	}
+	const char* Get() const
+	{	return data;
+	}
+};
+
+class HwAddress
+{	char data[4*4];
+public:
+	HwAddress(uint64_t quad2,char sep)
+	{	unsigned char* p = reinterpret_cast<unsigned char*>(&quad2);
+		sprintf(data,"%i%c%i%c%i%c%i%c%i%c%i%c%i%c%i",
+			unsigned(p[7]),sep,unsigned(p[6]),sep,unsigned(p[5]),sep,unsigned(p[4]),sep,
+			unsigned(p[3]),sep,unsigned(p[2]),sep,unsigned(p[1]),sep,unsigned(p[0]));			
+	}
+	const char* Get() const
+	{	return data;
+	}
+};
+#pragma warning(default%c4996)
+
+void Network::PrintIfStat(IfStat* ifstat)
+{	if(!ifstat || !ifstat->address)
+	{	return;
+	}
+	Ip4Address address(ifstat->address,'.');
+	Ip4Address netmask(ifstat->netmask,':');
+	Ip4Address broadcast(ifstat->broadcast,'.');
+	Ip4Address gateway(ifstat->gateway,'.');
+	HwAddress hw_address(ifstat->hw_address,':');
+	printf("inet: %s ip=%s mask=%s gateway=%s\n broachcast=%s hw=%s mtu=%i\n",ifstat->ifname,address.Get(),netmask.Get(),gateway.Get(),broadcast.Get(),hw_address.Get(),ifstat->mtu);
+	ifstat->in.Print(true);
+	ifstat->out.Print(false);
+}
+
 }
 #if 0
 uint32_t GetInet4(SOCKET sock)
@@ -260,5 +314,3 @@ f()
    printf("Local port is: %d\n", (int) ntohs(sa.sin_port));
 }
 #endif
-
-}
