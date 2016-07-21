@@ -12,27 +12,35 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 
-#define CHECK(var) if(var!=ifstat->var) isChanged = true
+#define CHECK(var) if(var!=ifstat->var){ ifstat->var=var; isChanged = true;}
 
 namespace portable
 {
+
+Network::Network(unsigned interfaceCount)
+:	isChanged(false)
+{	ifStats.resize(interfaceCount);
+
+#ifdef WIN32
+	route_filename = "C:/Users/rrowe/proc_net_route.txt";
+	dev_filename = "C:/Users/rrowe/proc_net_dev.txt";
+#else
+	route_filename = "/proc/net/route";
+	dev_filename = "/proc/net/dev";
+#endif
+}
 
 /* (size = 450 +4 = 77 + 123 + 2*125 + 4 LF)
 root@vm-ubuntu:/opt/toolchains# cat /proc/net/dev
 Inter-|   Receive                                                |  Transmit
  face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
-enp0s3: 616352817  446732    0    0    0     0          0         0 13516902  165770    0    0    0     0       0          0
-    lo:  485454    4814    0    0    0     0          0         0   485454    4814    0    0    0     0       0          0
+enth0:  616352817  446732    0    0    0     0          0         0 13516902  165770    0    0    0     0       0          0
+enth1:   485454    4814    0    0    0     0          0         0   485454    502     0    0    0     0       0          0
 */ 
 
 bool Network::UpdateIfStats()
 {	StdFile proc_net_dev;
-#ifdef WIN32
-	const char* filename = "C:/Users/rrowe/proc_net_dev.txt";
-#else
-	const char* filename = "/proc/net/dev";
-#endif
-	if(!proc_net_dev.Open(filename, "r"))
+	if(!proc_net_dev.Open(dev_filename, "r"))
 	{	return false;
 	}
 	proc_net_dev.SkipLine();
@@ -47,8 +55,7 @@ bool Network::UpdateIfStats()
 		ifstat->Reset();
 #pragma warning(disable:4996)
 		const int items = fscanf(fd,
-//			" %20[^:]:%llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu",
-			"%s %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu",
+			" %20[^:]:%llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu",
 			ifstat->ifname,
 			&ifstat->in.bytes,    
 			&ifstat->in.packets,
@@ -118,12 +125,7 @@ eth1	0002000A	00000000	0001	0	0	100	00FFFFFF	0	0	0
 
 void Network::UpdateRoute()
 {	StdFile proc_net_route;
-#ifdef WIN32
-	const char* filename = "C:/Users/rrowe/proc_net_route.txt";
-#else
-	const char* filename = "/proc/net/route";
-#endif
-	if(!proc_net_route.Open(filename, "r"))
+	if(!proc_net_route.Open(route_filename, "r"))
 	{	return;
 	}
 	proc_net_route.SkipLine();
@@ -148,11 +150,12 @@ void Network::UpdateRoute()
 			&pnr.irtt
 		);
 #pragma warning(default:4996)
+//		printf("Network::ifname=%s gateway=%u\n",pnr.ifname,pnr.gateway);
 		if(pnr.gateway)
 		{	IfStat* ifstat=GetIfStat(pnr.ifname);
 			if(ifstat)
 			{	const unsigned gateway = pnr.gateway;
-				CHECK(gateway);
+				CHECK(gateway)
 		}	}
 		if(-1==items)
 		{	break;
@@ -188,42 +191,42 @@ bool IsGood(int retval)
 bool Network::UpdateIoctls(IfStat* ifstat)
 {
 #ifdef WIN32
-	ifstat->address=	0x7f000001;
-	ifstat->broadcast=	0x7f000000;
-	ifstat->gateway=	0x01020304;
+	ifstat->address=	0x0100007f;
+	ifstat->broadcast=	0x0000007f;
+	ifstat->netmask=	0x00ffffff;
+	ifstat->gateway=	0x04030201;
 	ifstat->hw_address=0x0102030405060708ULL;
 	ifstat->mtu=32;
-	ifstat->netmask=0xffffff00;
+	return true;
 #else
 	const int sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 	if(-1 == sock) 
 	{	return false;
 	}	
-#	ifreq req;
+	ifreq req;
 	strncpy(req.ifr_name, ifstat->ifname, IFNAMSIZ);
 	req.ifr_name[IFNAMSIZ - 1] = 0;
 	int retval = ioctl(sock, SIOCGIFADDR, &req);
 	const uint32_t address=GetQuad(&req.ifr_addr,IsGood(retval));
-	CHECK(address);
-	retval = ioctl(sock, SIOCGIFNETMASK, &req);
+	CHECK(address)
+	retval += ioctl(sock, SIOCGIFNETMASK, &req);
 	const uint32_t netmask=GetQuad(&req.ifr_addr,IsGood(retval));;
-	CHECK(netmask);
-	retval = ioctl(sock, SIOCGIFBRDADDR, &req);
+	CHECK(netmask)
+	retval += ioctl(sock, SIOCGIFBRDADDR, &req);
 	const uint32_t broadcast=GetQuad(&req.ifr_addr,IsGood(retval));
-	CHECK(broadcast);
-	retval = ioctl(sock, SIOCGIFMTU, &req);
+	CHECK(broadcast)
+	retval += ioctl(sock, SIOCGIFMTU, &req);
 	const int mtu = -1!=retval ? req.ifr_mtu:0;
-	CHECK(mtu);
-	retval = ioctl(sock, SIOCGIFHWADDR, &req);
+	CHECK(mtu)
+	retval += ioctl(sock, SIOCGIFHWADDR, &req);
 	uint64_t hw_address = 0;
-	if(-1!=retval)
-	{	unsigned char* hwaddr = (unsigned char *) &req.ifr_hwaddr.sa_data;
-		memcpy(&ifstat->hw_address,hwaddr,6);
-	}
-	CHECK(hw_address);
+	unsigned char* hwaddr = (unsigned char *) &req.ifr_hwaddr.sa_data;
+	memcpy(&hw_address,hwaddr,6);
+	CHECK(hw_address)
 	close(sock);
+	//printf("Network::ioctl=%i address=%u netmask=%u broadcast=%u mtu=%i hw=%llu\n",retval,address,netmask,broadcast,mtu,hw_address);
+	return !retval;
 #endif
-	return true;
 }
 
 void Network::PrintStats()
@@ -238,7 +241,7 @@ class Ip4Address
 public:
 	Ip4Address(uint32_t quad,char sep)
 	{	unsigned char* p = reinterpret_cast<unsigned char*>(&quad);
-		sprintf(data,"%i%c%i%C%i%c%i",unsigned(p[3]),sep,unsigned(p[2]),sep,unsigned(p[1]),sep,unsigned(p[0]));			
+		sprintf(data,"%u%c%u%C%u%c%u",unsigned(p[0]),sep,unsigned(p[1]),sep,unsigned(p[2]),sep,unsigned(p[3]));			
 	}
 	const char* Get() const
 	{	return data;
@@ -250,15 +253,14 @@ class HwAddress
 public:
 	HwAddress(uint64_t quad2,char sep)
 	{	unsigned char* p = reinterpret_cast<unsigned char*>(&quad2);
-		sprintf(data,"%i%c%i%c%i%c%i%c%i%c%i%c%i%c%i",
-			unsigned(p[7]),sep,unsigned(p[6]),sep,unsigned(p[5]),sep,unsigned(p[4]),sep,
-			unsigned(p[3]),sep,unsigned(p[2]),sep,unsigned(p[1]),sep,unsigned(p[0]));			
+		sprintf(data,"%u%c%u%c%u%c%u%c%u%c%u",// only has 48 bits, ignore p[0] and p[1]
+			unsigned(p[2]),sep,unsigned(p[3]),sep,unsigned(p[4]),sep,unsigned(p[5]),sep,unsigned(p[6]),sep,unsigned(p[7]));			
 	}
 	const char* Get() const
 	{	return data;
 	}
 };
-#pragma warning(default%c4996)
+#pragma warning(default:4996)
 
 void Network::PrintIfStat(IfStat* ifstat)
 {	if(!ifstat || !ifstat->address)
@@ -269,7 +271,7 @@ void Network::PrintIfStat(IfStat* ifstat)
 	Ip4Address broadcast(ifstat->broadcast,'.');
 	Ip4Address gateway(ifstat->gateway,'.');
 	HwAddress hw_address(ifstat->hw_address,':');
-	printf("inet: %s ip=%s mask=%s gateway=%s\n broachcast=%s hw=%s mtu=%i\n",ifstat->ifname,address.Get(),netmask.Get(),gateway.Get(),broadcast.Get(),hw_address.Get(),ifstat->mtu);
+	printf("Interface: %s ip=%s mask=%s gateway=%s\n  broadcast=%s hw=%s mtu=%i\n",ifstat->ifname,address.Get(),netmask.Get(),gateway.Get(),broadcast.Get(),hw_address.Get(),ifstat->mtu);
 	ifstat->in.Print(true);
 	ifstat->out.Print(false);
 }

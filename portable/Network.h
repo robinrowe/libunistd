@@ -41,11 +41,11 @@ struct IfInterface
 	}
 	void Print(bool isIn)
 	{	if(isIn)
-		{	printf("packets=%llu bytes=%llu errors=%llu drops=%llu\n overruns==%llu multicast==%llu frame==%llu compress==%llu\n"
+		{	printf("  RX packets=%llu bytes=%llu errors=%llu drops=%llu\n  overruns==%llu multicast==%llu frame==%llu compress==%llu\n"
 				,packets,bytes,errors,drops,overruns,multicast,in_frame,in_compress);
 		}
 		else
-		{	printf("packets=%llu bytes=%llu errors=%llu drops=%llu\n overruns==%llu multicast==%llu colls==%llu carrier==%llu\n"
+		{	printf("  TX packets=%llu bytes=%llu errors=%llu drops=%llu\n  overruns==%llu multicast==%llu colls==%llu carrier==%llu\n"
 				,packets,bytes,errors,drops,overruns,multicast,out_colls,out_carrier);
 	}	}
 };
@@ -79,13 +79,12 @@ struct IfStat
 class Network
 {	bool UpdateIoctls(IfStat* ifstat);
 	void UpdateRoute();
+	const char* route_filename;
+	const char* dev_filename;
 public:
 	bool isChanged;
 	std::vector<IfStat> ifStats;
-	Network(unsigned interfaceCount)
-	:	isChanged(false)
-	{	ifStats.resize(interfaceCount);
-	}
+	Network(unsigned interfaceCount);
 	bool UpdateIfStats();
 	IfStat* GetIfStat(const char* ifname);
 	void PrintIfStat(IfStat* ifstat);

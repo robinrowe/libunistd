@@ -67,6 +67,11 @@ public:
 		bytes=fread(data,1,length,fp);
 		return bytes;
 	}
+	void Skip(unsigned charCount)
+	{	for(unsigned i=0;i<charCount && IsGood();i++)
+		{	int ch = getc(fp);
+			bytes++;
+	}	}	
 	void SkipLine()
 	{	if(!IsGood())
 		{	return;
