@@ -4,4 +4,5 @@ add_library (libunistd
     dirent.cpp
 	unistd.h
 	gettimeofday.cpp
+	uni_signal.cpp
 )

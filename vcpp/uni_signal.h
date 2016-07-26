@@ -1,11 +1,13 @@
 // uni_signal.h
-// Copyright 2016 Robin.Rowe@MovieEditor.com
+// Libunistd Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT 
 
 #ifndef uni_signal_h
 #define uni_signal_h
 
+#include "unistd.h"
 #include <signal.h>
+#include <time.h>
 #include "../portable/stub.h"
 
 #ifdef __cplusplus
@@ -124,27 +126,9 @@ inline
 int sigismember(const sigset_t *set, int signum)
 STUB0(sigismember)
 
-inline
-int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact)
-{	if(!act && !oldact)
-	{	return -1;
-	}
-	void (*sa_handler)(int);	
-	if(!act)
-	{	sa_handler = signal(signum,SIG_IGN);
-		if(SIG_ERR==sa_handler)
-		{	return -1;
-		}
-		signal (signum,sa_handler);
-		oldact->sa_handler=sa_handler;
-		return 0;
-	}
-	sa_handler = signal(signum,act->sa_handler);
-	if(SIG_ERR==sa_handler)
-	{	return -1;
-	}
-	return 0;
-}
+extern void (*CtrlCHandler)(int, struct siginfo_t *, void *);
+BOOL WindowsCtrlCHandler(DWORD fdwCtrlType) ;
+int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact);
 
 inline
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)

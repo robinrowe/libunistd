@@ -12,6 +12,8 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 
+#define SUPPRESS_SECURITY_WARNING __pragma(warning(suppress:4996))
+
 #define CHECK(var) if(var!=ifstat->var){ ifstat->var=var; isChanged = true;}
 
 namespace portable
@@ -19,6 +21,7 @@ namespace portable
 
 Network::Network(unsigned interfaceCount)
 :	isChanged(false)
+,	interfaces(0)
 {	ifStats.resize(interfaceCount);
 
 #ifdef WIN32
@@ -47,13 +50,15 @@ bool Network::UpdateIfStats()
 	proc_net_dev.SkipLine();
 	FILE* fd = proc_net_dev.GetFp();
 	unsigned lineCount=3;
-	for(unsigned i=0;i<ifStats.size();i++)
-	{	if(proc_net_dev.Feof())
-		{	break;
+	interfaces = 0;
+	while(!proc_net_dev.IsFeof())
+	{	if(interfaces>=ifStats.size())
+		{	proc_net_dev.SkipLine();
+			interfaces++;
 		}
-		IfStat* ifstat=&ifStats[i];
+		IfStat* ifstat=&ifStats[interfaces];
 		ifstat->Reset();
-#pragma warning(disable:4996)
+SUPPRESS_SECURITY_WARNING
 		const int items = fscanf(fd,
 			" %20[^:]:%llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu",
 			ifstat->ifname,
@@ -74,7 +79,8 @@ bool Network::UpdateIfStats()
 			&ifstat->out.out_carrier, 
 			&ifstat->out.out_carrier
 		);
-#pragma warning(default:4996)
+
+		interfaces++;
 		if(-1==items)
 		{	break;
 		}
@@ -132,9 +138,9 @@ void Network::UpdateRoute()
 	FILE* fd = proc_net_route.GetFp();
 	ProcNetRoute pnr;
 	unsigned lineCount = 2;
-	while(!proc_net_route.Feof())
+	while(!proc_net_route.IsFeof())
 	{	pnr.Reset();
-#pragma warning(disable:4996)
+SUPPRESS_SECURITY_WARNING
 		const int items = fscanf(fd,
 			"%s %x %x %x %x %x %x %x %x %x %x",
 			pnr.ifname,
@@ -149,7 +155,7 @@ void Network::UpdateRoute()
 			&pnr.window,
 			&pnr.irtt
 		);
-#pragma warning(default:4996)
+
 //		printf("Network::ifname=%s gateway=%u\n",pnr.ifname,pnr.gateway);
 		if(pnr.gateway)
 		{	IfStat* ifstat=GetIfStat(pnr.ifname);
@@ -230,17 +236,27 @@ bool Network::UpdateIoctls(IfStat* ifstat)
 }
 
 void Network::PrintStats()
-{	printf("Network::PrintStats() isChanged = %i\n",isChanged);
+{	printf("Network::PrintStats() interfaces=%u isChanged=%i\n",interfaces,isChanged);
 	for(unsigned i=0;i<ifStats.size();i++)
 	{	PrintIfStat(&ifStats[i]);
 }	}
 
-#pragma warning(disable:4996)
+void Network::PrintStats(const char* ifname)
+{	printf("Network::PrintStats() interfaces=%u isChanged=%i\n",interfaces,isChanged);
+	IfStat* ifstat = GetIfStat(ifname);
+	if(ifstat)
+	{	PrintIfStat(ifstat);
+	}
+	else
+	{	printf("Interface %s not found\n",ifname);
+}	}
+
 class Ip4Address
 {	char data[4*4];
 public:
 	Ip4Address(uint32_t quad,char sep)
 	{	unsigned char* p = reinterpret_cast<unsigned char*>(&quad);
+SUPPRESS_SECURITY_WARNING 
 		sprintf(data,"%u%c%u%C%u%c%u",unsigned(p[0]),sep,unsigned(p[1]),sep,unsigned(p[2]),sep,unsigned(p[3]));			
 	}
 	const char* Get() const
@@ -253,6 +269,7 @@ class HwAddress
 public:
 	HwAddress(uint64_t quad2,char sep)
 	{	unsigned char* p = reinterpret_cast<unsigned char*>(&quad2);
+SUPPRESS_SECURITY_WARNING
 		sprintf(data,"%u%c%u%c%u%c%u%c%u%c%u",// only has 48 bits, ignore p[0] and p[1]
 			unsigned(p[2]),sep,unsigned(p[3]),sep,unsigned(p[4]),sep,unsigned(p[5]),sep,unsigned(p[6]),sep,unsigned(p[7]));			
 	}
@@ -260,7 +277,7 @@ public:
 	{	return data;
 	}
 };
-#pragma warning(default:4996)
+
 
 void Network::PrintIfStat(IfStat* ifstat)
 {	if(!ifstat || !ifstat->address)
@@ -289,9 +306,9 @@ uint32_t GetInet4(SOCKET sock)
 	struct sockaddr_in *s = (struct sockaddr_in *)&addr;
 	inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
 	unsigned ip[4];
-#pragma warning(disable:4996)
+SUPPRESS_SECURITY_WARNING
 	scanf("%x.%x.%x.%x",ip,ip+1,ip+2,ip+3);
-#pragma warning(default:4996)
+
 	uint32_t r;
 	unsigned char* p = reinterpret_cast<unsigned char*>(&r);
 	p[0] = (unsigned char) ip[3];

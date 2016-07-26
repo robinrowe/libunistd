@@ -33,8 +33,8 @@ public:
 	bool IsGood() const
 	{	return nullptr!=fp;
 	}
-	bool Feof()
-	{	return IsGood()? 0!=feof(fp):true;
+	bool IsFeof()
+	{	return IsGood()? 0!=feof(fp):false;
 	}
 /* flags:
 "r"	read only: file must exist
@@ -69,7 +69,7 @@ public:
 	}
 	void Skip(unsigned charCount)
 	{	for(unsigned i=0;i<charCount && IsGood();i++)
-		{	int ch = getc(fp);
+		{	(void) getc(fp);
 			bytes++;
 	}	}	
 	void SkipLine()
@@ -83,6 +83,19 @@ public:
 			{	return;
 		}	}
 	}	
+	void GetLine(std::vector<char>& line)
+	{	if(!IsGood())
+		{	return;
+		}
+		for(unsigned i=0;i<line.size();i++)
+		{	int ch = getc(fp);
+			bytes++;
+			if (ch == '\n' || ch == EOF)
+			{	line[i] = 0;
+				return;
+		}	}
+		line[line.size()-1] = 0;
+	}
 	int Write(const char* data,size_t length)
 	{	if(!data || !IsGood())
 		{	return false;

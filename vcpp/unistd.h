@@ -367,6 +367,6 @@ typedef int Atom;
 
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
-#pragma warning(default:4996)
+
 
 #endif

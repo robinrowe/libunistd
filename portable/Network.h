@@ -83,12 +83,14 @@ class Network
 	const char* dev_filename;
 public:
 	bool isChanged;
+	unsigned interfaces;
 	std::vector<IfStat> ifStats;
 	Network(unsigned interfaceCount);
 	bool UpdateIfStats();
 	IfStat* GetIfStat(const char* ifname);
 	void PrintIfStat(IfStat* ifstat);
 	void PrintStats();
+	void PrintStats(const char* ifname);
 };
 
 }
