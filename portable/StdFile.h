@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <vector>
 #include <string.h>
+#include <stdarg.h>
 
 namespace portable
 {
@@ -146,6 +147,23 @@ public:
 	{	if(IsGood())
 		{	rewind(fp);
 	}	}
+#ifdef __GNUC__
+	int fscanf(const char* const format,...) __attribute__ ((format(scanf, 2, 3)))
+	{	va_list argList;
+		va_start(argList,format);
+		int retval = vfscanf(fp, format, argList);
+		va_end(argList);
+		return retval;
+	}
+#else
+	int fscanf(const char* const format,...)
+	{	va_list argList;
+		va_start(argList,format);
+		int retval = vfscanf(fp, format, argList);
+		va_end(argList);
+		return retval;
+	}
+#endif
 };
 
 // Slurp StdFile or StdDevice:

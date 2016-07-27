@@ -2,35 +2,45 @@
 // Libunistd Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT
 
-#include "Network.h"
-#include "StdFile.h"
-
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
+#include "Network.h"
+#include "StdFile.h"
+#include "StdBlob.h"
 
+#ifdef WIN32
 #define SUPPRESS_SECURITY_WARNING __pragma(warning(suppress:4996))
+#else
+#define SUPPRESS_SECURITY_WARNING 
+#endif
 
 #define CHECK(var) if(var!=ifstat->var){ ifstat->var=var; isChanged = true;}
 
 namespace portable
 {
 
+const char* output_proc_net_route =
+"Iface	Destination	Gateway 	Flags	RefCnt	Use	Metric	Mask		MTU	Window	IRTT\n"
+"eth0	00000000	0202000A	0003	0	0	100	00000000	0	0	1\n"
+"eth1	0002000A	00000000	0001	0	0	100	00FFFFFF	0	0	2\n";
+
+const char* output_proc_net_dev =
+"Inter-|   Receive                                                |  Transmit\n"
+" face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed\n"
+"    lo:   13380      87    0    0    0     0          0         0    13380      87    0    0    0     0       0          0\n"
+"  eth0: 279068630 1507895    0    0    0     0          0         0 567397982  852533    0    0    0     0       0          0\n"
+"  eth1: 1090810015 4017054   42    0    0     0          0         0 13975469  134398    0    0    0     0       0          0\n";
+
 Network::Network(unsigned interfaceCount)
 :	isChanged(false)
 ,	interfaces(0)
 {	ifStats.resize(interfaceCount);
-
-#ifdef WIN32
-	route_filename = "C:/Users/rrowe/proc_net_route.txt";
-	dev_filename = "C:/Users/rrowe/proc_net_dev.txt";
-#else
 	route_filename = "/proc/net/route";
 	dev_filename = "/proc/net/dev";
-#endif
 }
 
 /* (size = 450 +4 = 77 + 123 + 2*125 + 4 LF)
@@ -42,13 +52,17 @@ enth1:   485454    4814    0    0    0     0          0         0   485454    50
 */ 
 
 bool Network::UpdateIfStats()
-{	StdFile proc_net_dev;
+{	
+#ifdef WIN32
+	StdBlob proc_net_dev(output_proc_net_dev);
+#else
+	StdFile proc_net_dev;
 	if(!proc_net_dev.Open(dev_filename, "r"))
 	{	return false;
 	}
+#endif
 	proc_net_dev.SkipLine();
 	proc_net_dev.SkipLine();
-	FILE* fd = proc_net_dev.GetFp();
 	unsigned lineCount=3;
 	interfaces = 0;
 	while(!proc_net_dev.IsFeof())
@@ -59,7 +73,7 @@ bool Network::UpdateIfStats()
 		IfStat* ifstat=&ifStats[interfaces];
 		ifstat->Reset();
 SUPPRESS_SECURITY_WARNING
-		const int items = fscanf(fd,
+		const int items = proc_net_dev.fscanf(
 			" %20[^:]:%llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu %llu",
 			ifstat->ifname,
 			&ifstat->in.bytes,    
@@ -130,18 +144,22 @@ eth1	0002000A	00000000	0001	0	0	100	00FFFFFF	0	0	0
 */
 
 void Network::UpdateRoute()
-{	StdFile proc_net_route;
+{
+#ifdef WIN32
+	StdBlob proc_net_route(output_proc_net_route);
+#else
+	StdFile proc_net_route;
 	if(!proc_net_route.Open(route_filename, "r"))
 	{	return;
 	}
+#endif
 	proc_net_route.SkipLine();
-	FILE* fd = proc_net_route.GetFp();
 	ProcNetRoute pnr;
 	unsigned lineCount = 2;
 	while(!proc_net_route.IsFeof())
 	{	pnr.Reset();
 SUPPRESS_SECURITY_WARNING
-		const int items = fscanf(fd,
+		const int items = proc_net_route.fscanf(
 			"%s %x %x %x %x %x %x %x %x %x %x",
 			pnr.ifname,
 			&pnr.destination,
@@ -257,7 +275,7 @@ public:
 	Ip4Address(uint32_t quad,char sep)
 	{	unsigned char* p = reinterpret_cast<unsigned char*>(&quad);
 SUPPRESS_SECURITY_WARNING 
-		sprintf(data,"%u%c%u%C%u%c%u",unsigned(p[0]),sep,unsigned(p[1]),sep,unsigned(p[2]),sep,unsigned(p[3]));			
+		sprintf(data,"%u%c%u%c%u%c%u",unsigned(p[0]),sep,unsigned(p[1]),sep,unsigned(p[2]),sep,unsigned(p[3]));			
 	}
 	const char* Get() const
 	{	return data;

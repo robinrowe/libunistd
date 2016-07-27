@@ -27,7 +27,7 @@ public:
 		i = atoi(value);
 		return errno != EINVAL;
 	}
-	bool FindKey(const char* key)
+	bool IsKey(const char* key)
 	{	return nullptr != Get(key);
 	}
 };
