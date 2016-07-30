@@ -74,8 +74,8 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		{	SocketReset("Connection lost",packet);
 			return 0;
 		}
-		SocketReset("Packet receive underflow",packet);
-		return 0;
+		// SocketReset("Packet receive underflow",packet);
+		return bytes;
 	}
 	int packetSize = (int) packet.GetPacketSize();
 	if(packetSize<sizeof(packetSize))
@@ -85,11 +85,11 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 	//LogMsg("Receive packet");
 	for(;;)
 	{	
-#if 0			
-		cout <<"bytes: "<<bytes<<" packet: "<<packetSize<<endl;
+#if 1			
+		printf("bytes: %u packet: %u\n",bytes,packetSize);
 #endif
 		if(bytes<packetSize)
-		{	puts("Packet fragment");
+		{	printf("Packet fragment %u < %u\n",bytes,packetSize);
 			//SocketReset("Packet size overflow bytes",packet);
 			return bytes;
 		}
