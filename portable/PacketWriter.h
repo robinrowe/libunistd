@@ -6,7 +6,6 @@
 #define PacketWriter_h
 
 #include "Packet.h"
-#include "PacketMarker.h"
 
 namespace portable 
 {
@@ -31,15 +30,7 @@ public:
 	{	packetId = 0;
 		*packetSize=sizeof(T);
 	}
-	PacketMarker GetMarker() const
-	{	char* p=GetEndPtr();
-//		*packetSize+=sizeof(T);
-		return PacketMarker(p,*packetSize);
-	}
-	void SetMarker(PacketMarker& packetMarker)
-	{	packetMarker.SetDelta(GetPacketSize());
-	}
-	bool Skip(unsigned length)
+	bool Skip(unsigned length) override
 	{	if (*packetSize + length > bufsize)
 		{	return false;
 		}

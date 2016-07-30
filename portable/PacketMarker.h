@@ -5,35 +5,66 @@
 #ifndef PacketMarker_h
 #define PacketMarker_h
 
-#include "Packet.h"
+#include "PacketWriter.h"
+#include "PacketReader.h"
 
 namespace portable 
 {
 
+template <typename T>
 class PacketMarker
-{	friend class Packet;
-	char *buffer;
-	unsigned offset;
+{	char *data;
 public:
-	PacketMarker(char* buffer,unsigned offset)
-	:	buffer(buffer)
-	,	offset(offset)
-	{}
-	void SetDelta(unsigned offset)
-	{	SetValue(offset - this->offset);
+	PacketMarker(PacketWriter& packet)
+	:	data(packet.GetEndPtr())
+	{	packet.Skip(sizeof(T));
 	}
-	void SetValue(unsigned value)
-	{	memcpy(buffer,&value,sizeof(unsigned));
+	void SetValue(const T& value)
+	{	memcpy(data,&value,sizeof(T));
 	}
-/*
-	template <typename T>
-	void SetValue(T value)
-	{	memcpy(buffer,&value,sizeof(T));
+	unsigned GetSize() const
+	{	return sizeof(T);
 	}
-*/
 };
 
+class PacketDelta
+{	PacketWriter& packet;
+	PacketMarker<unsigned> marker;
+	unsigned offset;
+public:
+	PacketDelta(PacketWriter& packet)
+	:	packet(packet)
+	,	marker(packet)
+	{	offset = packet.GetPacketSize();
+	}
+	void SetValue()
+	{	const unsigned delta = packet.GetPacketSize() - offset;
+		marker.SetValue(delta);
+	}
+};
 
+class PacketHash
+{	Packet& packet;
+	unsigned offset;
+public:
+	PacketHash(PacketWriter& packet)
+	:	packet(packet)
+	{	offset = packet.GetPacketSize();
+	}
+	PacketHash(PacketReader& packet)
+	:	packet(packet)
+	{	offset = packet.GetReadOffset();
+	}
+	XXH64_hash_t  GetHash(unsigned long long seed = 0) const
+	{	const size_t length = packet.GetPacketSize() - offset;
+		const char* data = packet.GetPayload()+offset;
+		return XXH64(data,length,seed);
+	}
+	void Print() const
+	{	const unsigned length = packet.GetPacketSize() - offset;
+		printf("hash %u:%u %llu\n",offset,length,GetHash());
+	}
+};
 
 }
 
