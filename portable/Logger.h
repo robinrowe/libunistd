@@ -11,18 +11,24 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
 
 inline
 void SysLogMsg(const char* msg,const char* function)
 {	printf("TRACE: %s, %s\n",msg,function);
 }
+
 #pragma warning(disable:4996)
 inline
 void SysLogError(const char* msg,const char* function)
 {	printf("ERROR: %s, %s (%s)\n",msg,function,strerror(errno));
 #pragma warning(default:4996)
 #ifdef _DEBUG
+#ifdef _MSC_VER
 	DebugBreak();
+#else
+    raise(SIGTRAP);
+#endif
 #endif
 }
 #endif

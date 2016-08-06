@@ -3,6 +3,9 @@
 # Copyright 2016 Robin.Rowe@CinePaint.org
 # License open source MIT
 
+use POSIX qw(strftime);
+use Time::localtime;
+
 use strict;
 use warnings;
 	
@@ -36,7 +39,10 @@ sub main()
 	if(!length($license))
 	{	$license="License open source MIT";
 	}
-	my $top="// Copyright 2016 $email\n// $license\n\n";
+	my $now = "2016/7/27"; #strftime "%a %b %e %H:%M:%S %Y", localtime;
+	my $line1="// Copyright 2016 $email\n";
+	my $line2="// $now $license\n\n";
+	my $top = $line1.$line2;
 	my $h_file = $className.'.h';
 	my $body = "#ifndef ${className}_h\n#define ${className}_h\n\nclass ${className}\n{\npublic:\n};\n\n#endif\n";
 	Write($h_file,$body,$top);

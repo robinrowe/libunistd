@@ -1,5 +1,5 @@
 // CommandLine.h
-// Copyright 2016 Robin.Rowe@CinePaint.org
+// Libunistd Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT
 
 #ifndef CommandLine_h
@@ -7,19 +7,27 @@
 
 #include <map>
 #include <stdlib.h>
+#include <string.h>
+
+namespace portable
+{
 
 class CommandLine
 {	std::map<std::string,std::string> data;
+	int argc;
+	const char** argv;
 public:
-	void Read(int argc,const char** argv);
-	const char* Get(const char* key)
+	CommandLine(int argc,const char** argv);
+    void Append(const char* keyval);
+	const char* Get(const char* key) const
 	{	const auto it = data.find(key);
 		if(data.end()==it)
-		{	return 0;
+		{	return nullptr;
 		}
-		return &it->second;
+		const char* value = it->second.c_str();
+        return value;
 	}
-	bool Get(const char* key,int& i)
+	bool Get(const char* key,int& i) const
 	{	const char* value = Get(key);
 		if(!value)
 		{	return false;
@@ -27,9 +35,15 @@ public:
 		i = atoi(value);
 		return errno != EINVAL;
 	}
-	bool IsKey(const char* key)
-	{	return nullptr != Get(key);
+	const char* GetLast() const
+	{	return argv[argc-1];
+	}
+	bool IsKey(const char* key) const
+	{	const auto it = data.find(key);
+		return data.end()!=it;
 	}
 };
+
+}
 
 #endif

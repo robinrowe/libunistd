@@ -6,4 +6,5 @@ add_library (libportable
 	TimerPump.cpp
 	VariableClock.h
 	VariableClock.cpp
+	CommandLine.cpp
 )
