@@ -68,6 +68,28 @@ bool std_cpy(const char* start,const char* end,T& dest)
 	return true;
 }
 
+enum OS {unknown,android,linux,ios,mac,windows};
+
+inline 
+OS OperatingSystem()
+{
+#if defined(__ANDROID__)
+	return android;
+#elif defined(__gnu_linux__) || defined(__linux__)
+	return linux;
+#elif defined(__APPLE__) && defined(__MACH__)
+#if defined(TARGET_OS_IPHONE)
+	return ios;
+#else
+	return mac;
+#endif
+#elif defined(_WIN16) || defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__) || defined(WIN32)
+	return windows;
+#else
+	return unknown;
+#endif
+}
+
 } //portable
 
 #endif

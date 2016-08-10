@@ -41,4 +41,14 @@ void SysLogError(const char* msg,const char* function)
 #define SYSERR(msg) SysLogError(msg,__FUNCTION__)
 #endif
 
+/*
+ __attribute__((__format__(__printf__, 2,3)))
+void debugLogf(const char * functionName, const char * format, ...)
+{   va_list ap;
+    va_start(ap, format);
+    char buffer[1024];
+    vsnprintf(buffer, sizeof(buffer) / sizeof(*buffer), format, ap);
+    va_end(ap);
+}
+*/
 #endif

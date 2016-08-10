@@ -329,24 +329,6 @@ inline
 int snprintb_m(char *buf, size_t buflen, const char *fmt, uint64_t val,size_t max)
 STUB0(snprintb_m)
 
-inline
-size_t strlcpy(char* dst, const	char* src, size_t size)
-{	if(!dst || !src)
-	{	return 0;
-	}
-	strncpy(dst,src,size);
-	return strlen(src);
-}
-
-inline
-size_t strlcat(char* dst, const	char* src, size_t size)
-{	if(!dst || !src)
-	{	return 0;
-	}
-	strncat(dst,src,size);
-	return strlen(dst);
-}
-
 #define EBADFD 200
 #define ESHUTDOWN 201
 #define SHUT_RD SD_RECEIVE
