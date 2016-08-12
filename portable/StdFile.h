@@ -9,9 +9,10 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/stat.h>
-#include <vector>
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
+#include <string>
+#include <vector>
 
 namespace portable
 {
@@ -84,18 +85,14 @@ public:
 			{	return;
 		}	}
 	}	
-	void GetLine(std::vector<char>& line)
+	bool GetLine(char* s,unsigned size)
 	{	if(!IsGood())
-		{	return;
+		{	return false;
 		}
-		for(unsigned i=0;i<line.size();i++)
-		{	int ch = getc(fp);
-			bytes++;
-			if (ch == '\n' || ch == EOF)
-			{	line[i] = 0;
-				return;
-		}	}
-		line[line.size()-1] = 0;
+		return nullptr != fgets(s,size,fp);
+	}
+	bool GetLine(std::vector<char>& line)
+	{	return GetLine(&line[0],line.size());
 	}
 	int Write(const char* data,size_t length)
 	{	if(!data || !IsGood())
@@ -149,21 +146,15 @@ public:
 	}	}
 #ifdef __GNUC__
 	int fscanf(const char* const format,...) __attribute__ ((format(scanf, 2, 3)))
-	{	va_list argList;
-		va_start(argList,format);
-		int retval = vfscanf(fp, format, argList);
-		va_end(argList);
-		return retval;
-	}
 #else
 	int fscanf(const char* const format,...)
+#endif
 	{	va_list argList;
 		va_start(argList,format);
 		int retval = vfscanf(fp, format, argList);
 		va_end(argList);
 		return retval;
 	}
-#endif
 };
 
 // Slurp StdFile or StdDevice:

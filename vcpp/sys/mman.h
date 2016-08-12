@@ -5,15 +5,19 @@
 #ifndef mman_h
 #define mman_h
 
+#include <sys/types.h>
+#include <memory.h>
+#include <io.h>
+
 #define MAP_FAILED (void *) -1
 
 // On success, mmap() returns a pointer to the mapped area, on error, the value MAP_FAILED 
 //         p = mmap(nullptr, UIMAGE_SIZE, PROT_READ, MAP_SHARED | MAP_LOCKED, fd, 0xFC0A0000));
 inline
-void* mmap(void *addr, size_t len, int prot, int flags,int fd, off_t off)
-{	char* p = new char[len];
-	memset(p,0,len);
-	const int bytes = _read(fd,p,len);
+void *mmap(void *addr, size_t length, int prot, int flags,int fd, off_t offset)
+{	char* p = new char[length];
+	memset(p,0,length);
+	const int bytes = _read(fd,p,length);
 	return p;
 }
 

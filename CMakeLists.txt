@@ -1,6 +1,9 @@
+# Libunistd/CMakeList.txt
 
-add_subdirectory(
-	vcpp
-	portable
-	tabstop
-)
+if(WIN32)
+add_subdirectory(vcpp)
+endif()
+
+add_subdirectory(portable)
+add_subdirectory(tabstop)
+

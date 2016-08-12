@@ -137,13 +137,6 @@ inline
 int settimeofday(const struct timeval *tv, const struct timezone *tz)
 STUB0(0)
 
-inline
-struct tm* localtime_r(const time_t* t,struct tm* result)
-{	struct tm* r=localtime(t);
-	*result=*r;
-	return result;
-}
-
 #pragma warning(default:4996)
 
 #endif

@@ -86,7 +86,7 @@ size_t safe_strlen(const char* s)
 	return (s ? strlen(s):0);
 }
 
-#define strlen safe_strlen
+//#define strlen safe_strlen
 
 //#define inet_ntop InetNtop
 
@@ -97,12 +97,26 @@ size_t safe_strlen(const char* s)
 /* use with limits.h */
 #define LONG_LONG_MAX LLONG_MAX     
 #define LONG_LONG_MIN LLONG_MIN     
-/* #define ULLONG_MAX */
 
-#define snprintf _snprintf
 #define strdup _strdup
-/*#define snwprintf _snwprintf*/
 #define vsnprintf _vsnprintf
+
+inline
+int uni_sscanf(char* input,const char* format,...)
+{	if(!input || !format)
+	{	return 0;
+	}
+	const size_t length = strlen(input);
+	va_list argList;
+	va_start(argList,format);
+#pragma warning(suppress:4996)
+	const int retval = _snscanf(input,length-1,format,argList);
+	va_end(argList);
+	input[length-1]=0;
+	return retval;
+}
+
+#define sscanf uni_sscanf
 
 #undef MAX_PRIORITY /* remove winspool.h warning */
 
