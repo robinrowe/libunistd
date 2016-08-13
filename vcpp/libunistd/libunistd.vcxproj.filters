@@ -140,5 +140,8 @@
     <ClCompile Include="..\..\xxHash\xxhsum.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\portable\PacketReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

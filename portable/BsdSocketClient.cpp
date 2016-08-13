@@ -40,13 +40,13 @@ bool BsdSocketClient::Open(const char* serverName,int serverPort)
 		return false;
 	}
 	SetReuse(socketfd);
-	isGo=true;
 	Start();
 	return true;
 }
 
 void BsdSocketClient::Run()
-{	std::unique_ptr<char[]> buffer(new char[bufsize]);
+{	isGo = true;
+	std::unique_ptr<char[]> buffer(new char[bufsize]);
 	PacketReader packet(buffer.get(),bufsize);
 	unsigned offset=0;
 	while(isGo)
@@ -65,50 +65,45 @@ void BsdSocketClient::Run()
 }
 
 int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
-{	if(bytes<0)
-	{	SocketReset("Socket closed",packet);
-		return 0;
+{	if(!ReadyStream(bytes,packet))
+	{	return bytes;
 	}
-	if(bytes<=sizeof(unsigned))
-	{	if(!bytes)
-		{	SocketReset("Connection lost",packet);
-			return 0;
-		}
-		// SocketReset("Packet receive underflow",packet);
-		return bytes;
-	}
-	int packetSize = (int) packet.GetPacketSize();
-	if(packetSize<sizeof(packetSize))
-	{	SocketReset("Packet size underflow",packet);
-		return 0;
-	}	
+#if 1
+	printf("bytes: %i packetSize: %i\n",bytes,packetSize);
+#endif
+	unsigned packetId = 0;
 	//LogMsg("Receive packet");
 	for(;;)
-	{	
-#if 1			
-		printf("bytes: %u packet: %u\n",bytes,packetSize);
-#endif
+	{	if(status.IsActive())
+		{	status.packetCount++;
+			status.Print(packetId,bytes,packetSize);
+		}
 		if(bytes<packetSize)
-		{	printf("Packet fragment %u < %u\n",bytes,packetSize);
+		{	status.packetFragments++;
+			//printf("Packet fragment %u < %u\n",bytes,packetSize);
 			//SocketReset("Packet size overflow bytes",packet);
 			return bytes;
 		}
-		if(packetSize > (int) packet.GetCapacity())
-		{	SocketReset("Packet size corrupted",packet);
+		if(packetSize > packet.GetCapacity())
+		{	status.packetErrors++;
+			status.Print(packetId,bytes,packetSize);
+			SocketReset("Packet size corrupted",packet);
 			return 0;
 		}
-		unsigned packetId = 0;
+		packetId = 0;
 		packet>>packetId;
 		if(0==packetId)
 		{//	LogMsg("Reading header");
 			if(!ReadHeader(packet))
-			{	SocketReset("Packet header corrupted",packet);
+			{	status.Print(packetId,bytes,packetSize);
+				SocketReset("Packet header corrupted",packet);
 				return 0;
 		}	}
 		else
 		{//	LogMsg("Reading frame");
 			if(!ReadFrame(packet,packetId))
-			{	std::string s("Packet frame corrupted #");
+			{	status.Print(packetId,bytes,packetSize);
+				std::string s("Packet frame corrupted #");
 				s+=std::to_string(packetId);
 				SocketReset(s.c_str(),packet);
 				return 0;
@@ -136,7 +131,8 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		puts(msg.c_str());
 #endif
 		if(bytes<=sizeof(unsigned))
-		{	SocketReset("Packet receive underflow bytes",packet);
+		{	status.Print(packetId,bytes,packetSize);
+			SocketReset("Packet receive underflow bytes",packet);
 			return 0;
 		}
 //		packet>>packetSize;
@@ -147,7 +143,8 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		puts(msg.c_str());
 #endif
 		if(packetSize<sizeof(packetSize))
-		{	SocketReset("Packet size underflow packet",packet);
+		{	status.Print(packetId,bytes,packetSize);
+			SocketReset("Packet size underflow packet",packet);
 			return 0;
 		}	
 	}

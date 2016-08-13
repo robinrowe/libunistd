@@ -1,5 +1,5 @@
 // portable/PacketReader.h
-// Copyright 2016/1/16 Robin.Rowe@cinepaint.org
+// Libunistd Copyright 2016/1/16 Robin.Rowe@cinepaint.org
 // License open source MIT/BSD
 
 #ifndef PacketReader_h
@@ -13,6 +13,7 @@ namespace portable
 class PacketReader
 :	public Packet
 {	unsigned readOffset;
+	const char* dumpFilename;
 	bool IsOverflow(unsigned length) const
 	{	const unsigned size = GetPacketSize();
 		if(readOffset + length > size)
@@ -35,10 +36,14 @@ public:
 	PacketReader(const PacketSizer& sizer)
 	:	Packet(sizer)
 	{	InitReader();
+
 	}
 	PacketReader(char* buffer,unsigned bufsize)
 	:	Packet(buffer,bufsize)
 	{	InitReader();
+	}
+	void SetDumpFilename(const char* dumpFilename)
+	{	this->dumpFilename = dumpFilename;
 	}
 	bool IsGood() const
 	{	return !IsInvalid();
@@ -49,7 +54,7 @@ public:
 	}	
 	void NextInPipeline()
 	{	packet+=*packetSize;
-		packetSize=(unsigned*)packet;
+		packetSize=(T*)packet;
 		InitReader();
 	}
 #if 0
@@ -81,51 +86,9 @@ public:
 		readOffset+=length;
 		return true;
 	}
-	bool Read(std::string& s)
-	{	if(IsInvalid() || IsEmpty())
-		{	return false;
-		}
-		const char* readPtr = GetReadPtr();
-		const char* p = readPtr;
-		const char* endPtr = GetEndPtr();
-		while(p<endPtr)
-		{	if('\n' == *p)
-			{	const unsigned size = unsigned(p-readPtr);
-				s=std::move(std::string(readPtr,size));
-				readOffset+=size+1;
-				return true;
-			}
-			p++;
-		}
-		TRACE("Packet read string");
-		Invalidate();
-		return false;
-	}
-	bool Read(const char*& s,unsigned& size)
-	{	if(IsInvalid() || IsEmpty())
-		{	return false;
-		}
-		const char* readPtr = GetReadPtr();
-		const char* p = readPtr;
-		const char* endPtr = GetEndPtr();
-		while(p<endPtr)
-		{	if('\n' == *p)
-			{	size=unsigned(p-readPtr);
-				s = readPtr;
-				readOffset+=size+1;
-				return true;
-			}
-			p++;
-		}
-		size=0;
-		Invalidate();
-		return false;
-	}
-	void Dump() const
-	{	Packet::Dump();
-		const char* p=packet+readOffset;
-		printf(", readOffset = %d, reading: %d, %d, %d, %d\n",readOffset,unsigned(p[0]),unsigned(p[1]),unsigned(p[2]),unsigned(p[3]));
-	}
+	bool Read(std::string& s);
+	bool Read(const char*& s,unsigned& size);
+	void Dump() const;
 };
 
 
@@ -136,12 +99,8 @@ PacketReader& operator>>(PacketReader& packet,T& data)
 	return packet;
 }
 
-inline
-PacketReader& operator>>(PacketReader& packet,std::string& data)
-{	const bool ok = packet.Read(data);
-//	std::cout<<"read string" << std::endl;
-	return packet;
-}
+template<>
+PacketReader& operator>>(PacketReader& packet,std::string& data);
 
 }
 

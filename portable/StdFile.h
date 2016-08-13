@@ -159,7 +159,7 @@ long long GetFileSize(const char* filename)
 inline
 bool DeleteFile(const char* filename)
 {	
-#ifdef WIN32	
+#ifdef _WIN32	
 	const int err=_unlink(filename);
 	return err!=0;
 #else

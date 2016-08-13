@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include "PacketSizer.h"
 #include "SoftLock.h"
+#include "StdFile.h"
 #include "../xxHash/xxhash.h"
 
 #if 1
@@ -26,7 +27,7 @@ class Packet
 protected:
 	unsigned packetId;
 	char* packet;
-	typedef unsigned T;
+	typedef int T;
 	T* packetSize;
 	const unsigned bufsize;
 	bool IsEmpty() const
@@ -34,12 +35,9 @@ protected:
 //		std::cout << "isEmpty = "<<isEmpty << std::endl;
 		return isEmpty;
 	}
-	void SetEndl()
-	{	packet[GetPacketSize()-1]='\n';
-	}
 	void Init()
 	{	packet=buffer;
-		packetSize=(unsigned*) buffer;
+		packetSize=(T*) buffer;
 	}	
 public:			
 	AtomicMutex ownership;
@@ -64,10 +62,10 @@ public:
 	const char* GetPayload() const 
 	{	return packet+sizeof(*packetSize);
 	}
-	unsigned GetCapacity() const
+	T GetCapacity() const
 	{	return bufsize;
 	}
-	unsigned GetPacketSize() const
+	T GetPacketSize() const
 	{	return *packetSize;
 	}
 	bool IsGood() const

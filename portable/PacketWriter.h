@@ -39,30 +39,23 @@ public:
 	}
 	bool Write(const char* data,unsigned length)
 	{	if (*packetSize + length > bufsize)
-		{	return false;
+		{	puts("Packet write failed");
+			return false;
 		}
 		memcpy(GetEndPtr(),data,length);
 		*packetSize+=length;
 		return true;
 	}
 	bool Write(const std::string& s)
-	{	const unsigned length = (unsigned) s.length()+1;
-		if(!Write(s.c_str(),length))
-		{	return false;
-		}
-		SetEndl();
-		return true;
+	{	const unsigned zlength = (unsigned) s.length()+1;
+		return Write(s.c_str(),zlength);
 	}
 	bool Write(const char* s)
 	{	if(!s)
 		{	return false;
 		}
-		const unsigned length = (unsigned) strlen(s)+1;
-		if(!Write(s,length))
-		{	return false;
-		}
-		SetEndl();
-		return true;
+		const unsigned zlength = (unsigned) strlen(s)+1;
+		return Write(s,zlength);
 	}
 	void Duplicate()
 	{	char* end=GetEndPtr();
@@ -80,13 +73,6 @@ PacketWriter& operator<<(PacketWriter& packet,T data)
 
 inline
 PacketWriter& operator<<(PacketWriter& packet,const std::string& data)
-{	const bool ok = packet.Write(data);
-//	std::cout<<"read string" << std::endl;
-	return packet;
-}
-
-inline
-PacketWriter& operator<<(PacketWriter& packet,const char* data)
 {	const bool ok = packet.Write(data);
 //	std::cout<<"read string" << std::endl;
 	return packet;

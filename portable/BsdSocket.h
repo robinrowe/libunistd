@@ -45,7 +45,8 @@ protected:
 	{	return 0;
 	}
 	virtual void OnStop()
-	{}
+	{	puts("Soscket stream stopping");
+	}
 public:
 	MsgBuffer<120> errorMsg;
 	virtual ~BsdSocket()
@@ -77,7 +78,8 @@ public:
 	{	return SendTo(packet.GetPacket(),packet.GetPacketSize());
 	}
 	void Close()
-	{	isGo=false;
+	{	puts("Socket close");
+		isGo=false;
 		if(socketfd)
 		{	closesocket(socketfd);
 			socketfd=0;
@@ -100,7 +102,8 @@ public:
 			SendTo("",0);
 	}	}
 	virtual void Start()
-	{}
+	{	puts("Soscket stream starting");
+	}
 	static void GetPeerName(SOCKET sock,std::string& s); 
 	void GetPeerName(std::string& s) const
 	{	return GetPeerName(socketfd,s);

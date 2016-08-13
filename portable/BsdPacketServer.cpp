@@ -34,10 +34,16 @@ bool BsdPacketServer::Login(SOCKET* slot,SOCKET fd)
 	}
 	for(unsigned i=0;i<pool.socketfd.size();i++)
 	{	if(IsInvalid(pool.socketfd[i]))
-		{	if(!SendHeaderPacket(fd))
-			{	return false;
+		{	bool isStreaming = false;
+			if(isStreaming)
+			{	if(!SendHeaderPacket(fd))
+				{	return false;
+				}
+				pool.socketfd[i]=fd;
 			}
-			pool.socketfd[i]=fd;
+			else
+			{	pool.socketfd[i]=-fd;
+			}
 			std::string msg;
 			BsdSocket bsdSocket(fd);
 			bsdSocket.GetPeerName(msg);

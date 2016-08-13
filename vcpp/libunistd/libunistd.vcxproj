@@ -179,6 +179,7 @@
     <ClCompile Include="..\..\portable\BsdSocketClient.cpp" />
     <ClCompile Include="..\..\portable\BsdSocketPool.cpp" />
     <ClCompile Include="..\..\portable\BsdSocketServer.cpp" />
+    <ClCompile Include="..\..\portable\PacketReader.cpp" />
     <ClCompile Include="..\..\portable\TimerPump.cpp" />
     <ClCompile Include="..\..\xxHash\xxhash.c" />
     <ClCompile Include="..\..\xxHash\xxhsum.c" />

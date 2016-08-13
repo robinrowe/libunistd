@@ -10,14 +10,55 @@
 
 namespace portable 
 {
-	
+struct PacketStatus
+{	unsigned packetCount;
+	unsigned printStatusMax;
+	unsigned packetFragments;
+	unsigned packetErrors;
+	PacketStatus()
+	:	packetCount(0)
+	,	packetFragments(0)
+	,	packetErrors(0)
+	{	printStatusMax = 60*60;
+		dumpFilename = "PacketDump.bin";
+	}
+	bool IsActive() const
+	{	return 0 != printStatusMax;
+	}
+	const char* dumpFilename;
+	void Print(unsigned id,int bytes,int packetSize)
+	{	if(packetCount >= printStatusMax || packetErrors == 1)
+		{	packetCount = 0;
+			printf("id: %u packets: %u bytes: %u packetSize: %u fragments: %u errors: %u\n",
+					id,    packetCount,bytes,   packetSize, packetFragments,packetErrors);	
+	}	}
+};
+
 class BsdSocketClient
 :	public BsdSocket
 {	std::thread worker;
 	const unsigned bufsize;
+	PacketStatus status;
+	int packetSize;
 	static void Main(BsdSocketClient* self)
     {   self->Run();
     }
+	bool ReadyStream(int bytes,portable::PacketReader& packet) 
+	{	if(bytes<0)
+		{	SocketReset("Socket closed",packet);
+			return false;
+		}
+		if(bytes<sizeof(int))
+		{	status.packetFragments++;
+			return false;
+		}
+		packetSize = packet.GetPacketSize();
+		if(packetSize < bytes)
+		{	status.packetFragments++;
+			return false;
+		}
+		return true;
+	}
 protected:
 	void Run() override;
 	virtual bool ReadHeader(portable::PacketReader& packet) = 0;
@@ -27,7 +68,11 @@ protected:
 public:
 	BsdSocketClient(unsigned bufsize)
 	:	bufsize(bufsize)
+	,	packetSize(0)
 	{}
+	void PrintStatusMax(unsigned maxPackets)
+	{	status.printStatusMax = maxPackets;
+	}
 	void Close()
 	{	Stop();
 		if(socketfd)
