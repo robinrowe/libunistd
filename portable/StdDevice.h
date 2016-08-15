@@ -30,7 +30,7 @@ public:
 	,	bytes(0)
 	{}
 	~StdDevice()
-	{//	Close();
+	{//	Close(); //Do not close devices implicitly, may live beyond temporary StdDevice.
 	}
 	operator int() const
 	{	return fd;
@@ -70,6 +70,13 @@ public:
 		{	return 0;
 		}
 		bytes=read(fd,data,length);
+		return bytes;
+	}
+	int Read(char& c)
+	{	if(!IsGood())
+		{	return 0;
+		}
+		bytes=read(fd,&c,1);
 		return bytes;
 	}
 	int Write(const char* data,size_t length)
