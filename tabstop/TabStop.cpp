@@ -98,7 +98,9 @@ bool TabStop::TabsToSpaces()
 }
 
 bool TabStop::SpacesToTabs()
-{	while(infile.IsGood())
+{
+#if 0
+	while(infile.IsGood())
 	{	const char* inbuf = &in[0];
 		char* outbuf = &out[0];
 		infile.GetLine(in);
@@ -119,5 +121,6 @@ bool TabStop::SpacesToTabs()
 		*outbuf = 0;
 		puts(outbuf);
 	}
+#endif
 	return true;
 }

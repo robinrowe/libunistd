@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
 set(CMAKE_CXX_EXTENSIONS FALSE)
 
+include_directories(.)
+
 if(WIN32)
 add_subdirectory(vcpp)
 endif()

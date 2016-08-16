@@ -31,15 +31,7 @@ public:
 		out.resize(bufsize);
 	}
 	bool Open();
-	bool Run()
-	{	if(cmdLine.IsKey("--first-only") || cmdLine.IsKey("--unexpand"))
-		{	return SpacesToTabs();
-		}
-		if(cmdLine.IsKey("--initial") || cmdLine.IsKey("--expand"))
-		{	return TabsToSpaces();
-		}
-		return false;
-	}
+	bool Run();
 };
 
 #endif
