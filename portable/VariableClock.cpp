@@ -4,6 +4,11 @@
 
 #include "VariableClock.h"
 
+namespace portable
+{
+
 double VariableClock::speed;
 timeval VariableClock::dayStart;
 timespec VariableClock::clockStart;
+
+}

@@ -11,6 +11,12 @@
 #include <stdio.h>
 #include <memory.h>
 
+#ifdef _WIN32
+#define ATTRIBUTE(a,b) 
+#else
+#define ATTRIBUTE(a,b) __attribute__((format(printf, a, b)))
+#endif
+
 namespace portable
 {
 
@@ -75,7 +81,7 @@ size_t strlcat(T& dst, const char *src, size_t size)
 }
 
 inline
-int slprintf(char* const buffer, size_t size,const char* const format,...)
+int slprintf(char* const buffer, size_t size,const char* const format,...) //ATTRIBUTE(3,4)
 {	if(!buffer || !format || !size)
 	{	return 0;
 	}
@@ -85,18 +91,18 @@ int slprintf(char* const buffer, size_t size,const char* const format,...)
 #pragma warning(suppress:4996)
 	const int count = vsnprintf(buffer,size-1,format,argList);
 #else
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=format"
 	const int count = vsnprintf(buffer,size-1,format,argList);
+#pragma GCC diagnostic push
 #endif
 	va_end(argList);
-	if(size == count)
-	{	buffer[size-1]=0;
-		return count-1;
-	}
+	buffer[size-1]=0;
 	return count;
 }
 
 template<typename T>
-int slprintf(T& buffer, const char* const format,...)
+int slprintf(T& buffer, const char* const format,...) //ATTRIBUTE(2,3)
 {	const size_t size = buffer.size();
 	if(!format || !size)
 	{	return 0;
@@ -108,13 +114,14 @@ int slprintf(T& buffer, const char* const format,...)
 #pragma warning(suppress:4996)
 	const int count = vsnprintf(p,size-1,format,argList);
 #else
+//__pragma("GCC diagnostic ignored \"-Wsuggest-attribute=format\"")
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=format"
 	const int count = vsnprintf(p,size-1,format,argList);
+#pragma GCC diagnostic push
 #endif
 	va_end(argList);
-	if(size == count)
-	{	buffer[size-1]=0;
-		return count-1;
-	}
+	buffer[size-1]=0;
 	return count;
 }
 

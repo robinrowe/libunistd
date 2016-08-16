@@ -9,6 +9,9 @@
 #include <sys/time.h>
 #include <time.h>
 
+namespace portable
+{
+
 class VariableClock
 {	static double speed;
 	static timeval dayStart;
@@ -61,6 +64,8 @@ public:
 		tp->tv_sec=clockStart.tv_sec+delta.tv_sec;
 		tp->tv_nsec=clockStart.tv_nsec+delta.tv_nsec;
 		return 0;		
-	}};
+}	};
+
+}
 
 #endif
