@@ -76,7 +76,7 @@ size_t strlcat(char *dst, const char *src, size_t size)
 }
 
 template <typename T>
-size_t strlcat(T& dst, const char *src, size_t size)
+size_t strlcat(T& dst, const char *src)
 {	return strlcat(&dst[0],src,dst.size());
 }
 
