@@ -6,7 +6,8 @@
 #include "TabStop.h"
 
 unsigned TabStop::Untab(unsigned pin,unsigned pout)
-{	unsigned spaces = pout % tabsize;
+{	(void) pin;
+	unsigned spaces = pout % tabsize;
 	if(!spaces)
 	{	spaces = tabsize;
 	}
@@ -24,6 +25,7 @@ unsigned TabStop::Untab(unsigned pin,unsigned pout)
 
 unsigned TabStop::Tab(unsigned spaces,unsigned pout)
 {	unsigned tabs = spaces/tabsize;
+	(void) tabs;
 	spaces %= tabsize;
 	char* outbuf = &out[pout];
 	const unsigned end = pout+spaces;
