@@ -48,12 +48,32 @@
 
 #ifdef __cplusplus
 #include "chrono.h"
+#include <cinttypes>
 #pragma warning(disable : 4996)
+
+inline
+int snprintb(char *buf, size_t buflen, const char *fmt, uint64_t val)
+STUB0(snprintb)
+
+inline
+int snprintb_m(char *buf, size_t buflen, const char *fmt, uint64_t val,size_t max)
+STUB0(snprintb_m)
 
 inline
 int uni_open(const char* filename,unsigned oflag,int mode)
 {	return _open(filename,oflag,mode);
 }
+
+//overloaded C++ functions:
+
+inline 
+int mkdir(const char* path,int)
+{	 return _mkdir(path);
+}
+
+inline
+int fcntl(int handle,int mode,int mode2)
+STUB0(fcntl)
 
 #else
 #pragma warning(disable : 4996)
@@ -67,16 +87,6 @@ int uni_open(const char* filename,unsigned oflag)
 {	return _open(filename,oflag,0);
 }
 
-//overloaded C++ functions:
-inline 
-int mkdir(const char* path,int)
-{	 return _mkdir(path);
-}
-
-inline
-int fcntl(int handle,int mode,int mode2)
-STUB0(fcntl)
-
 inline 
 size_t safe_strlen(const char* s)
 {	if(!s)
@@ -86,7 +96,7 @@ size_t safe_strlen(const char* s)
 	return (s ? strlen(s):0);
 }
 
-#define strlen safe_strlen
+//#define strlen safe_strlen
 
 //#define inet_ntop InetNtop
 
@@ -97,12 +107,26 @@ size_t safe_strlen(const char* s)
 /* use with limits.h */
 #define LONG_LONG_MAX LLONG_MAX     
 #define LONG_LONG_MIN LLONG_MIN     
-/* #define ULLONG_MAX */
 
-#define snprintf _snprintf
 #define strdup _strdup
-/*#define snwprintf _snwprintf*/
 #define vsnprintf _vsnprintf
+
+inline
+int uni_sscanf(char* input,const char* format,...)
+{	if(!input || !format)
+	{	return 0;
+	}
+	const size_t length = strlen(input);
+	va_list argList;
+	va_start(argList,format);
+#pragma warning(suppress:4996)
+	const int retval = _snscanf(input,length-1,format,argList);
+	va_end(argList);
+	input[length-1]=0;
+	return retval;
+}
+
+#define sscanf uni_sscanf
 
 #undef MAX_PRIORITY /* remove winspool.h warning */
 
@@ -320,32 +344,6 @@ int syncfs(int fd)
 inline
 int fcntl(int handle,int mode)
 STUB0(fcntl)
-
-inline
-int snprintb(char *buf, size_t buflen, const char *fmt, uint64_t val)
-STUB0(snprintb)
-
-inline
-int snprintb_m(char *buf, size_t buflen, const char *fmt, uint64_t val,size_t max)
-STUB0(snprintb_m)
-
-inline
-size_t strlcpy(char* dst, const	char* src, size_t size)
-{	if(!dst || !src)
-	{	return 0;
-	}
-	strncpy(dst,src,size);
-	return strlen(src);
-}
-
-inline
-size_t strlcat(char* dst, const	char* src, size_t size)
-{	if(!dst || !src)
-	{	return 0;
-	}
-	strncat(dst,src,size);
-	return strlen(dst);
-}
 
 #define EBADFD 200
 #define ESHUTDOWN 201
