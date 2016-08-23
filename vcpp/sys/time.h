@@ -57,6 +57,32 @@ typedef struct _SYSTEMTIME {
 } SYSTEMTIME, *PSYSTEMTIME;
 #endif
 
+inline
+struct tm *gmtime_r(const time_t* t, struct tm* result)
+{	const errno_t err = gmtime_s(result, t);
+	return err ? nullptr:result;
+}
+
+inline
+char *asctime_r(const struct tm *tm, char *result)
+{	const unsigned bufsize = 26;//minimum
+	const errno_t err = asctime_s(result,bufsize,tm);
+	return err ? nullptr:result;
+}
+
+inline
+char *ctime_r(const time_t *t, char *result)
+{	const unsigned bufsize = 26;//minimum
+	const errno_t err = ctime_s(result,bufsize,t);
+	return err ? nullptr:result;
+}
+
+inline
+struct tm *localtime_r(const time_t *t, struct tm *result)
+{	const errno_t err = localtime_s(result,t);
+	return err ? nullptr:result;
+}
+
 #ifdef __cplusplus
 }
 #endif

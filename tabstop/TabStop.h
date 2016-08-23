@@ -25,21 +25,13 @@ class TabStop
 	bool Append(unsigned pin,unsigned pout);
 public:
 	TabStop(int argc,const char* argv[])
-	:	cmdLine(argc,argv)
-	,	tabsize(4)
+	:	tabsize(4)
+	,	cmdLine(argc,argv)
 	{	in.resize(bufsize);
 		out.resize(bufsize);
 	}
 	bool Open();
-	bool Run()
-	{	if(cmdLine.IsKey("--first-only") || cmdLine.IsKey("--unexpand"))
-		{	return SpacesToTabs();
-		}
-		if(cmdLine.IsKey("--initial") || cmdLine.IsKey("--expand"))
-		{	return TabsToSpaces();
-		}
-		return false;
-	}
+	bool Run();
 };
 
 #endif
