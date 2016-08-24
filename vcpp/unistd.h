@@ -9,9 +9,9 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-#define _CRT_SECURE_NO_DEPRECATE 
-#undef _CRT_SECURE_NO_WARNINGS
-#define _CRT_NONSTDC_NO_WARNINGS
+//#define _CRT_SECURE_NO_DEPRECATE 
+//#undef _CRT_SECURE_NO_WARNINGS
+//#define _CRT_NONSTDC_NO_WARNINGS
 #if _MSC_VER == 1900
 #include <vcruntime.h>
 #include <corecrt_io.h>
@@ -45,7 +45,7 @@
 #include <assert.h>
 #include "uni_signal.h"
 #include "../portable/stub.h"
-
+#include "gettimeofday.h"
 #ifdef __cplusplus
 #include "chrono.h"
 #include <cinttypes>

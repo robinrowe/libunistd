@@ -1,5 +1,5 @@
 // chrono.h: Windows emulation of common time functions
-// Copyright Nov 10, 2002, Robin.Rowe@CinePaint.org
+// Libunistd Copyright Nov 10, 2002, Robin.Rowe@CinePaint.org
 // License MIT (http://opensource.org/licenses/mit-license.php)
 
 #ifndef chrono_h
@@ -130,12 +130,6 @@ int nanosleep(const struct timespec *req, struct timespec *rem)
     delay+=req->tv_nsec;
 	return usleep(delay);
 }
-
-int gettimeofday(struct timeval* tv, struct timezone* tz);
-
-inline
-int settimeofday(const struct timeval *tv, const struct timezone *tz)
-STUB0(0)
 
 #pragma warning(default:4996)
 

@@ -22,8 +22,8 @@ void StubBug(const char* msg)
 
 #else
 inline
-void StubBug(const char* )
-{
+void StubBug(const char* msg)
+{	(void) msg;
 }
 
 #endif
