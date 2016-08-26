@@ -49,19 +49,19 @@ class PacketHash
 public:
 	PacketHash(PacketWriter& packet)
 	:	packet(packet)
-	{	offset = packet.GetPacketSize();
+	{	offset = packet.GetPayloadSize();
 	}
 	PacketHash(PacketReader& packet)
 	:	packet(packet)
 	{	offset = packet.GetReadOffset();
 	}
 	XXH64_hash_t  GetHash(unsigned long long seed = 0) const
-	{	const size_t length = packet.GetPacketSize() - offset;
-		const char* data = packet.GetPayload()+offset;
+	{	const size_t length = packet.GetPayloadSize() - offset;
+		const char* data = packet.GetPayload() + offset;
 		return XXH64(data,length,seed);
 	}
 	void Print() const
-	{	const unsigned length = packet.GetPacketSize() - offset;
+	{	const unsigned length = packet.GetPayloadSize();
 		printf("hash %u:%u %llu\n",offset,length,GetHash());
 	}
 };

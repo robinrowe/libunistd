@@ -15,42 +15,35 @@ PacketReader& operator>>(PacketReader& packet,std::string& data)
 }
 
 bool PacketReader::Read(std::string& s)
-{	if(IsInvalid() || IsEmpty())
+{	const char* cs ="";
+	unsigned stringLength = 0;
+	if(!Read(cs,stringLength))
 	{	return false;
 	}
-	const char* readPtr = GetReadPtr();
-	const char* p = readPtr;
-	const unsigned end = unsigned(GetEndPtr()-p);
-	for(unsigned i = 0; i < end; i++)
-	{	if(!p[i])
-		{	const unsigned size = unsigned(p-readPtr);
-			s=std::move(std::string(readPtr,size));
-			readOffset+=size+1;
-			return true;
-	}	}
-	printf("Packet read string overrun %u\n",end);
-	Invalidate();
-	return false;
+	s = cs;
+	return true;
 }
 
-bool PacketReader::Read(const char*& s,unsigned& size)
-{	if(IsInvalid() || IsEmpty())
+bool PacketReader::Read(const char*& s,unsigned& stringLength)
+{	stringLength = 0;
+	if(IsInvalid())
+	{	return false;
+	}
+	if(IsEmpty())
 	{	return false;
 	}
 	const char* readPtr = GetReadPtr();
 	const char* p = readPtr;
-	const char* endPtr = GetEndPtr();
-	while(p<endPtr)
-	{	if('\n' == *p)
-		{	size=unsigned(p-readPtr);
+	const unsigned size = unsigned(GetEndPtr() - p);
+	for(unsigned i=0;i<size;i++)
+	{	if(0 == p[i])
+		{	stringLength = i;
 			s = readPtr;
-			readOffset+=size+1;
+			readOffset += i;
+			readOffset++;
 			return true;
 		}
-		p++;
 	}
-	size=0;
-	Invalidate();
 	return false;
 }
 

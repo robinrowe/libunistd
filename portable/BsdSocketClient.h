@@ -26,11 +26,11 @@ struct PacketStatus
 	{	return 0 != printStatusMax;
 	}
 	const char* dumpFilename;
-	void Print(unsigned id,int bytes,int packetSize)
-	{	if(packetCount >= printStatusMax || packetErrors == 1)
+	void Print(unsigned id,int bytes,int packetSize, int capacity)
+	{	//if(packetCount >= printStatusMax || packetErrors == 1)
 		{	packetCount = 0;
-			printf("id: %u packets: %u bytes: %u packetSize: %u fragments: %u errors: %u\n",
-					id,    packetCount,bytes,   packetSize, packetFragments,packetErrors);	
+			printf("id: %u packets: %i bytes: %i packetSize: %i capacity: %u fragments: %u errors: %u\n",
+					id,    packetCount,bytes,   packetSize, capacity, packetFragments,packetErrors);	
 	}	}
 };
 

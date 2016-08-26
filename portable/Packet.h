@@ -68,6 +68,9 @@ public:
 	T GetPacketSize() const
 	{	return *packetSize;
 	}
+	T GetPayloadSize() const
+	{	return GetPacketSize() - sizeof(*packetSize);
+	}
 	bool IsGood() const
 	{	if(GetPacketSize()>GetCapacity())
 		{	return false;

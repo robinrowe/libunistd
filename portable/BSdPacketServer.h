@@ -34,6 +34,7 @@ class BsdPacketServer
 	virtual bool Login(SOCKET* slot,SOCKET fd) override;
 	bool Subscribe(SOCKET fd);
 	BsdMulticast multicast;
+	bool isStreaming;
 public:
 	PacketWriter headerPacket;
 	PacketQueue<bufSize> framePacket;
@@ -45,16 +46,14 @@ public:
 	,	headerPacket(&headerBuffer[0],bufSize)
 	,	framePacket(bufSize)
 	,	multicast(pool)
+	,	isStreaming(false)
 	{}
 	~BsdPacketServer()
 	{}
 	void MulticastHeaderPacket()
-	{	if(pool.IsEmpty())
-		{	return;
-		}
+	{	
 		multicast.SetHeaderPacket(&headerPacket);
-		multicast.SetFramePacket(&framePacket.GetBaked());
-		multicast.Wake();
+		MulticastFramePacket();
 	}
 	void MulticastFramePacket()
 	{	if(pool.IsEmpty())
@@ -63,6 +62,7 @@ public:
 		multicast.SetFramePacket(&framePacket.GetBaked());
 		multicast.Wake();
 	}
+#if 0
 	bool SendFramePacket(SOCKET fd)
 	{	if(framePacket.GetBaked().GetPacketSize()<=4)
 		{	puts("Packet not ready");
@@ -89,6 +89,10 @@ public:
 		BsdSocket::GetPeerName(fd,ip);
 		printf("Sent header packet to %s\n",ip.c_str());
 		return SendFramePacket(fd);
+	}
+#endif
+	void SetIsStreaming(bool isStreaming = true)
+	{	this->isStreaming = isStreaming;
 	}
 	bool Start(int serverPort,unsigned maxStreams);
 	//virtual void OnStop() const;

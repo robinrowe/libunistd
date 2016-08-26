@@ -20,6 +20,7 @@
 #include "MsgBuffer.h"
 #include "PacketReader.h"
 #include "AtomicCounter.h"
+#include "VerboseCounter.h"
 
 #pragma warning(disable:4265)
 
@@ -75,7 +76,12 @@ public:
 		return true;
 	}
 	bool SendTo(Packet& packet)
-	{	return SendTo(packet.GetPacket(),packet.GetPacketSize());
+	{	static VerboseCounter counter(600);
+		counter++;
+		if (counter)
+		{	printf("Packet #%u send %i\n", packet.GetPacketId(), packet.GetPacketSize());
+		}
+		return SendTo(packet.GetPacket(),packet.GetPacketSize());
 	}
 	void Close()
 	{	puts("Socket close");

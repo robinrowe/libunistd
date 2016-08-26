@@ -5,6 +5,7 @@
 
 #include "BsdSocketPool.h"
 #include "SoftLock.h"
+#include "VerboseCounter.h"
 
 namespace portable 
 {
@@ -23,10 +24,8 @@ SOCKET* BsdSocketPool::GetZombieSlot()
 	{	if(socketfd[i])
 		{	BsdSocket bsdSocket(socketfd[i]);
 			if(!bsdSocket.SendTo("",0))
-			{	socketfd[i]=0;
-				if(!s)
-				{	s = &socketfd[i];
-	}	}	}	}
+			{	ReleaseSlot(i);
+	}	}	}
 	return s;
 }
 
@@ -34,33 +33,43 @@ SOCKET* BsdSocketPool::GetZombieSlot()
 bool BsdSocketPool::ReleaseSlot(SOCKET* sock)
 {	for(unsigned i =0;i<socketfd.size();i++)
 	{	if(sock == &socketfd[i])
-		{	socketfd[i]=0;
+		{	ReleaseSlot(i);
 			return true;
 	}	}
 	return false;
 }
 
-int BsdSocketPool::DirectMulticast(Packet& packet)
-{	if(!packet.IsGood())
+int BsdSocketPool::DirectMulticast(Packet* headerPacket,Packet* framePacket,unsigned verboseCount)
+{	if(!headerPacket || !headerPacket->IsGood() || !framePacket || !framePacket->IsGood())
 	{	return -1;
 	}
-	SoftLock softlock(packet.ownership);
+	SoftLock softlock(framePacket->ownership);
 	if(!softlock)
 	{	return -1;
 	}
 	const unsigned maxShowPacketId = 10;
-//	if(counter<maxShowPacketId)
-	printf("Muticast packet #%d\n",packet.GetPacketId());
+	if(verboseCount)
+	{	static portable::VerboseCounter counter(600);
+		counter++;
+		if (counter)
+		{	printf("Muticast packet #%d\n", framePacket->GetPacketId());
+	}	}
 	int count = 0;
 	for(unsigned i=0;i<socketfd.size();i++)
 	{	if(!socketfd[i])
 		{	continue;
 		}
-		BsdSocket bsdSocket(socketfd[i]);
-		if(!bsdSocket.SendTo(packet))
-		{	ReleaseSlot(i);
+		if (!isHeaderSent[i])
+		{	if(SendPacket(headerPacket,i))
+			{	SendPacket(framePacket,i);
+			}
+			count++;
 			continue;
 		}
+		if(!isStreaming)
+		{	continue;
+		}
+		SendPacket(framePacket,i);
 		count++;
 	}
 	return count;

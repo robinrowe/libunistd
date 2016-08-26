@@ -42,6 +42,9 @@ public:
 	:	Packet(buffer,bufsize)
 	{	InitReader();
 	}
+	void SeekEnd()
+	{	readOffset = GetPacketSize();
+	}
 	void SetDumpFilename(const char* dumpFilename)
 	{	this->dumpFilename = dumpFilename;
 	}
