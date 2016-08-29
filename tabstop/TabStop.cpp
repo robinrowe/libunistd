@@ -41,8 +41,7 @@ void TabStop::TabsToSpaces(bool isTabs)
 }
 
 void TabStop::TabLine(bool isTabs)
-{	unsigned offset = 0;
-	unsigned spaces = 0;
+{	unsigned spaces = 0;
 	unsigned tabs = 0;
 	for(unsigned i = 0;i<in.size();i++)
 	{	if(isspace(in[i]))
