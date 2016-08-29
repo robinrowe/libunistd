@@ -5,6 +5,7 @@
 #ifndef chrono_h
 #define chrono_h
 
+#undef _CRT_NO_TIME_T
 #include <time.h>
 #include <chrono>
 #include <thread>
