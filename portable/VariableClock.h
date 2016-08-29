@@ -7,7 +7,7 @@
 
 #ifdef _WIN32
 #include "../vcpp/unistd.h"
-#include "../sys/time.h"
+#include "../vcpp/sys/time.h"
 #else
 #include <unistd.h>
 #include <sys/time.h>
