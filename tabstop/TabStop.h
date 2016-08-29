@@ -12,23 +12,31 @@
 #include <portable/CommandLine.h>
 
 class TabStop
-{	const size_t bufsize = 2048;
-	int tabsize;
+{	const size_t bufSize = 2048;
+	int tabSize;
 	std::vector<char> in;
 	std::vector<char> out;
 	portable::StdFile infile;
 	portable::CommandLine cmdLine;
-	bool TabsToSpaces();
-	bool SpacesToTabs();
-	unsigned Tab(unsigned pin,unsigned pout);
-	unsigned Untab(unsigned pin,unsigned pout);
-	bool Append(unsigned pin,unsigned pout);
+	void PrintLine()
+	{	puts(&out[0]);
+	}
+	void AppendOut(unsigned offset,const char* pin)
+	{	strncpy(&out[offset],pin,bufSize-offset);
+		out[bufSize-1] = 0;
+	}
+	void TabsToSpaces(bool isTabs);
+	void TabLine(bool isTabs);
+	void WriteOut(unsigned offset,unsigned spaces,unsigned tabs,bool isTabs);
+	unsigned SpaceOut(unsigned pin,unsigned pout);
 public:
 	TabStop(int argc,const char* argv[])
-	:	tabsize(4)
+	:	tabSize(4)
 	,	cmdLine(argc,argv)
-	{	in.resize(bufsize);
-		out.resize(bufsize);
+	{	in.resize(bufSize);
+		out.resize(bufSize);
+		in[0] = 0;
+		out[0] = 0;
 	}
 	bool Open();
 	bool Run();

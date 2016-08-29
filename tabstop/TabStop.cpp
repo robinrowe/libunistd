@@ -5,52 +5,6 @@
 #include <ctype.h>
 #include "TabStop.h"
 
-unsigned TabStop::Untab(unsigned pin,unsigned pout)
-{	(void) pin;
-	unsigned spaces = pout % tabsize;
-	if(!spaces)
-	{	spaces = tabsize;
-	}
-	char* outbuf = &out[pout];
-	const unsigned end = pout+spaces;
-	if(end>=bufsize)
-	{	return 0;
-	}
-	for(unsigned i = pout;i<end;i++)
-	{	*outbuf = ' ';
-		outbuf++;
-	}
-	return end;
-}
-
-unsigned TabStop::Tab(unsigned spaces,unsigned pout)
-{	unsigned tabs = spaces/tabsize;
-	(void) tabs;
-	spaces %= tabsize;
-	char* outbuf = &out[pout];
-	const unsigned end = pout+spaces;
-	if(end>=bufsize)
-	{	return 0;
-	}
-	for(unsigned i = pout;i<end;i++)
-	{	*outbuf = ' ';
-		outbuf++;
-	}
-	return end;
-}
-
-bool TabStop::Append(unsigned pin,unsigned pout)
-{	for(; pin<bufsize; pin++,pout++)
-	{	if(pout>=bufsize)
-		{	return false;
-		}
-		out[pout] = in[pin];
-		if(!in[pin])
-		{	return true;
-	}	}
-	return true;
-}
-
 bool TabStop::Open()
 {	const char* filename = cmdLine.GetLast();
 	if(!infile.Open(filename,"r"))
@@ -59,7 +13,7 @@ bool TabStop::Open()
 	}
 	const char* tabs="--tabs";
 	if(cmdLine.IsKey(tabs))
-	{	if(!cmdLine.Get(tabs,tabsize) || tabsize < 1)
+	{	if(!cmdLine.Get(tabs,tabSize) || tabSize < 1)
 		{	return false;
 	}	}
 	return true;
@@ -67,62 +21,60 @@ bool TabStop::Open()
 
 bool TabStop::Run()
 {	if(cmdLine.IsKey("--first-only") || cmdLine.IsKey("--unexpand"))
-	{	return SpacesToTabs();
+	{	TabsToSpaces(false);
+		return true;
 	}
 	if(cmdLine.IsKey("--initial") || cmdLine.IsKey("--expand"))
-	{	return TabsToSpaces();
+	{	TabsToSpaces(true);
+		return true;
 	}
 	puts("Not sure what you want to do...");
 	return false;
 }
 
-bool TabStop::TabsToSpaces()
-{	while(infile.IsGood())
-	{	unsigned offset = 0;
-		infile.GetLine(in);
-		for(unsigned i = 0;i<in.size();i++)
-		{	const char c = in[i];
-			if('\t'==c)
-			{	offset = Tab(i,offset);
-				if(!offset)
-				{	puts("Buffer overflow > 2k line");
-					return false;
-				}
-				continue;
-			}
-			if(!isspace(c))
-			{	Append(i,offset);
-				break;
-		}	}
-		puts(&out[0]);
+void TabStop::TabsToSpaces(bool isTabs)
+{	tabSize = 0;
+	while(infile.GetLine(in))
+	{	TabLine(isTabs);
+		PrintLine();
 	}
-	return true;
 }
 
-bool TabStop::SpacesToTabs()
-{
-#if 0
-	while(infile.IsGood())
-	{	const char* inbuf = &in[0];
-		char* outbuf = &out[0];
-		infile.GetLine(in);
-		bool isMargin = true;
-		for(unsigned i = 0;i<in.size();i++)
-		{	const char c = in[i];
-			if('\t'==c)
-			{	if(outbuf - &out[0] + tabsize > (int) bufsize)
-				{	puts("Buffer overflow > 2k line");
-					return false;
-				}
-				outbuf = Tab(i,outbuf);
-				continue;
-			}
-			*outbuf = in[i];
-			outbuf++;
+void TabStop::TabLine(bool isTabs)
+{	unsigned offset = 0;
+	unsigned spaces = 0;
+	unsigned tabs = 0;
+	for(unsigned i = 0;i<in.size();i++)
+	{	if(isspace(in[i]))
+		{	spaces++;
+			continue;
 		}
-		*outbuf = 0;
-		puts(outbuf);
+		return WriteOut(i,spaces,tabs,isTabs);
 	}
-#endif
-	return true;
+	out[0] = 0;// only had spaces
 }
+
+void TabStop::WriteOut(unsigned offset,unsigned spaces,unsigned tabs,bool isToTabs)
+{	char* outbuf = &out[0];
+	if(!isToTabs)
+	{	const unsigned length = tabs*tabSize;
+		memset(outbuf,' ',length);
+		AppendOut(tabs,&in[offset]);
+		return;
+	}
+	if(!tabSize)
+	{	tabSize = spaces;
+	}	
+	if(!tabSize)
+	{	tabSize = 4;
+	}
+	unsigned length = spaces/tabSize;
+	memset(outbuf,'\t',length);
+	const unsigned extraLength = spaces % tabSize;
+	if(extraLength)
+	{	memset(outbuf+length,' ',extraLength);
+		length += extraLength;
+	}
+	AppendOut(length,&in[offset]);
+}
+	
