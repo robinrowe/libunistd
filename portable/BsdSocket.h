@@ -6,10 +6,16 @@
 #ifndef BsdSocket_h
 #define BsdSocket_h
 
+#ifdef _WIN32
+#include "../vcpp/unistd.h"
+#include "../vcpp/netinet/in.h"
+#include "../vcpp/arpa/inet.h"
+#else
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
+#emdif
+#include <sys/socket.h>
 #include <thread>
 #include <memory.h> 
 #include <string>

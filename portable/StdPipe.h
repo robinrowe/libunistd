@@ -6,7 +6,6 @@
 #define StdPipe_h
 
 #include "StdFile.h"
-#include <unistd.h>
 #include <stdio.h>
 
 namespace portable

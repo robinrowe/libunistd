@@ -6,7 +6,11 @@
 #ifndef StdDevice_h
 #define StdDevice_h
 
+#ifdef _WIN32
+#include "../vcpp/unistd.h"
+#else
 #include <unistd.h>
+#endif
 #include <fcntl.h>
 #include <string.h>
 

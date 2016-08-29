@@ -8,7 +8,11 @@
 #ifdef UNREAL_ENGINE
 #include "UnrealLogger.h"
 #else
+#ifdef _WIN32
+#include "../vcpp/unistd.h"
+#else
 #include <unistd.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>

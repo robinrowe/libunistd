@@ -2,12 +2,19 @@
 // 2013/11/20
 
 #include "Http.h"
+#ifdef _WIN32
+#include "../vcpp/unistd.h"
+#include "../vcpp/netinet/in.h"
+#include "../vcpp/arpa/inet.h"
+#include "../vcpp/netdb.h"
+#else
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#endif
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <ctype.h>
 #include <string>
 #include <stdlib.h>

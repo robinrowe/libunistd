@@ -5,7 +5,11 @@
 #ifndef VariableClock_h
 #define VariableClock_h
 
+#ifdef _WIN32
+#include "../vcpp/unistd.h"
+#else
 #include <unistd.h>
+#endif
 #include <sys/time.h>
 #include <time.h>
 
