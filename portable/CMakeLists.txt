@@ -10,6 +10,6 @@ add_library (libportable
 	CommandLine.cpp
 )
 
-if(WIN32)
-include_directories(..)
+if (WIN32)
+include_directories(../vcpp)
 endif()
