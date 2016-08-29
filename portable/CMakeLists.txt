@@ -9,3 +9,7 @@ add_library (libportable
 	VariableClock.cpp
 	CommandLine.cpp
 )
+
+if(WIN32)
+include_directories(..)
+endif()
