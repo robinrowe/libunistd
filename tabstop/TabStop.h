@@ -21,10 +21,12 @@ class TabStop
 	void PrintLine()
 	{	puts(&out[0]);
 	}
+#pragma warning(disable:4996)
 	void AppendOut(unsigned offset,const char* pin)
 	{	strncpy(&out[offset],pin,bufSize-offset);
 		out[bufSize-1] = 0;
 	}
+#pragma warning(default:4996)
 	void TabsToSpaces(bool isTabs);
 	void TabLine(bool isTabs);
 	void WriteOut(unsigned offset,unsigned spaces,unsigned tabs,bool isTabs);

@@ -7,10 +7,11 @@
 
 #ifdef _WIN32
 #include "../vcpp/unistd.h"
+#include "../sys/time.h"
 #else
 #include <unistd.h>
-#endif
 #include <sys/time.h>
+#endif
 #include <time.h>
 
 namespace portable

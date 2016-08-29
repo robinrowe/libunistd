@@ -26,7 +26,7 @@ class StdDevice
 #endif
 public:
 	StdDevice()
-	:	fd(0)
+	:	fd(-1)
 	,	bytes(0)
 	{}
 	StdDevice(int fd)
@@ -40,7 +40,7 @@ public:
 	{	return fd;
 	}
 	bool IsGood() const
-	{	return 0 < fd;
+	{	return 0 <= fd;
 	}
 	bool operator!() const
 	{	return !IsGood();
@@ -50,7 +50,7 @@ public:
 	void Close()
 	{	if(IsGood())
 		{	close(fd);
-			fd=0;
+			fd = -1;
 	}	}
 	bool Open(const char* filename,int flags)
 	{	fd = open(filename,flags);

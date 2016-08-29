@@ -5,7 +5,7 @@
 #ifndef arpa_inet_h
 #define arpa_inet_h
 
-#include "unistd.h"
+#include "../unistd.h"
 
 #ifdef __cplusplus
 extern "C" {
