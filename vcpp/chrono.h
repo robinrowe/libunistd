@@ -5,6 +5,7 @@
 #ifndef chrono_h
 #define chrono_h
 
+#include <time.h>
 #include <chrono>
 #include <thread>
 #include <string>
@@ -63,8 +64,7 @@ enum
 	CLOCK_THREAD_CPUTIME_ID
 };
 
-#if 1
-//#if _MSC_VER <= 1800
+#if _MSC_VER <= 1800
 struct timespec {
         time_t   tv_sec;        /* seconds */
         long     tv_nsec;       /* nanoseconds */
