@@ -5,6 +5,12 @@
 #ifndef ip_h
 #define ip_h
 
+#ifdef _WIN32
+#include "../unistd.h"
+#else
+#include <unistd.h>
+#endif
+#include <inaddr.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -12,26 +18,6 @@ extern "C" {
 #else
 #define inline __inline
 #endif
-
-#if 0
-struct ip
-{	uint8_t ip_hdr_len;
-	uint8_t ip_version;
-	uint8_t ip_tos;
-	uint16_t ip_len;
-	uint16_t ip_id;
-	uint16_t ip_off;
-	uint8_t ip_ttl;
-	uint8_t ip_proto;
-	uint16_t ip_chk;
-	uint32_t ip_src;
-	uint32_t ip_dst;
-};
-#endif
-
-struct in_addr 
-{	uint32_t       s_addr;     /* address in network byte order */
-};
 
 struct ip
 {	unsigned int ip_hl:4;		/* header length */
