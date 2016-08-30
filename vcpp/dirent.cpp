@@ -1,366 +1,226 @@
-/*
- * dirent.c
- *
- * Derived from DIRLIB.C by Matt J. Weinstein 
- * This note appears in the DIRLIB.H
- * DIRLIB.H by M. J. Weinstein   Released to public domain 1-Jan-89
- *
- * Updated by Jeremy Bettis <jeremy@hksys.com>
- * Significantly revised and rewinddir, seekdir and telldir added by Colin
- * Peters <colin@fu.is.saga-u.ac.jp>
- *	
- * $Revision: 1.1 $
- * $Author: tml $
- * $Date: 2001/09/29 22:09:24 $
- *
- */
+// dirent.cpp
+// Created by Robin Rowe on 2016/8/30
+// Copyright (c) 2016 Robin.Rowe@CinePaint.org
+// License open source MIT
 
+#include "unistd.h"
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
 #include <io.h>
 #include <direct.h>
-#include "dirent.h"
 #include <list>
 #include <string>
+#include "dirent.h"
 
+#define SUFFIX	'*'
+#define	SLASH	'\\'
 
-#define WIN32_LEAN_AND_MEAN
-#include <WinSock2.h>
-#include <windows.h> /* for GetFileAttributes */
-
-#define SUFFIX	"*"
-#define	SLASH	"\\"
-#pragma warning (disable : 4996)
-/*
- * opendir
- *
- * Returns a pointer to a DIR structure appropriately filled in to begin
- * searching a directory.
- */
-DIR * 
-opendir (const char *szPath)
-{
-  DIR *nd;
-  unsigned int rc;
-	
-  errno = 0;
-
-  if (!szPath)
-    {
-      errno = EFAULT;
-      return (DIR *) 0;
-    }
-
-  if (szPath[0] == '\0')
-    {
-      errno = ENOTDIR;
-      return (DIR *) 0;
-    }
-
-  /* Attempt to determine if the given path really is a directory. */
-  rc = GetFileAttributes(szPath);
-  if (rc == -1)
-    {
-      /* call GetLastError for more error info */
-      errno = ENOENT;
-      return (DIR *) 0;
-    }
-  if (!(rc & FILE_ATTRIBUTE_DIRECTORY))
-    {
-      /* Error, entry exists but not a directory. */
-      errno = ENOTDIR;
-      return (DIR *) 0;
-    }
-
-  /* Allocate enough space to store DIR structure and the complete
-   * directory path given. */
-  nd = (DIR *) malloc (sizeof (DIR) + strlen (szPath) + strlen (SLASH) +
-		       strlen (SUFFIX));
-
-  if (!nd)
-    {
-      /* Error, out of memory. */
-      errno = ENOMEM;
-      return (DIR *) 0;
-    }
-
-  /* Create the search expression. */
-  strcpy (nd->dd_name, szPath);
-
-  /* Add on a slash if the path does not end with one. */
-  if (nd->dd_name[0] != '\0' &&
-      nd->dd_name[strlen (nd->dd_name) - 1] != '/' &&
-      nd->dd_name[strlen (nd->dd_name) - 1] != '\\')
-    {
-      strcat (nd->dd_name, SLASH);
-    }
-
-  /* Add on the search pattern */
-  strcat (nd->dd_name, SUFFIX);
-
-  /* Initialize handle to -1 so that a premature closedir doesn't try
-   * to call _findclose on it. */
-  nd->dd_handle = -1;
-
-  /* Initialize the status. */
-  nd->dd_stat = 0;
-
-  /* Initialize the dirent structure. ino and reclen are invalid under
-   * Win32, and name simply points at the appropriate part of the
-   * findfirst_t structure. */
-  nd->dd_dir.d_ino = 0;
-  nd->dd_dir.d_reclen = 0;
-  nd->dd_dir.d_namlen = 0;
-  nd->dd_dir.d_name = nd->dd_dta.name;
-
-  return nd;
+DIR* opendir(const char *path)
+{	errno = 0;
+	if(!path)
+	{	errno = EFAULT;
+		return nullptr;
+	}
+	if(!path[0])
+	{	errno = ENOTDIR;
+		return nullptr;
+	}
+	const unsigned int rc = GetFileAttributes(path);
+	if(rc == -1)
+	{	errno = ENOENT;
+		return nullptr;
+	}
+	if (!(rc & FILE_ATTRIBUTE_DIRECTORY))
+	{	errno = ENOTDIR;
+		return nullptr;
+	}
+	size_t pathLength = strlen (path);
+	const size_t size = sizeof (DIR) + pathLength + 2;
+	DIR* dir = (DIR *) malloc(size);
+	if (!dir)
+	{	errno = ENOMEM;
+		return nullptr;
+	}
+	strcpy (dir->dd_name,path);
+	if(pathLength)
+	{	const char c = dir->dd_name[pathLength-1];
+		if(c != '/' && c != '\\')
+		{	dir->dd_name[pathLength++] = SLASH;
+			dir->dd_name[pathLength] = 0;
+	}	}
+	dir->dd_name[pathLength++] = SUFFIX;
+	dir->dd_name[pathLength] = 0;
+	dir->dd_handle = -1;
+	dir->dd_stat = 0;
+	dir->dd_dir.d_ino = 0;
+	dir->dd_dir.d_reclen = 0;
+	dir->dd_dir.d_namlen = 0;
+	dir->dd_dir.d_name = dir->dd_dta.name;
+	return dir;
 }
 
-
-/*
- * readdir
- *
- * Return a pointer to a dirent structure filled with the information on the
- * next entry in the directory.
- */
-struct dirent *
-readdir (DIR * dirp)
-{
-  errno = 0;
-
-  /* Check for valid DIR struct. */
-  if (!dirp)
-    {
-      errno = EFAULT;
-      return (struct dirent *) 0;
-    }
-
-  if (dirp->dd_dir.d_name != dirp->dd_dta.name)
-    {
-      /* The structure does not seem to be set up correctly. */
-      errno = EINVAL;
-      return (struct dirent *) 0;
-    }
-
-  if (dirp->dd_stat < 0)
-    {
-      /* We have already returned all files in the directory
-       * (or the structure has an invalid dd_stat). */
-      return (struct dirent *) 0;
-    }
-  else if (dirp->dd_stat == 0)
-    {
-      /* We haven't started the search yet. */
-      /* Start the search */
-      dirp->dd_handle = _findfirst (dirp->dd_name, &(dirp->dd_dta));
-
-  	  if (dirp->dd_handle == -1)
-	{
-	  /* Whoops! Seems there are no files in that
-	   * directory. */
-	  dirp->dd_stat = -1;
+struct dirent* readdir(DIR* dir)
+{	errno = 0;
+	if(!dir)
+	{	errno = EFAULT;
+		return nullptr;
 	}
-      else
-	{
-	  dirp->dd_stat = 1;
+	if(dir->dd_dir.d_name != dir->dd_dta.name)
+	{	errno = EINVAL;
+		return nullptr;
 	}
-    }
-  else
-    {
-      /* Get the next search entry. */
-      if (_findnext (dirp->dd_handle, &(dirp->dd_dta)))
-	{
-	  /* We are off the end or otherwise error. */
-	  _findclose (dirp->dd_handle);
-	  dirp->dd_handle = -1;
-	  dirp->dd_stat = -1;
+	if(dir->dd_stat < 0)
+	{	return nullptr;	
 	}
-      else
-	{
-	  /* Update the status to indicate the correct
-	   * number. */
-	  dirp->dd_stat++;
+	if(dir->dd_stat == 0)
+	{	dir->dd_handle = _findfirst (dir->dd_name, &(dir->dd_dta));
+		if(dir->dd_handle == -1)
+		{	dir->dd_stat = -1;
+			return nullptr;
+		}
+		dir->dd_stat = 1;
 	}
-    }
-
-  if (dirp->dd_stat > 0)
-    {
-      /* Successfully got an entry. Everything about the file is
-       * already appropriately filled in except the length of the
-       * file name. */
-      dirp->dd_dir.d_namlen = (unsigned short) strlen (dirp->dd_dir.d_name);
-      return &dirp->dd_dir;
-    }
-
-  return (struct dirent *) 0;
+	else
+	{	if(_findnext(dir->dd_handle,&(dir->dd_dta)))
+		{	_findclose (dir->dd_handle);
+			dir->dd_handle = -1;
+			dir->dd_stat = -1;
+			return nullptr;
+		}
+		dir->dd_stat++;
+	}
+	dir->dd_dir.d_namlen = (unsigned short) strlen(dir->dd_dir.d_name);
+	return &dir->dd_dir;
 }
 
-
-/*
- * closedir
- *
- * Frees up resources allocated by opendir.
- */
-int
-closedir (DIR * dirp)
-{
-  int rc;
-
-  errno = 0;
-  rc = 0;
-
-  if (!dirp)
-    {
-      errno = EFAULT;
-      return -1;
-    }
-
-  if (dirp->dd_handle != -1)
-    {
-      rc = _findclose (dirp->dd_handle);
-    }
-
-  /* Delete the dir structure. */
-  free (dirp);
-
-  return rc;
-}
-
-/*
- * rewinddir
- *
- * Return to the beginning of the directory "stream". We simply call findclose
- * and then reset things like an opendir.
- */
-void
-rewinddir (DIR * dirp)
-{
-  errno = 0;
-
-  if (!dirp)
-    {
-      errno = EFAULT;
-      return;
-    }
-
-  if (dirp->dd_handle != -1)
-    {
-      _findclose (dirp->dd_handle);
-    }
-
-  dirp->dd_handle = -1;
-  dirp->dd_stat = 0;
-}
-
-/*
- * telldir
- *
- * Returns the "position" in the "directory stream" which can be used with
- * seekdir to go back to an old entry. We simply return the value in stat.
- */
-long
-telldir (DIR * dirp)
-{
-  errno = 0;
-
-  if (!dirp)
-    {
-      errno = EFAULT;
-      return -1;
-    }
-  return dirp->dd_stat;
-}
-
-/*
- * seekdir
- *
- * Seek to an entry previously returned by telldir. We rewind the directory
- * and call readdir repeatedly until either dd_stat is the position number
- * or -1 (off the end). This is not perfect, in that the directory may
- * have changed while we weren't looking. But that is probably the case with
- * any such system.
- */
-void
-seekdir (DIR * dirp, long lPos)
-{
-  errno = 0;
-
-  if (!dirp)
-    {
-      errno = EFAULT;
-      return;
-    }
-
-  if (lPos < -1)
-    {
-      /* Seeking to an invalid position. */
-      errno = EINVAL;
-      return;
-    }
-  else if (lPos == -1)
-    {
-      /* Seek past end. */
-      if (dirp->dd_handle != -1)
-	{
-	  _findclose (dirp->dd_handle);
-	}
-      dirp->dd_handle = -1;
-      dirp->dd_stat = -1;
-    }
-  else
-    {
-      /* Rewind and read forward to the appropriate index. */
-      rewinddir (dirp);
-
-      while ((dirp->dd_stat < lPos) && readdir (dirp))
-	;
-    }
-}
-
-struct DirEntry
-{	dirent dir;
-	std::string name;
-public:
-	DirEntry(dirent* dir,const char* name)
-	:	dir(*dir)
-	,	name(name)
-	{	dir->d_name=&this->name[0];
-	}
-};
-
-struct DirCompare 
-{    bool operator()(const DirEntry& a, const DirEntry& b) const
-	{	return a.name<b.name;
-	}
-};
-
-int scandir(const char* buf, dirent*** namelist, scandir_f select, scandir_alphasort dcomp)
-{
-#if 0
-	DIR* dirp = opendir(dirname);
-	if(!dirp)
+int readdir_r(DIR *dir, struct dirent *entry, struct dirent** result)
+{	dirent* d = readdir(dir);
+	if(!d)
 	{	return -1;
 	}
-	if(fstat(dirp->dd_fd, &stb) < 0)
-	{	return -1;
+	*result = d;
+	return 0;
+}
+
+int closedir(DIR* dir)
+{	errno = 0;
+	if (!dir)
+	{	errno = EFAULT;
+		return -1;
 	}
-	std::set<DirEntry,DirCompare> names;
-	struct dirent* d;
-	while ((d = readdir(dirp)) != NULL) 
-	{	if (select != NULL && !(*select)(d))
+	int rc = 0;
+	if(dir->dd_handle != -1)
+	{	rc = _findclose (dir->dd_handle);
+	}
+	free (dir);
+	return rc;
+}
+
+void rewinddir(DIR * dir)
+{	errno = 0;
+	if (!dir)
+	{	errno = EFAULT;
+		return;
+	}
+	if(dir->dd_handle != -1)
+	{	_findclose (dir->dd_handle);
+	}
+	dir->dd_handle = -1;
+	dir->dd_stat = 0;
+}
+
+long telldir(DIR * dir)
+{	errno = 0;
+	if (!dir)
+	{	errno = EFAULT;
+		return -1;
+	}
+	return dir->dd_stat;
+}
+
+void seekdir(DIR * dir, long lPos)
+{	errno = 0;
+	if (!dir)
+	{	errno = EFAULT;
+		return;
+	}
+	if(lPos < -1)
+	{	errno = EINVAL;
+		return;
+	}
+	if(lPos == -1)
+	{	if(dir->dd_handle != -1)
+		{	_findclose (dir->dd_handle);
+		}
+		dir->dd_handle = -1;
+		dir->dd_stat = -1;
+	}
+	else
+	{	rewinddir (dir);
+		while ((dir->dd_stat < lPos) && readdir (dir))
+		;	
+	}
+}
+
+int alphaqsort(const void* a,const void* b)
+{	void* a2 = const_cast<void*>(a);
+	void* b2 = const_cast<void*>(b);
+	return alphasort(reinterpret_cast<const dirent**>(a2),reinterpret_cast<const dirent**>(b2));
+}
+
+unsigned GetFileCount(DIR* dir,scandir_f selector)
+{	unsigned count = 0;
+	for(;;)
+	{	dirent* d = readdir(dir);
+		if(!d)
+		{	break;
+		}
+		if(selector != NULL && !(*selector)(d))
 		{	continue;
 		}
-		names.emplace(d,d->d_name);
+		count++;
 	}
-	closedir(dirp);
-	dirent** leak = (struct dirent **) malloc(names.size() * sizeof(struct dirent *));
-	for (auto it = names.begin(); it != names.end(); ++it)
-	{	leak
+	rewinddir(dir);
+	return count;
 }
-	*namelist = names;
-	return(nitems);
-#else
-		return 0;
-#endif
+
+int scandir(const char* dirname, dirent*** namesList, scandir_f selector, scandir_alphasort sorter)
+{	DIR* dir = opendir(dirname);
+	if(!dir)
+	{	return -1;
+	}
+	const unsigned count = GetFileCount(dir,selector);
+	if(!count)
+	{	return -1;
+	}
+	dirent** names = (dirent **) malloc(count * sizeof(dirent*));
+	if(!names)
+	{	return -1;
+	}
+	*namesList = names;
+	int matches = 0;
+	for(unsigned i = 0; i < count; i++)
+	{	dirent* d = readdir(dir);
+		if(!d)
+		{	break;
+		}
+		if(selector != NULL && !(*selector)(d))
+		{	continue;
+		}
+		matches++;
+		**names = *d;
+		const size_t length = strlen(d->d_name);
+		names[i]->d_name = (char*) malloc(length+1);
+		if(names[i]->d_name)
+		{	strcpy(names[i]->d_name,d->d_name);
+		}
+		names++;
+	}
+	closedir(dir);
+	if(sorter) 
+	{	qsort(dir, matches, sizeof(*dir),alphaqsort);
+	}
+	return matches;
 }
+
