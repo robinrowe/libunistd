@@ -80,7 +80,7 @@ STUB0(fcntl)
 #define inline __inline
 #endif
 
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
+//#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 inline
 int uni_open(const char* filename,unsigned oflag)
