@@ -28,7 +28,6 @@ void StubExit(int errorlevel,const char* msg,const char* file,const char* functi
 }
 
 #define SystemExit(x) StubExit(x,"Exit ",__FILE__, __FUNCTION__, __LINE__)
-#define AssertExit(x) StubExit(x,#x,__FILE__, __FUNCTION__, __LINE__)
 
 inline
 int SystemCall(const char* cmd)
@@ -43,6 +42,8 @@ int SystemCall(const char* cmd)
 	return system(cmd);
 #endif
 }
+
+#define SystemAssert(expression)  (void)( (!!(expression)) || StubExit(-1,#expression,__FILE__, __FUNCTION__, __LINE__) )                                                          \
 
 namespace portable
 {

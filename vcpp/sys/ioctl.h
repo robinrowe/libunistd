@@ -1,5 +1,5 @@
 // sys/ioctl.h
-// Copyright 2016 Robin.Rowe@MovieEditor.com
+// Libunistd Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT
 
 #ifndef sys_ioctl_h
