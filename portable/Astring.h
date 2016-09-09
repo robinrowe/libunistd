@@ -39,7 +39,7 @@ public:
 	{	return 0 == data()[0];
 	}
 	size_t size() const 
-	{	return strlen(data);
+	{	return strlen(data());
 	}
 	size_t length() const 
 	{	return size();
@@ -51,7 +51,10 @@ public:
 	{	return data();
 	}
 	void ends(size_t len = SIZE)
-	{	data()[len] = 0;
+	{	if(len > SIZE)
+		{	len = SIZE;
+		}
+		data()[len] = 0;
 	}
 	Astring& append(const char* s)
 	{	strncat(data(),s,SIZE);
@@ -59,7 +62,7 @@ public:
 		return *this;
 	}
 	Astring& append(const Astring& s)
-	{	return append(s.data);
+	{	return append(s.data());
 	}
 	Astring& operator+=(const char* s)
 	{	return append(s);
@@ -83,10 +86,10 @@ public:
 		return *this;
 	}
 	Astring& assign(const Astring& s,size_t pos,size_t count)
-	{	return assign(s.data,pos,count);
+	{	return assign(s.data(),pos,count);
 	}
 	Astring& assign(const Astring& s)
-	{	return assign(s.data);
+	{	return assign(s.data());
 	}
 	Astring& operator=(const char* s)
 	{	return assign(s);
@@ -98,31 +101,31 @@ public:
 	{	if(IsOverflow(pos))
 		{	return 0;
 		}
-		return &data[pos];
+		return data()[pos];
 	}
 	const char* operator[](size_t pos) const
 	{	if(IsOverflow(pos))
 		{	return 0;
 		}
-		return &data[pos];
+		return data()[pos];
 	}
 	bool operator==(const char* s) const
 	{	if(!s)
 		{	return false;
 		}
-		return !strcmp(data,s);
+		return !strcmp(data(),s);
 	}
 	bool operator==(const Astring& s) const
-	{	return *this == s.data;
+	{	return *this == s.data();
 	}
 	bool operator!=(const char* s) const
 	{	if(!s)
 		{	return true;
 		}
-		return 0 != strcmp(data,s);
+		return 0 != strcmp(data(),s);
 	}
 	bool operator!=(const Astring& s) const
-	{	return *this != s.data;
+	{	return *this != s.data();
 	}
 
 };
