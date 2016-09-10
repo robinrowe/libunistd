@@ -23,6 +23,7 @@ public:
 	Astring()
 	{	clear();
 	}
+
 	Astring(const char* s)
 	{	assign(s);
 	}
@@ -62,7 +63,7 @@ public:
 		return *this;
 	}
 	Astring& append(const Astring& s)
-	{	return append(s.this->data());
+	{	return append(s.data());
 	}
 	Astring& operator+=(const char* s)
 	{	return append(s);
@@ -86,10 +87,10 @@ public:
 		return *this;
 	}
 	Astring& assign(const Astring& s,size_t pos,size_t count)
-	{	return assign(s.this->data(),pos,count);
+	{	return assign(s.data(),pos,count);
 	}
 	Astring& assign(const Astring& s)
-	{	return assign(s.this->data());
+	{	return assign(s.data());
 	}
 	Astring& operator=(const char* s)
 	{	return assign(s);
@@ -116,7 +117,7 @@ public:
 		return !strcmp(this->data(),s);
 	}
 	bool operator==(const Astring& s) const
-	{	return *this == s.this->data();
+	{	return *this == s.data();
 	}
 	bool operator!=(const char* s) const
 	{	if(!s)
@@ -125,7 +126,7 @@ public:
 		return 0 != strcmp(this->data(),s);
 	}
 	bool operator!=(const Astring& s) const
-	{	return *this != s.this->data();
+	{	return *this != s.data();
 	}
 
 };
