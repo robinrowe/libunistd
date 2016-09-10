@@ -33,13 +33,13 @@ public:
 	{	assign(s);
 	}
 	void clear()
-	{	data()[0] = 0;
+	{	this->data()[0] = 0;
 	}
 	bool empty() const
-	{	return 0 == data()[0];
+	{	return 0 == this->data()[0];
 	}
 	size_t size() const 
-	{	return strlen(data());
+	{	return strlen(this->data());
 	}
 	size_t length() const 
 	{	return size();
@@ -48,21 +48,21 @@ public:
 	{	return SIZE;
 	}
 	const char* c_str() const
-	{	return data();
+	{	return this->data();
 	}
 	void ends(size_t len = SIZE)
 	{	if(len > SIZE)
 		{	len = SIZE;
 		}
-		data()[len] = 0;
+		this->data()[len] = 0;
 	}
 	Astring& append(const char* s)
-	{	strncat(data(),s,SIZE);
+	{	strncat(this->data(),s,SIZE);
 		ends();
 		return *this;
 	}
 	Astring& append(const Astring& s)
-	{	return append(s.data());
+	{	return append(s.this->data());
 	}
 	Astring& operator+=(const char* s)
 	{	return append(s);
@@ -71,7 +71,7 @@ public:
 	{	return append(s);
 	}
 	Astring& assign(const char* s)
-	{	strncpy(data(),s,SIZE);
+	{	strncpy(this->data(),s,SIZE);
 		ends();
 		return *this;
 	}
@@ -81,15 +81,15 @@ public:
 	Astring& assign(const char* s,size_t pos,size_t count)
 	{	s+=pos;
 		const size_t len = (count <= SIZE) ? count:SIZE;
-		strncpy(data(),s,len);
+		strncpy(this->data(),s,len);
 		ends(len);
 		return *this;
 	}
 	Astring& assign(const Astring& s,size_t pos,size_t count)
-	{	return assign(s.data(),pos,count);
+	{	return assign(s.this->data(),pos,count);
 	}
 	Astring& assign(const Astring& s)
-	{	return assign(s.data());
+	{	return assign(s.this->data());
 	}
 	Astring& operator=(const char* s)
 	{	return assign(s);
@@ -101,31 +101,31 @@ public:
 	{	if(IsOverflow(pos))
 		{	return 0;
 		}
-		return data()[pos];
+		return this->data()[pos];
 	}
 	const char* operator[](size_t pos) const
 	{	if(IsOverflow(pos))
 		{	return 0;
 		}
-		return data()[pos];
+		return this->data()[pos];
 	}
 	bool operator==(const char* s) const
 	{	if(!s)
 		{	return false;
 		}
-		return !strcmp(data(),s);
+		return !strcmp(this->data(),s);
 	}
 	bool operator==(const Astring& s) const
-	{	return *this == s.data();
+	{	return *this == s.this->data();
 	}
 	bool operator!=(const char* s) const
 	{	if(!s)
 		{	return true;
 		}
-		return 0 != strcmp(data(),s);
+		return 0 != strcmp(this->data(),s);
 	}
 	bool operator!=(const Astring& s) const
-	{	return *this != s.data();
+	{	return *this != s.this->data();
 	}
 
 };
