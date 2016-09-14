@@ -16,14 +16,13 @@ namespace portable
 template <unsigned SIZE>
 class Astring
 :	public std::array<char,SIZE+1>
-{	bool IsOverflow(size_t pos)
-	{	return pos > size;
+{	bool IsOverflow(size_t pos) const
+	{	return pos > SIZE;
 	}
 public:
 	Astring()
 	{	clear();
 	}
-
 	Astring(const char* s)
 	{	assign(s);
 	}
