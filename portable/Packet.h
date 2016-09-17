@@ -56,6 +56,7 @@ public:
 	unsigned GetPacketId() const
 	{	return packetId;
 	}
+#pragma warning(disable: 4458)
 	void SetPacketId(unsigned packetId)
 	{	this->packetId = packetId;
 	}
