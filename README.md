@@ -1,6 +1,6 @@
 # libunistd
 
-Libunistd is a lightweight Windows POSIX library that enables typical Linux C/C++ code to build in Windows Visual C++. Libunistd provides standard BSD sockets, pthreads and message queue APIs in Windows. It supports just about every common Linux call, except fork(). ses threads instead. 
+Libunistd is a lightweight Windows POSIX library that enables typical Linux C/C++ code to build in Windows Visual C++. Libunistd provides standard BSD sockets, pthreads and message queue APIs in Windows. It supports just about every common Linux call, except fork(). Use threads instead. 
 
 Usage: Set the include path in your VC++ project to include the directory libunistd/vcpp. In any Linux code you have that has trouble compiling in VC++, include the following at top of your header file:
 
