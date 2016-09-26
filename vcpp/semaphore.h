@@ -85,7 +85,7 @@ public:
 #ifdef TRACE_SEM_T
 		printf("Semaphore %x trywait\n",(int) this);
 #endif
-		const int i = count.fetch_sub(1);
+		const int i = count.fetch_sub(1) - 1;
 		if(i>0)
 		{	return 0;
 		}
@@ -97,10 +97,11 @@ public:
 #ifdef TRACE_SEM_T
 		printf("Semaphore %x wait\n",(int) this);
 #endif
-		const int i = count.fetch_sub(1);
-		if(i>=0)
+		const int i = count.fetch_sub(1) - 1;
+		if(i>0)
 		{	return 0;
 		}
+		count.fetch_add(1);
 		std::unique_lock<std::mutex> lk(sem_mutex);
 		isDone = false;
 		while(!isDone)
@@ -113,10 +114,11 @@ public:
 #ifdef TRACE_SEM_T
 		printf("Semaphore %x wait\n",(int) this);
 #endif
-		const int i = count.fetch_sub(1);
-		if(i>=0)
+		const int i = count.fetch_sub(1) - 1;
+		if(i>0)
 		{	return 0;
 		}
+		count.fetch_add(1);
 		std::unique_lock<std::mutex> lk(sem_mutex);
 		std::chrono::milliseconds delay(GetDelay(ts));
 #ifdef TRACE_SEM_T
@@ -137,12 +139,11 @@ public:
 #ifdef TRACE_SEM_T
 		printf("Semaphore %x post\n",(int) this);
 #endif
-		const int i = count.fetch_add(1);
-		if(-1 == i)
-		{	return 0;
+		const int i = count.fetch_add(1) + 1;
+		if(i>0)
+		{	isDone = true;
+			sem_cv.notify_one();
 		}
-		isDone = true;
-		sem_cv.notify_one();
 		return 0;
 	}
 	static int sem_unlink(const char *)
