@@ -18,13 +18,15 @@
 #include <string>
 #include <chrono>
 
+// #define TRACE_SEM_T
+
 class sem_t
 {	unsigned flagOverwrite;
-	bool isDone;
 	std::mutex sem_mutex;
 	std::condition_variable sem_cv;
-	std::atomic<int> count;
+	std::atomic<int> posts;
 	std::string name;
+	unsigned semNumber;
 	std::chrono::milliseconds GetDelay(const struct timespec* deadline)
 	{	struct timespec now;
 		if (!deadline || clock_gettime(CLOCK_REALTIME, &now) == -1)
@@ -37,17 +39,35 @@ class sem_t
         }
 		return std::chrono::milliseconds(delay);
 	}
+	bool IsPosted()
+	{	const int i = posts.fetch_sub(1) - 1;
+		if(i>=0)
+		{
+#ifdef TRACE_SEM_T
+		printf("sem_t #%u consumed:%i\n",semNumber,int(posts));
+#endif
+			return true;
+		}
+		posts.fetch_add(1);
+		return false;
+	}
 public:
 	~sem_t()
 	{	flagOverwrite=0;
+#ifdef TRACE_SEM_T
+		static unsigned i;
+		semNumber = ++i;
+		printf("sem_t #%u destroyed\n",semNumber);
+#endif
 	}
 	sem_t()
-	:	count(0)
+	:	posts(0)
 	,	flagOverwrite(6009)
-	,	isDone(true)
 	{
 #ifdef TRACE_SEM_T
-		printf("Semaphore %x created\n",(int) this);
+		static unsigned i;
+		semNumber = ++i;
+		printf("sem_t #%u created\n",semNumber);
 #endif
 	}
 	static sem_t* sem_open(const char *name, int oflag)
@@ -58,7 +78,7 @@ public:
 	static sem_t* sem_open(const char *name, int oflag,mode_t mode, unsigned int value)
 	{	sem_t* st = new sem_t;
 		st->name = name;
-		st->count.exchange(value);
+		st->posts.exchange(value);
 		return st;
 	}
 	int sem_init(int pshared, unsigned int value)
@@ -66,7 +86,7 @@ public:
 		{	puts("ERROR: Windows sem_t memory overwrite");
 			return -1;  
 		}
-		count.exchange(value);
+		posts.exchange(value);
 		return 0;
 	}
 	static int sem_close(sem_t *st)
@@ -78,54 +98,42 @@ public:
 	}
 	int sem_getvalue(sem_t *restrict, int *restrict2)
 	{	*restrict2=0;
-		return count;
+		return posts;
 	}
 	int sem_trywait()
 	{	
 #ifdef TRACE_SEM_T
-		printf("Semaphore %x trywait\n",(int) this);
-#endif
-		const int i = count.fetch_sub(1) - 1;
-		if(i>0)
-		{	return 0;
-		}
-		count.fetch_add(1);
-		return -1;
+		printf("sem_t #%u trywait:%i\n",semNumber,int(posts));
+#endif		
+		return posts > 0 ? 0:-1;
 	}
 	int sem_wait()
-	{
-#ifdef TRACE_SEM_T
-		printf("Semaphore %x wait\n",(int) this);
-#endif
-		const int i = count.fetch_sub(1) - 1;
-		if(i>0)
+	{	if(IsPosted())
 		{	return 0;
 		}
-		count.fetch_add(1);
 		std::unique_lock<std::mutex> lk(sem_mutex);
-		isDone = false;
-		while(!isDone)
-		{	sem_cv.wait(lk); // Restart if interrupted
+		while(!IsPosted())
+		{	
+#ifdef TRACE_SEM_T
+		printf("sem_t #%u wait:%i\n",semNumber,int(posts));
+#endif
+			sem_cv.wait(lk); // Restart if interrupted
 		}
 		return 0;
 	}
 	int sem_timedwait(const struct timespec* ts)
 	{
-#ifdef TRACE_SEM_T
-		printf("Semaphore %x wait\n",(int) this);
-#endif
-		const int i = count.fetch_sub(1) - 1;
-		if(i>0)
+		if(IsPosted())
 		{	return 0;
 		}
-		count.fetch_add(1);
 		std::unique_lock<std::mutex> lk(sem_mutex);
 		std::chrono::milliseconds delay(GetDelay(ts));
+		while(delay.count() && !IsPosted())
+		{	
 #ifdef TRACE_SEM_T
-		printf("wait_for(%d)\n",int(delay.count()));
+		printf("sem_t #%u timedwait(%lli):%i\n",semNumber,delay.count(),int(posts));
 #endif
-		while(delay.count())
-		{	if(std::cv_status::timeout==sem_cv.wait_for(lk,delay))
+			if(std::cv_status::timeout==sem_cv.wait_for(lk,delay))
 			{	return 0;
 			}
 			delay = GetDelay(ts);
@@ -135,16 +143,15 @@ public:
 		return 0;
 	}
 	int sem_post()
-	{
+	{	posts.fetch_add(1);
 #ifdef TRACE_SEM_T
-		printf("Semaphore %x post\n",(int) this);
-#endif
-		const int i = count.fetch_add(1) + 1;
-		if(i>0)
-		{	isDone = true;
-			sem_cv.notify_one();
-		}
+		printf("sem_t #%u post:%i\n",semNumber,int(posts));
+#endif	
+		sem_cv.notify_one();
 		return 0;
+	}
+	void sem_name_win32(const char* name)
+	{	this->name = name;
 	}
 	static int sem_unlink(const char *)
 	STUB0(sem_unlink)
@@ -178,6 +185,15 @@ int sem_init(sem_t *st, int pshared, unsigned int value)
 	}
 	return st->sem_init(pshared,value);
 }
+
+inline
+void sem_name_win32(sem_t *st, const char* name)
+{	if(!st)
+	{	return;
+	}
+	return st->sem_name_win32(name);
+}
+
 
 inline
 sem_t* sem_open(const char *name, int oflag)
