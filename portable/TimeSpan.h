@@ -20,19 +20,21 @@ public:
     TimeSpan()
 	{	Reset();
 	}
-	void Reset()
+	void Reset(const char* msg = nullptr)
 	{	tickCount = 0;
 		longestDuration = 0.;
 		shortestDuration = -1.;
 		start = std::chrono::steady_clock::now();
-	}
+		if(msg)
+		{	printf("%s: resetting from %fs at tick %u\n",msg,longestDuration/1000,tickCount);
+	}	}
 	void Snap(const char* msg = nullptr)
 	{	tickCount++;
 		auto end = std::chrono::steady_clock::now();
  		std::chrono::duration<double,std::milli> interval = end - start;
 		if(interval.count()>longestDuration)
 		{	if(msg)
-			{	printf("%s: increasing from %fs to %fs at tick %u\n",msg,longestDuration,interval.count()/1000,tickCount);
+			{	printf("%s: increasing from %fs to %fs at tick %u\n",msg,longestDuration/1000,interval.count()/1000,tickCount);
 			}
 			longestDuration = interval.count();
 		}
