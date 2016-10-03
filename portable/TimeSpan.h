@@ -32,7 +32,7 @@ public:
  		std::chrono::duration<double,std::milli> interval = end - start;
 		if(interval.count()>longestDuration)
 		{	if(msg)
-			{	printf("%s: increasing from %fus to %fus at tick %u\n",msg,longestDuration,interval.count(),tickCount);
+			{	printf("%s: increasing from %fs to %fs at tick %u\n",msg,longestDuration,interval.count()/1000,tickCount);
 			}
 			longestDuration = interval.count();
 		}
