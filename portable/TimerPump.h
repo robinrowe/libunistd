@@ -9,7 +9,26 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <stdio.h>
 
+namespace portable
+{
+	
+class PrintTask
+{
+public:
+	PrintTask(const char* functionName,const char* description = "")
+	{
+#ifdef _DEBUG
+		static unsigned i;
+		i++;
+		printf("Thread(%u): %s() %s\n",i,functionName,description);
+#endif
+		(void) functionName;
+		(void) description;
+	}
+};
+	
 class TimerPump
 {protected:
     typedef std::unique_lock<std::mutex> Lock;
@@ -34,13 +53,14 @@ public:
     virtual ~TimerPump()
     {   isGo=false;
     }
-    bool Start(int millis=0)
+    bool Start(int millis=0,const char* description)
     {   if(isGo)
         {   return false;
         }
         SetTimeout(millis);
         isGo=true;
         std::thread worker(Main,this);
+		PrintTask("TimerPump",description);
         worker.detach();
         return true;
     }
@@ -61,4 +81,5 @@ public:
     void Run();
 };
 
+}
 #endif

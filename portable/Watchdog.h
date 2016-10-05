@@ -8,6 +8,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include "TimerPump.h"
 
 namespace portable
 {
@@ -34,10 +35,11 @@ public:
 	:	delay(0)
 	,	isGo(false)
 	{}
-	void Start(unsigned delay)
+	void Start(unsigned delay,const char* description= "")
     {	isGo =true;
 		this->delay = milliseconds(delay);
 		std::thread worker(Main,this);
+		PrintTask("Watchdog",description);
 		worker.detach();
     }
     virtual ~Watchdog()

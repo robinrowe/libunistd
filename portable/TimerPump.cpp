@@ -5,6 +5,8 @@
 
 #include "TimerPump.h"
 
+namespace portable
+{
 void TimerPump::Run()
 {//   qDebug()<<"Starting pump "<<object;
     Init();
@@ -22,4 +24,6 @@ void TimerPump::Run()
         {   Action(isTimeout);
     }   }
 //    qDebug()<<"Stopping pump";
+}
+
 }
