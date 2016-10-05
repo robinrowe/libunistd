@@ -53,7 +53,7 @@ public:
     virtual ~TimerPump()
     {   isGo=false;
     }
-    bool Start(int millis=0,const char* description)
+    bool Start(int millis=0,const char* description="")
     {   if(isGo)
         {   return false;
         }
