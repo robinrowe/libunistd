@@ -28,7 +28,7 @@ class PrintTask
 public:
 	PrintTask(const char* functionName,const char* description = "")
 	{
-#ifdef _DEBUG
+#ifdef TASK_TRACE
 		static unsigned i;
 		i++;
 		printf("Thread(%u): %s() %s\n",i,functionName,description);
