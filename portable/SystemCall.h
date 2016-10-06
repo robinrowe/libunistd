@@ -20,14 +20,37 @@
 #endif
 #endif
 
+namespace portable
+{
+	
+class PrintTask
+{
+public:
+	PrintTask(const char* functionName,const char* description = "")
+	{
+#ifdef _DEBUG
+		static unsigned i;
+		i++;
+		printf("Thread(%u): %s() %s\n",i,functionName,description);
+#endif
+		(void) functionName;
+		(void) description;
+	}
+};
+
 [[ noreturn ]]
 inline
 void StubExit(int errorlevel,const char* msg,const char* file,const char* function,int line)
-{	printf("ERROR: %s %s exit(%i)\n%s:%i",msg,function,errorlevel,file,line);
+{	printf("exit(%i): %s %s\n%s:%i",errorlevel,msg,function,file,line);
 	exit(errorlevel);
 }
 
-#define SystemExit(x) StubExit(x,"Exit ",__FILE__, __FUNCTION__, __LINE__)
+[[ noreturn ]]
+inline
+void StubAssert(int errorlevel,const char* msg,const char* file,const char* function,int line)
+{	printf("assert(%s): %s\n%s:%i",msg,function,file,line);
+	exit(errorlevel);
+}
 
 inline
 int SystemCall(const char* cmd)
@@ -42,11 +65,6 @@ int SystemCall(const char* cmd)
 	return system(cmd);
 #endif
 }
-
-#define SystemAssert(expression)  (void)( (!!(expression)) || StubExit(-1,#expression,__FILE__, __FUNCTION__, __LINE__) )                                                          \
-
-namespace portable
-{
 
 template <typename T>
 bool memcopy(T& dest,const char* start,unsigned size)
@@ -92,6 +110,10 @@ OS OperatingSystem()
 }
 
 } //portable
+
+#define SystemExit(errorlevel) portable::StubExit(errorlevel,"Exit ",__FILE__, __FUNCTION__, __LINE__)
+
+#define SystemAssert(expression)  (void)( (!!(expression)) || portable::StubAssert(-1,#expression,__FILE__, __FUNCTION__, __LINE__) )
 
 #endif
 

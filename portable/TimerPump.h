@@ -14,21 +14,6 @@
 namespace portable
 {
 	
-class PrintTask
-{
-public:
-	PrintTask(const char* functionName,const char* description = "")
-	{
-#ifdef _DEBUG
-		static unsigned i;
-		i++;
-		printf("Thread(%u): %s() %s\n",i,functionName,description);
-#endif
-		(void) functionName;
-		(void) description;
-	}
-};
-	
 class TimerPump
 {protected:
     typedef std::unique_lock<std::mutex> Lock;
