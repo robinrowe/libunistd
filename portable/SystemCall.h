@@ -1,4 +1,4 @@
-// SystemCall_h
+// SystemCall.h
 // Libunist Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT
 
@@ -9,32 +9,21 @@
 #include <stdlib.h>
 #include <algorithm>
 
-#if 0
-#ifdef __clang__
-#include <stdnoreturn.h>
-#define no_return noreturn
-#elif __GNUC__
-#define no_return  __attribute__((__noreturn__))
-#elif _MSC_VER
-#define no_return
-#endif
-#endif
-
 namespace portable
 {
 	
 class PrintTask
-{	static unsigned i;
+{
 public:
 	PrintTask(const char* functionName,const char* description = "")
-	{	if(i<0)
+	{	if(!functionName || !description)
 		{	return;
 		}
+#ifdef TRACE_TASKS
+		static unsigned i;
 		i++;
 		printf("Thread(%u): %s() %s\n",i,functionName,description);
 #endif
-		(void) functionName;
-		(void) description;
 	}
 };
 
@@ -55,7 +44,7 @@ void StubAssert(int errorlevel,const char* msg,const char* file,const char* func
 inline
 int SystemCall(const char* cmd)
 {	
-#ifdef _DEBUG
+#ifdef TRACE_SYSTEM_CALLS
 	static int i;
 	printf("[%i] system(%s)\n",++i,cmd);
 #endif

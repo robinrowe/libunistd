@@ -5,8 +5,6 @@ add_library (libportable
 	CommandLine.cpp
 	Network.h
 	Network.cpp
-	SystemCall.h
-	SystemCall.cpp
 	TimerPump.h
 	TimerPump.cpp
 	VariableClock.h
