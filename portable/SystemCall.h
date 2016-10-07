@@ -24,12 +24,12 @@ namespace portable
 {
 	
 class PrintTask
-{
+{	static unsigned i;
 public:
 	PrintTask(const char* functionName,const char* description = "")
-	{
-#ifdef TASK_TRACE
-		static unsigned i;
+	{	if(i<0)
+		{	return;
+		}
 		i++;
 		printf("Thread(%u): %s() %s\n",i,functionName,description);
 #endif
