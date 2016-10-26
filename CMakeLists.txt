@@ -12,5 +12,5 @@ add_subdirectory(vcpp)
 endif()
 
 add_subdirectory(portable)
-add_subdirectory(tabstop)
+#add_subdirectory(tabstop)
 
