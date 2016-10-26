@@ -9,7 +9,7 @@ namespace portable
 
 void CommandLine::Set(int argc,const char** argv)
 {	this->argc = argc;
-	this->argv = nullptr;
+	this->argv = argv;
 	// skip arg[0] = prog_name
     for(int i=1;i<argc;i++)
 	{	Append(argv[i]);
