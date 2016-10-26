@@ -104,5 +104,27 @@ OS OperatingSystem()
 
 #define SystemAssert(expression)  (void)( (!!(expression)) || portable::StubAssert(-1,#expression,__FILE__, __FUNCTION__, __LINE__) )
 
+#ifdef _WIN32
+#define ANSI_RED   
+#define ANSI_GRN   
+#define ANSI_YEL   
+#define ANSI_BLU   
+#define ANSI_MAG   
+#define ANSI_CYN   
+#define ANSI_WHT   
+#define ANSI_CLR   
+#else
+#define ANSI_RED   "\x1B[31m"
+#define ANSI_GRN   "\x1B[32m"
+#define ANSI_YEL   "\x1B[33m"
+#define ANSI_BLU   "\x1B[34m"
+#define ANSI_MAG   "\x1B[35m"
+#define ANSI_CYN   "\x1B[36m"
+#define ANSI_WHT   "\x1B[37m"
+#define ANSI_CLR   "\x1B[0m"
+#endif
+
+//  printf(ANSI_RED "red" ANSI_CLR);
+
 #endif
 
