@@ -7,13 +7,12 @@
 namespace portable
 {
 
-CommandLine::CommandLine(int argc,const char** argv)
-:	argc(argc)
-,	argv(argv)
+CommandLine::Set(int argc,const char** argv)
 {	// skip arg[0] = prog_name
     for(int i=1;i<argc;i++)
 	{	Append(argv[i]);
     }
+	last = argv[argc-1];
 }
 
 void CommandLine::Append(const char* keyval)
