@@ -26,4 +26,8 @@ void CommandLine::Append(const char* keyval)
     data[keyval] = "true";
 }
 
+void CommandLine::Print()
+{	for(int i=0;i<argc;i++)
+	{	printf("%s ",argv[i]);
+	}
 }
