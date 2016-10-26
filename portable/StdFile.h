@@ -218,7 +218,23 @@ bool IsFile(const char* filename)
 	if(err!=0)
 	{	return false;
 	}
-	return true;
+	return 0!=S_ISFILE(st.st_mode));
+}
+
+inline
+bool IsDir(const char* path)
+{
+#ifdef WIN32	
+	struct __stat64 st;
+	const int err = _stat64(path, &st);
+#else
+	struct stat st;
+	const int err = stat(path, &st);
+#endif
+	if(err!=0)
+	{	return false;
+	}
+	return 0!=S_ISDIR(st.st_mode));
 }
 
 inline
