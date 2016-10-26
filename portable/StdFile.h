@@ -218,7 +218,7 @@ bool IsFile(const char* filename)
 	if(err!=0)
 	{	return false;
 	}
-	return 0!=S_ISFILE(st.st_mode));
+	return 0!=S_ISREG(st.st_mode));
 }
 
 inline
