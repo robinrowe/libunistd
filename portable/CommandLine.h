@@ -14,10 +14,12 @@ namespace portable
 
 class CommandLine
 {	std::map<std::string,std::string> data;
-	const char* last;
+	int argc;
+	const char** argv;
 public:
 	CommandLine()
-	{	last="";
+	{	argc = 0;
+		argv = nullptr;
 	}
 	CommandLine(int argc,const char** argv)
 	{	Set(argc,argv);
@@ -40,8 +42,14 @@ public:
 		i = atoi(value);
 		return errno != EINVAL;
 	}
-	const char* GetLast() const
-	{	return last;
+	const char* operator[](int i) const
+	{	if(i<0)
+		{	i = argc+i;
+		}
+		if(i>=argc)
+		{	return "";
+		}
+		return argv[i];
 	}
 	bool IsKey(const char* key) const
 	{	const auto it = data.find(key);
