@@ -55,7 +55,7 @@ public:
 	{	const auto it = data.find(key);
 		return data.end()!=it;
 	}
-	void Print();
+	std::string toString()
 };
 
 }

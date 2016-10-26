@@ -26,10 +26,15 @@ void CommandLine::Append(const char* keyval)
     data[keyval] = "true";
 }
 
-void CommandLine::Print()
-{	for(int i=0;i<argc;i++)
-	{	printf("%s ",argv[i]);
-	}
+std::string CommandLine::toString()
+{	std::string s;
+	for(int i=0;i<argc;i++)
+	{	if(argv[i])
+		{	s+=argv[i];
+			s+=" ";
+	}	}
+	s.pop_back();
+	return s;
 }
 
 }//portable
