@@ -31,3 +31,5 @@ void CommandLine::Print()
 	{	printf("%s ",argv[i]);
 	}
 }
+
+}//portable
