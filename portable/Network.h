@@ -7,6 +7,11 @@
 
 #include <memory>
 #include <vector>
+#ifdef _WIN32
+#include "../vcpp/arpa/inet.h"
+#else
+#include <arpa/inet.h>
+#endif
 
 namespace portable
 {
@@ -91,6 +96,36 @@ public:
 	void PrintIfStat(IfStat* ifstat);
 	void PrintStats();
 	void PrintStats(const char* ifname);
+};
+
+class IpAddress
+{	char address[INET6_ADDRSTRLEN+1];
+	unsigned ipType;
+public:
+	IpAddress(unsigned long ip)
+	:	ipType(0)
+	{	address[0] = 0;
+		struct in_addr ipaddr;
+		ipaddr.s_addr = htonl(ip);
+		const char* p = inet_ntop(AF_INET,&ipaddr,address, INET6_ADDRSTRLEN);
+		if(p!=nullptr)
+		{	ipType = 4;
+			return;
+		}
+		p = inet_ntop(AF_INET6,&ipaddr,address, INET6_ADDRSTRLEN);
+		if(p!=nullptr)
+		{	ipType = 6;
+			return;
+		}
+		strncpy(address,strerror(errno),INET6_ADDRSTRLEN);
+		address[INET6_ADDRSTRLEN] = 0;
+    }
+	operator const char*() const
+	{	return address;
+	}
+	unsigned GetIpType() const
+	{	return ipType;
+	}
 };
 
 }
