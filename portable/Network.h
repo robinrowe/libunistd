@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <vector>
+#include <string.h>
 #ifdef _WIN32
 #include "../vcpp/arpa/inet.h"
 #else
