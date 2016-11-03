@@ -36,6 +36,10 @@ public:
 	FILE* GetFp()
 	{	return fp;
 	}
+    void SetFp(FILE* fp)
+    {   Close();
+        this->fp = fp;
+    }
     size_t GetLastBytes() const
     {   return bytes;
     }
@@ -162,6 +166,17 @@ public:
 		va_end(argList);
 		return bytes;
 	}
+#ifdef __GNUC__
+	int fprintf(const char* const format,...) __attribute__ ((format(scanf, 2, 3)))
+#else
+	int fprintf(const char* const format,...)
+#endif
+	{	va_list argList;
+		va_start(argList,format);
+		bytes = vfscanf(fp, format, argList);
+		va_end(argList);
+		return bytes;
+	}
 };
 
 // Slurp StdFile or StdDevice:
@@ -261,10 +276,11 @@ bool DeleteFile(const char* filename)
 {	
 #ifdef WIN32	
 	const int err=_unlink(filename);
+	return err!=0;
 #else
 	const int err=unlink(filename);
-#endif
 	return err!=0;
+#endif
 }
 
 }
