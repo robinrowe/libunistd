@@ -36,6 +36,9 @@ public:
 	FILE* GetFp()
 	{	return fp;
 	}
+    size_t GetLastBytes() const
+    {   return bytes;
+    }
 	bool IsGood() const
 	{	return nullptr!=fp;
 	}
@@ -66,12 +69,12 @@ public:
 	bool OpenAppend(const char* filename)
 	{	return Open(filename,"ab");
 	}
-	int Read(char* data,size_t length)
+	bool Read(char* data,size_t length)
 	{	if(!IsGood())
-		{	return 0;
+		{	return false;
 		}
 		bytes=fread(data,1,length,fp);
-		return bytes;
+		return bytes>0;
 	}
 	void Skip(unsigned charCount)
 	{	for(unsigned i=0;i<charCount && IsGood();i++)
@@ -98,24 +101,24 @@ public:
 	bool GetLine(std::vector<char>& line)
 	{	return GetLine(&line[0],line.size());
 	}
-	int Write(const char* data,size_t length)
+	bool Write(const char* data,size_t length)
 	{	if(!data || !IsGood())
 		{	return false;
 		}
 		bytes=fwrite(data,1,length,fp);
 		return bytes==length;
 	}
-	int Write(char c)
+	bool Write(char c)
 	{	return Write(&c,1);
 	}
-	int Write(const char* string)
+	bool Write(const char* string)
 	{	if(!string)
 		{	return false;
 		}
 		const size_t length=strlen(string);	
 		return Write(string,length);
 	}
-	int WriteNull()
+	bool WriteNull()
 	{	return Write("",1);
 	}
 	void Close()
@@ -155,9 +158,9 @@ public:
 #endif
 	{	va_list argList;
 		va_start(argList,format);
-		int retval = vfscanf(fp, format, argList);
+		bytes = vfscanf(fp, format, argList);
 		va_end(argList);
-		return retval;
+		return bytes;
 	}
 };
 
@@ -258,11 +261,10 @@ bool DeleteFile(const char* filename)
 {	
 #ifdef WIN32	
 	const int err=_unlink(filename);
-	return err!=0;
 #else
 	const int err=unlink(filename);
-	return err!=0;
 #endif
+	return err!=0;
 }
 
 }
