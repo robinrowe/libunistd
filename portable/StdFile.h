@@ -131,18 +131,21 @@ public:
 		}
 		fp=nullptr;
 	}
-	bool Seek(long offset)
+	bool Seek(long offset,int where=SEEK_CUR)
 	{	if(!IsGood())
 		{	return false;
 		}
-		const int err=fseek(fp,0,offset);
+		const int err=fseek(fp,offset,where);
 		if(err)
 		{	return false;
 		}
 		return true;
 	}
 	bool SeekEnd()
-	{	return Seek(SEEK_END);
+	{	return Seek(0,SEEK_END);
+	}
+	bool SeekStart()
+	{	return Seek(0,SEEK_SET);
 	}
 	long Tell() const
 	{	if(!IsGood())
