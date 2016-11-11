@@ -26,12 +26,20 @@ class StdFile
 	FILE* fp;
 	size_t bytes;
 public:
+    StdFile(const StdFile&) = delete;
+	~StdFile()
+	{	Close();
+	}
 	StdFile()
 	:	fp(nullptr)
 	,	bytes(0)
 	{}
-	~StdFile()
-	{	Close();
+	void Close()
+	{	if(IsGood())
+		{	fclose(fp);
+		}
+		fp=nullptr;
+        bytes = -1;
 	}
 	FILE* GetFp()
 	{	return fp;
@@ -124,12 +132,6 @@ public:
 	}
 	bool WriteNull()
 	{	return Write("",1);
-	}
-	void Close()
-	{	if(IsGood())
-		{	fclose(fp);
-		}
-		fp=nullptr;
 	}
 	bool Seek(long offset,int where=SEEK_CUR)
 	{	if(!IsGood())
