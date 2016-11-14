@@ -172,13 +172,13 @@ public:
 		return bytes;
 	}
 #ifdef __GNUC__
-	int fprintf(const char* const format,...) __attribute__ ((format(scanf, 2, 3)))
+	int fprintf(const char* const format,...) __attribute__ ((format(printf, 2, 3)))
 #else
 	int fprintf(const char* const format,...)
 #endif
 	{	va_list argList;
 		va_start(argList,format);
-		bytes = vfscanf(fp, format, argList);
+		bytes = vfprintf(fp, format, argList);
 		va_end(argList);
 		return bytes;
 	}
