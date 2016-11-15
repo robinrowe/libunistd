@@ -363,6 +363,20 @@ STUB0(fcntl)
 
 typedef int Atom;
 
+inline
+int gethostname(char *name, size_t len)
+{   DWORD bufsize = len;
+    BOOL ok = GetComputerNameA(name,&bufsize);
+    return ok? 0:-1;
+}
+
+inline
+int getlogin_r(char *buf, size_t len)
+{   DWORD bufsize = len;
+    BOOL ok = GetUserNameA(buf,&bufsize);
+    return ok? 0:-1;
+}
+
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
 
