@@ -177,7 +177,9 @@ int mkdir(const char* path)
 {	 return _mkdir(path);
 }
 
-typedef int pid_t;
+typedef intptr_t pid_t;
+typedef int gid_t;
+typedef int uid_t;
 
 inline
 int kill(pid_t p, int x)
@@ -227,10 +229,6 @@ From WIN32 sys/stat.h:
 #define S_IEXEC  _S_IEXEC
 
 */
-
-typedef intptr_t pid_t;
-typedef int gid_t;
-typedef int uid_t;
 
 #define fileno _fileno
 #define STDIN_FILENO _fileno(stdin)
