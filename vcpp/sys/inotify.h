@@ -28,7 +28,8 @@ enum
 	IN_MOVE_SELF,
 	IN_MOVED_FROM,
 	IN_MOVED_TO,
-	IN_OPEN
+        IN_OPEN,
+        IN_MOVE
 };
 
 struct inotify_event 

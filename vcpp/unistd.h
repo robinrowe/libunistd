@@ -9,6 +9,10 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
+#if defined(_WINDOWS_) || defined(_INC_WINDOWS)
+#error unistd.h must be included before Windows.h
+#endif
+
 //#define _CRT_SECURE_NO_DEPRECATE 
 //#undef _CRT_SECURE_NO_WARNINGS
 //#define _CRT_NONSTDC_NO_WARNINGS
@@ -177,10 +181,6 @@ int mkdir(const char* path)
 {	 return _mkdir(path);
 }
 
-typedef intptr_t pid_t;
-typedef int gid_t;
-typedef int uid_t;
-
 inline
 int kill(pid_t p, int x)
 {	return -1;
@@ -206,11 +206,14 @@ int kill(pid_t p, int x)
 #define S_IWUSR _S_IWRITE
 #define S_IXOTH S_IEXEC
 #define S_IXGRP S_IEXEC
-#define S_IRWXU _S_IEXEC|_S_IREAD|_S_IWRITE
-#define S_IRWXG _S_IEXEC|_S_IREAD|_S_IWRITE
+#define S_IRWXU S_IRUSR|S_IWUSR|S_IXUSR
+#define S_IRWXG S_IRGRP|S_IWGRP|S_IXGRP
+#define S_IRWXO S_IROTH|S_IWOTH|S_IXOTH
+//#define S_IRWXU _S_IEXEC|_S_IREAD|_S_IWRITE
+//#define S_IRWXO _S_IEXEC|_S_IREAD|_S_IWRITE
+//#define S_IRWXG _S_IEXEC|_S_IREAD|_S_IWRITE
 #define S_IROTH S_IREAD
 #define S_IRGRP S_IREAD
-#define S_IRWXO _S_IEXEC|_S_IREAD|_S_IWRITE
 #define S_IWGRP S_IWRITE
 #define S_IWOTH S_IWRITE
 #define O_CLOEXEC 0

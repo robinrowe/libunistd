@@ -5,7 +5,6 @@
 #ifndef uni_signal_h
 #define uni_signal_h
 
-#include "unistd.h"
 #include <signal.h>
 #include <time.h>
 #include "../portable/stub.h"
@@ -42,7 +41,8 @@ SIGTERM Termination request
 
 #define WNOHANG 0
 
-typedef int pid_t;
+typedef intptr_t pid_t;
+typedef int gid_t;
 typedef int uid_t;
 typedef int sigval_t;
 typedef int sigset_t;
