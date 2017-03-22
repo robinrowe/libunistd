@@ -88,6 +88,9 @@ public:
 		bytes=fread(data,1,length,fp);
 		return bytes>0;
 	}
+#define READ(T) bool Read(T x){ return Read((char*) x,sizeof(x)); }
+    READ(unsigned)
+#undef READ
 	void Skip(unsigned charCount)
 	{	for(unsigned i=0;i<charCount && IsGood();i++)
 		{	(void) getc(fp);
@@ -120,9 +123,12 @@ public:
 		bytes=fwrite(data,1,length,fp);
 		return bytes==length;
 	}
+#define WRITE(T) bool Write(T x){ return Write((const char*) &x,sizeof(x)); }
 	bool Write(char c)
 	{	return Write(&c,1);
 	}
+    WRITE(unsigned)
+#undef WRITE
 	bool Write(const char* string)
 	{	if(!string)
 		{	return false;
