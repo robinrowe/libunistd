@@ -1,27 +1,24 @@
-// BsdSocket.h
+// portable/BsdSocket.h
 // Created by Robin Rowe on 11/27/2015
 // Copyright (c) 2015 Robin.Rowe@CinePaint.org
 // License open source MIT
 
 #ifndef BsdSocket_h
 #define BsdSocket_h
-
-#ifdef _WIN32
-#include "../vcpp/unistd.h"
-#include "../vcpp/netinet/in.h"
-#include "../vcpp/arpa/inet.h"
-#else
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#emdif
-#include <sys/socket.h>
 #include <thread>
 #include <memory.h> 
 #include <string>
 #include <memory>
+#include <vector>
+#include "../vcpp/unistd.h"
+#include "../vcpp/arpa/inet.h"
+#include "../vcpp/netinet/in.h"
 #include "MsgBuffer.h"
-#include "Packet.h"
+#include "PacketReader.h"
+#include "AtomicCounter.h"
+#include "VerboseCounter.h"
+
+#pragma warning(disable:4265)
 
 namespace portable 
 {
@@ -29,191 +26,97 @@ namespace portable
 class BsdSocket
 {protected:
 	SOCKET socketfd;
-	SOCKET newsockfd;
-	std::unique_ptr<char[]> buffer;
-	unsigned bufsize;
 	bool isGo;
-	bool isTcp;
-	bool isClient;
 	sockaddr_in server_sockaddr;
-	std::thread worker;
-	static void Main(BsdSocket* self)
-    {   self->Run();
-    }
-private:
-	int OpenSocket(bool isTcp)
+	std::thread packetWorker;
+	int OpenSocket(bool isTcp=true)
 	{	if(isTcp)
 		{	return (int) socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
 		}
-		else
-		{	return (int) socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
-	}	}
-	bool ListenAccept()
-	{   const int backlog = 1; //point-to-point, not SOMAXCONN;
-		listen(socketfd,backlog); 
-		sockaddr_in cli_addr;
-		int clilen = sizeof(cli_addr);
-//		puts("\nListening...");
-		newsockfd = accept(socketfd, (struct sockaddr *)&cli_addr, &clilen);
-		if (newsockfd < 0) 
-		{	perror("ERROR on accept");
-			return false;
-		}
-		puts("Connected");
-		return true;
-	}   
-	void Run()
-	{	PacketSizer packetSizer(buffer.get(),bufsize);
-		PacketReader packet(packetSizer);
-		unsigned offset=0;
-		while(isGo)
-		{	if(!isClient && newsockfd<=0)
-			{	ListenAccept();
-			}
-			const int bytes = RecvFrom(offset);
-			packet.Init();
-			OnPacket(bytes,packet);
-		}
-		OnStop();
+		return (int) socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 	}
-	bool OpenClient(const char* serverName,int serverPort)
-	{	socketfd= OpenSocket(isTcp);
-		if(socketfd == -1)			
-		{	puts(errorMsg.GetLastError());
-			return false;
-		}
-		memset((char *) &server_sockaddr, 0, sizeof(server_sockaddr));
-		server_sockaddr.sin_family = AF_INET;
-		server_sockaddr.sin_port = htons((u_short) serverPort);  
-//		server_sockaddr.sin_addr.S_un.S_addr = inet_addr(serverName);
-		if(1!=inet_pton(AF_INET,serverName,&server_sockaddr.sin_addr))
-		{	puts(errorMsg.GetLastError());
-			return false;
-		}
-		const int ok = connect(socketfd, (struct sockaddr*)&server_sockaddr, sizeof(server_sockaddr));
-		if(ok<0) 
-		{	perror("ERROR connecting");
-			return false;
-		}
-		isGo=true;
-		return true;
+protected:
+	virtual void Run()
+	{}
+	virtual int OnPacket(int bytes,portable::PacketReader& packet)
+	{	return 0;
 	}
-	bool OpenServer(const char* ,int serverPort)
-	{	socketfd=OpenSocket(isTcp);
-		if(socketfd == -1)
-		{	puts(errorMsg.GetLastError());
-			return false;
-		}
-		server_sockaddr.sin_family = AF_INET;
-		server_sockaddr.sin_port = htons((u_short) serverPort);
-		server_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-		if(::bind(socketfd, (struct sockaddr*)&server_sockaddr,sizeof(server_sockaddr)) == -1)
-		{	puts(errorMsg.GetLastError());
-			return false;
-		}
-		isGo=true;
-		return true;
+	virtual void OnStop()
+	{	puts("Soscket stream stopping");
 	}
-	BsdSocket(BsdSocket&);
-	void operator=(BsdSocket&);
 public:
 	MsgBuffer<120> errorMsg;
 	virtual ~BsdSocket()
-	{	Close();
-	}
+	{}
 	BsdSocket()
 	:	socketfd(0)
-	,	newsockfd(0)
-	,	bufsize(bufsize)
 	,	isGo(false)
-	,	isTcp(true)
-	,	isClient(true)
 	{}
-	BsdSocket(SOCKET fd)
-	:	socketfd(fd)
-	,	newsockfd(0)
-	,	bufsize(bufsize)
+	BsdSocket(SOCKET socketfd)
+	:	socketfd(socketfd)
 	,	isGo(false)
-	,	isTcp(true)
-	,	isClient(true)
 	{}
+	BsdSocket(const BsdSocket&) = default;
 	bool IsOpen() const
 	{	return isGo;
 	}
-	void Resize(unsigned bufsize)
-	{	if(!bufsize)
-		{	this->bufsize = 0;
-			buffer.reset();
-			return;
-		}
-		buffer=std::unique_ptr<char[]>(new char[bufsize]);
-		this->bufsize = bufsize;
-		//buffer=std::make_unique<char[]>(bufsize);
-	}
-	bool Open(const char* serverName,int serverPort,bool isClient,bool isTcp=true)
-	{	this->isClient = isClient;
-		this->isTcp = isTcp;
-		if(isClient)
-		{	return  OpenClient(serverName,serverPort);
-		}
-		return  OpenServer(serverName,serverPort);
-	}	
-	void Stop()
-	{	if(isGo)
-		{	isGo=false;
-			SendTo("",0);
-	}	}
-	void Start(bool isBlocking)
-	{	worker=std::thread(Main,this);
-		if(isBlocking)
-		{	worker.join();
-		}
-		else
-		{	worker.detach();
-	}	}
-	void Close()
-	{	Stop();
-		if(socketfd)
-		{	closesocket(socketfd);
-			socketfd=0;
-	}	}
 	bool SendTo(const char* msg,unsigned len)
 	{	if(socketfd<=0)
 		{	return false;
 		}
 		int slen = sizeof(sockaddr_in);
 		if(sendto(socketfd,msg,len,0,(struct sockaddr *)&server_sockaddr,slen)==-1)
-		{	puts(errorMsg.GetLastError());
+		{	OnSocketError(msg,len);
 			return false;
 		}
 		return true;
 	}
 	bool SendTo(Packet& packet)
-	{	return SendTo(packet.GetPacket(),packet.GetPacketSize());
-	}
-	const char* GetString() const
-	{	return buffer.get();
-	}
-	virtual unsigned OnPacket(unsigned ,PacketReader&)
-	{	return 0;
-	}
-	virtual void OnStop() const
-	{}
-	int RecvFrom(unsigned offset=0)
-	{	int slen = sizeof(sockaddr_in);
-		if(isClient)
-		{	if(socketfd<=0)
-			{	errorMsg.Set("Socket not open");
-				return -1;
-			}	
-			return recvfrom(socketfd,buffer.get()+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
+	{	static VerboseCounter counter(600);
+		counter++;
+		if (counter)
+		{	printf("Packet #%u send %i\n", packet.GetPacketId(), packet.GetPacketSize());
 		}
-		if(newsockfd<=0)
+		return SendTo(packet.GetPacket(),packet.GetPacketSize());
+	}
+	void Close()
+	{	puts("Socket close");
+		isGo=false;
+		if(socketfd)
+		{	closesocket(socketfd);
+			socketfd=0;
+	}	}
+	int RecvFrom(char* buffer,unsigned bufsize,unsigned offset=0)
+	{	int slen = sizeof(sockaddr_in);
+		if(socketfd<=0)
 		{	errorMsg.Set("Socket not open");
 			return -1;
 		}	
-		return recvfrom(newsockfd,buffer.get()+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen); 
+		return recvfrom(socketfd,buffer+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
 	}
+	void SocketReset(const char* msg)
+	{	socketfd=0;
+		puts(msg);
+	}
+	virtual void Stop()
+	{	if(isGo)
+		{	isGo=false;
+			SendTo("",0);
+	}	}
+	virtual void Start()
+	{	puts("Soscket stream starting");
+	}
+	static void GetPeerName(SOCKET sock,std::string& s); 
+	void GetPeerName(std::string& s) const
+	{	return GetPeerName(socketfd,s);
+	}
+	static bool SetReuse(SOCKET socketfd,int isReuse=1)
+	{	return setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, (const char*) &isReuse, sizeof(int)) > 0;
+	}
+	virtual void OnSocketError(const char* msg,unsigned len)
+	{	puts(errorMsg.GetLastError());
+	}
+	static bool GetIp(const char* hostname,std::string& ip);
 };
 
 }

@@ -12,9 +12,9 @@
 #include <stdio.h>
 #include "SystemCall.h"
 
-namespace portable
+namespace portable 
 {
-	
+
 class TimerPump
 {protected:
     typedef std::unique_lock<std::mutex> Lock;
@@ -24,6 +24,7 @@ class TimerPump
     std::condition_variable pumpCon;
     milliseconds wakeDelay;
     bool isGo;
+	bool isWake;
     const char* object;
     static void Main(TimerPump* self)
     {   self->Run();
@@ -33,8 +34,9 @@ class TimerPump
     {}
 public:
     TimerPump()
-    :   isGo(false),
-        object("TimerPump")
+    :   isGo(false)
+	,	isWake(false)
+    ,	object("TimerPump")
     {}
     virtual ~TimerPump()
     {   isGo=false;
@@ -51,7 +53,8 @@ public:
         return true;
     }
 	void Wake()
-	{	pumpCon.notify_one();
+	{	isWake = true;
+		pumpCon.notify_one();
 	}
     bool Stop()
     {   isGo=false;
@@ -68,4 +71,5 @@ public:
 };
 
 }
+
 #endif

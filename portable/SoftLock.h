@@ -4,6 +4,11 @@
 #ifndef SoftLock_h
 #define SoftLock_h
 
+#include "AtomicMutex.h"
+
+namespace portable
+{
+
 class AtomicMutex;
 
 class SoftLock
@@ -12,8 +17,14 @@ class SoftLock
 	SoftLock(SoftLock&);
 	void operator=(SoftLock&);
 public:
-	SoftLock(AtomicMutex& atomicMutex);
-	~SoftLock();
+	~SoftLock()
+	{	if(isLocked)
+		{	atomicMutex.Unlock();
+	}	}
+	SoftLock(AtomicMutex& atomicMutex)
+	:	atomicMutex(atomicMutex),
+		isLocked(atomicMutex.Lock())
+	{}
 	bool IsLocked() const
 	{	return isLocked;
 	}
@@ -22,5 +33,6 @@ public:
 	}
 };
 
+}
 
 #endif

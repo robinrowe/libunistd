@@ -17,6 +17,10 @@ UnrealLogger logger("your_plugin_name");
 #ifndef UnrealLogger_h
 #define UnrealLogger_h
 
+#ifdef UNREAL_ENGINE
+#include <AllowWindowsPlatformTypes.h>
+#endif
+
 #include <Runtime/CoreUObject/Public/UObject/ObjectBase.h>
 #include <portable/Counter.h>
 #include <crtdbg.h>
@@ -60,6 +64,11 @@ extern UnrealLogger logger;
 
 #define LogMsg(msg) logger.Log(__FILE__, __LINE__,msg)
 #define LogError(msg) logger.Error(__FILE__, __LINE__,msg)
+
+
+#ifdef UNREAL_ENGINE
+#include <HideWindowsPlatformTypes.h>
+#endif
 
 #endif
 
