@@ -88,7 +88,7 @@ public:
 		bytes=fread(data,1,length,fp);
 		return bytes>0;
 	}
-#define READ(T) bool Read(T x){ return Read((char*) x,sizeof(x)); }
+#define READ(T) bool Read(T x){ return Read((char*) &x,sizeof(x)); }
     READ(unsigned)
 #undef READ
 	void Skip(unsigned charCount)
@@ -107,11 +107,11 @@ public:
 			{	return;
 		}	}
 	}	
-	bool GetLine(char* s,unsigned size)
+	bool GetLine(char* s,size_t size)
 	{	if(!IsGood())
 		{	return false;
 		}
-		return nullptr != fgets(s,size,fp);
+		return nullptr != fgets(s,(int) size,fp);
 	}
 	bool GetLine(std::vector<char>& line)
 	{	return GetLine(&line[0],line.size());
@@ -175,7 +175,7 @@ public:
 		va_start(argList,format);
 		bytes = vfscanf(fp, format, argList);
 		va_end(argList);
-		return bytes;
+		return (int) bytes; // Should return the number of input items assigned or EOF
 	}
 #ifdef __GNUC__
 	int fprintf(const char* const format,...) __attribute__ ((format(printf, 2, 3)))
@@ -186,7 +186,7 @@ public:
 		va_start(argList,format);
 		bytes = vfprintf(fp, format, argList);
 		va_end(argList);
-		return bytes;
+		return (int)bytes; // Should return the number of input items assigned or EOF
 	}
 };
 

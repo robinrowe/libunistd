@@ -566,8 +566,8 @@ static int BMK_hash(const char* fileName,
         const size_t maxInfoFilenameSize = fileNameSize > 30 ? 30 : fileNameSize;
         size_t infoFilenameSize = 1;
         while ( (infoFilenameSize < maxInfoFilenameSize)
-              &&(fileNameEnd[-infoFilenameSize-1] != '/')
-              &&(fileNameEnd[-infoFilenameSize-1] != '\\') )
+              &&(fileNameEnd[infoFilenameSize-1] != '/')
+              &&(fileNameEnd[infoFilenameSize-1] != '\\') )
               infoFilenameSize++;
         DISPLAY("\rLoading %s...                        \r", fileNameEnd - infoFilenameSize);
     }
