@@ -21,7 +21,7 @@ UnrealLogger logger("your_plugin_name");
 #include <AllowWindowsPlatformTypes.h>
 #endif
 
-#include <Runtime/CoreUObject/Public/UObject/ObjectBase.h>
+//#include <Runtime/CoreUObject/Public/UObject/ObjectBase.h>
 #include <portable/Counter.h>
 #include <crtdbg.h>
 
