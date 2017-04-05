@@ -6,6 +6,15 @@
 #ifndef TIMERPUMP_H
 #define TIMERPUMP_H
 
+// You may get _Pad compile error if a dependant class is not defined.
+// If you embed unique_ptr anywhere in your objects, you may get this error.
+/* Also try this:
+#pragma warning(push)
+#pragma warning(disable:4265)
+#include <thread>
+#pragma warning(pop)
+*/
+
 #include <thread>
 #include <mutex>
 #include <condition_variable>
