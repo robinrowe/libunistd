@@ -22,8 +22,8 @@ public:
 	AtomicCounter<T>(T n)
 	{	this->n=n;
 	}
-	AtomicCounter<T>& operator=(const T n)
-	{	this->n=n;
+	AtomicCounter<T>& operator=(const T rhs)
+	{	n=rhs;
 		return *this;
 	}
 	T operator++(int)

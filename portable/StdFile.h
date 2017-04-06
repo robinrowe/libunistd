@@ -39,11 +39,12 @@ public:
 		{	fclose(fp);
 		}
 		fp=nullptr;
-        bytes = -1;
+        bytes = 0;
 	}
 	FILE* GetFp()
 	{	return fp;
 	}
+#pragma warning(disable:4458)
     void SetFp(FILE* fp)
     {   Close();
         this->fp = fp;
@@ -295,5 +296,6 @@ bool DeleteFile(const char* filename)
 }
 
 }
+#pragma warning(default:4458)
 
 #endif

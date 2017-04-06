@@ -33,13 +33,13 @@ void BsdSocket::GetPeerName(SOCKET sock,std::string& s)
 	socklen_t len = sizeof addr;
 	getpeername(sock, (struct sockaddr*)&addr, &len);
 	if (addr.ss_family == AF_INET) 
-	{	struct sockaddr_in *s = (struct sockaddr_in *)&addr;
-		inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
+	{	struct sockaddr_in *sockin = (struct sockaddr_in *)&addr;
+		inet_ntop(AF_INET, &sockin->sin_addr, ipstr, sizeof ipstr);
 	}
 	else 
 	{ // AF_INET6
-		struct sockaddr_in6 *s = (struct sockaddr_in6 *)&addr;
-		inet_ntop(AF_INET6, &s->sin6_addr, ipstr, sizeof ipstr);
+		struct sockaddr_in6 *sockin6 = (struct sockaddr_in6 *)&addr;
+		inet_ntop(AF_INET6, &sockin6->sin6_addr, ipstr, sizeof ipstr);
 	}
 	s=ipstr;
 }

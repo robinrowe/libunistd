@@ -43,7 +43,7 @@ void StubAssert(int errorlevel,const char* msg,const char* file,const char* func
 
 inline
 int SystemCall(const char* cmd)
-{	
+{	(void)cmd;
 #ifdef TRACE_SYSTEM_CALLS
 	static int i;
 	printf("[%i] system(%s)\n",++i,cmd);

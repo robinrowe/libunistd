@@ -46,7 +46,9 @@ public:
 			socketfd=0;
 	}	}
 	virtual bool Login(SOCKET* slot,SOCKET fd)
-	{	return false;
+	{	(void)slot;
+		(void)fd;
+		return false;
 	}
 	void Start() override
 	{	listenWorker=std::thread(ListenMain,this);

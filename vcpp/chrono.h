@@ -76,7 +76,10 @@ struct timespec {
 
 inline
 int clock_getres(clockid_t clk_id, struct timespec *res)
-STUB0(clock_getres)
+{	(void)clk_id;
+	(void)res;
+	STUB0(clock_getres);
+}
 
 // seconds and nanosecond count of the time since the Epoch (00:00 1 January, 1970 UTC).
 
@@ -122,11 +125,15 @@ int clock_gettime(clockid_t clk_id, struct timespec *tp)
 
 inline
 int clock_settime(clockid_t clk_id, const struct timespec *tp)
-STUB0(clock_settime)
+{	(void)clk_id;
+	(void)tp;
+	STUB0(clock_settime);
+}
 
 inline
 int nanosleep(const struct timespec *req, struct timespec *rem)
-{	long long delay = req->tv_sec;
+{	(void)rem;
+	long long delay = req->tv_sec;
 	const long long billion = 1000000000LL;
 	delay*=billion;
     delay+=req->tv_nsec;

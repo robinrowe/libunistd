@@ -39,7 +39,9 @@ protected:
 	virtual void Run()
 	{}
 	virtual int OnPacket(int bytes,portable::PacketReader& packet)
-	{	return 0;
+	{	(void)bytes;
+		(void)packet;
+		return 0;
 	}
 	virtual void OnStop()
 	{	puts("Soscket stream stopping");
@@ -114,7 +116,9 @@ public:
 	{	return setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, (const char*) &isReuse, sizeof(int)) > 0;
 	}
 	virtual void OnSocketError(const char* msg,unsigned len)
-	{	puts(errorMsg.GetLastError());
+	{	(void)msg;
+		(void)len;
+		puts(errorMsg.GetLastError());
 	}
 	static bool GetIp(const char* hostname,std::string& ip);
 };

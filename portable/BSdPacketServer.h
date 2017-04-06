@@ -44,7 +44,6 @@ public:
 	,	programVersion(programVersion)
 	,	headerBuffer(bufSize)
 	,	headerPacket(&headerBuffer[0],bufSize)
-	,	framePacket(bufSize)
 	,	multicast(pool)
 	,	isStreaming(false)
 	{}

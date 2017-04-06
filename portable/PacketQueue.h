@@ -21,7 +21,7 @@ class PacketQueue
 	PacketWriter* dirty;
 	PacketWriter* fresh;
 public:
-	PacketQueue(unsigned bufSize)
+	PacketQueue()
 	:	packetWriter0(buffer,bufsize)
 	,	packetWriter1(buffer+bufsize,bufsize)
 	,	packetWriter2(buffer+2*bufsize,bufsize)
