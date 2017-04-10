@@ -9,7 +9,7 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-#if (defined(_WINDOWS_) || defined(_INC_WINDOWS)) && !defined(WIN32_LEAN_AND_MEAN)
+#if  ((defined(_WINDOWS_) || defined(_INC_WINDOWS))) && !defined(WIN32_LEAN_AND_MEAN)
 #error unistd.h must be included before Windows.h or #define WIN32_LEAN_AND_MEAN
 #endif
 
