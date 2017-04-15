@@ -1,0 +1,8 @@
+# libunistd/test/PosixQueue/CMakeList.txt
+
+if(WIN32)
+include_directories(../../vcpp)
+endif()
+
+add_executable(WormFile main.cpp)
+target_link_libraries (WormFile LINK_PUBLIC libportable)

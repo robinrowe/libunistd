@@ -7,7 +7,7 @@
 
 #include <thread>
 #include "unistd.h"
-#include "portable/Logger.h"
+#include "../portable/Logger.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,11 +67,13 @@ typedef int pthread_spinlock_t;
 
 inline
 void pthread_cleanup_push(void (*routine)(void *),void *arg)
-STUB(pthread_cleanup_push)
+{   STUB(pthread_cleanup_push);
+}
 
 inline
 void pthread_cleanup_pop(int execute)
-STUB(pthread_cleanup_pop)
+{   STUB(pthread_cleanup_pop);
+}
 
 /*
 struct pthread_attr_t
@@ -142,27 +144,33 @@ int pthread_attr_destroy(pthread_attr_t *attr)
 
 inline
 int pthread_attr_setinheritsched(pthread_attr_t *attr,int inheritsched)
-STUB0(pthread_attr_setinheritsched)
+{   STUB0(pthread_attr_setinheritsched);
+}
 
 inline
 int pthread_attr_getinheritsched(const pthread_attr_t *attr,int *inheritsched)
-STUB0(pthread_attr_getinheritsched)
+{   STUB0(pthread_attr_getinheritsched);
+}
 
 inline
 int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy)
-STUB0(pthread_attr_setschedpolicy)
+{   STUB0(pthread_attr_setschedpolicy);
+}
 
 inline
 int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy)
-STUB0(pthread_attr_getschedpolicy)
+{   STUB0(pthread_attr_getschedpolicy);
+}
 
 inline
 int pthread_attr_setschedparam(pthread_attr_t *attr,const struct sched_param *param)
-STUB0(pthread_attr_setschedparam)
+{   STUB0(pthread_attr_setschedparam);
+}
 
 inline
 int pthread_attr_getschedparam(const pthread_attr_t *attr,struct sched_param *param)
-STUB0(pthread_attr_getschedparam)
+{   STUB0(pthread_attr_getschedparam);
+}
 
 #ifdef VERBOSE_PTHREAD
 inline
@@ -239,23 +247,28 @@ int pthread_join(pthread_t thread, void **retval)
 
 inline
 int pthread_mutex_lock(pthread_mutex_t *mutex)
-STUB0(pthread_mutex_lock)
+{   STUB0(pthread_mutex_lock);
+}
 
 inline
 int pthread_mutex_trylock(pthread_mutex_t *mutex)
-STUB0(pthread_mutex_trylock)
+{   STUB0(pthread_mutex_trylock);
+}
 
 inline
 int pthread_mutex_unlock(pthread_mutex_t *mutex)
-STUB0(pthread_mutex_unlock)
+{   STUB0(pthread_mutex_unlock);
+}
 
 inline
 void pthread_exit(void *retval)
-STUB(pthread_exit)
+{   STUB(pthread_exit);
+}
 
 inline
 int pthread_cancel(pthread_t thread)
-STUB0(pthread_cancel)
+{   STUB0(pthread_cancel);
+}
 
 #ifdef __cplusplus
 }

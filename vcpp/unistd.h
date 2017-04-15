@@ -196,6 +196,8 @@ int mkdir(const char* path)
 {	 return _mkdir(path);
 }
 
+typedef int pid_t;
+
 inline
 int kill(pid_t p, int x)
 {	(void)p;
@@ -260,11 +262,15 @@ From WIN32 sys/stat.h:
 
 #define getpid _getpid
 
+typedef int gid_t;
+
 inline 
 int setgid(gid_t g)
 {	(void)g;
 	return -1;
 }
+
+typedef int uid_t;
 
 inline 
 int setuid(uid_t g)

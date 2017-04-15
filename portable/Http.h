@@ -4,13 +4,14 @@
 #ifndef Http_h
 #define Http_h
 
+#include <string>
+
 namespace portable
 {
 
-#include "String.h"
-
 class Http
-{	enum http_retcode
+{	typedef std::string String;
+    enum http_retcode
 	{	/* Client side errors */
 		ERRHOST=-1, /* No such host */
 		ERRSOCK=-2, /* Can't create socket */

@@ -10,11 +10,13 @@
 
 inline
 int statfs(const char *path, struct statfs *buf)
-STUB0(statfs)
+{   STUB0(statfs);
+}
 
 inline
 int fstatfs(int fd, struct statfs *buf)
-STUB0(fstatfs)
+{   STUB0(fstatfs);
+}
 
 typedef short __fsword_t;
 typedef int fsblkcnt_t;

@@ -3,7 +3,7 @@
 #ifndef libintl_h
 #define libintl_h
 
-#include "stub.h"
+#include "../portable/stub.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,11 +20,13 @@ const char* IntlGetPackage()
 
 inline
 void bindtextdomain(const char* package, const char* localdir)
-STUB(bindtextdomain)
+{   STUB(bindtextdomain);
+}
 
 inline
 void textdomain(const char* package)
-STUB(textdomain)
+{   STUB(textdomain);
+}
 
 inline
 char const* gettext(char const * text)

@@ -14,13 +14,16 @@ extern "C" {
 #endif
 
 int ffs(int i)
-STUB0(ffs)
+{   STUB0(ffs);
+}
 
 int ffsl(long int i)
-STUB0(ffsl)
+{   STUB0(ffsl);
+}
 
 int ffsll(long long int i)
-STUB0(ffsll)
+{   STUB0(ffsll);
+}
 
 #ifdef __cplusplus
 }

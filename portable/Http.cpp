@@ -1,27 +1,21 @@
 // Http.cpp
 // 2013/11/20
 
-#include "Http.h"
-#ifdef _WIN32
-#include "../vcpp/unistd.h"
-#include "../vcpp/netinet/in.h"
-#include "../vcpp/arpa/inet.h"
-#include "../vcpp/netdb.h"
-#else
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#endif
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <ctype.h>
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include "Http.h"
 
 //#define VERBOSE
-
+namespace portable
+{
 /*
  * read a line from file descriptor
  * returns the number of bytes read. negative if a read error occured
@@ -64,7 +58,6 @@ int Http::http_read_buffer (int fd,char *buffer,int length)
 	}
 	return bytes;
 }
-
 
 /* beware that filename+type+rest of header must not exceed MAXBUF */
 /* so we limit filename to 256 and type to 64 chars in put & get */
@@ -191,7 +184,6 @@ bool Http::http_put(char *data,int length,int overwrite,char *type)
   return http_query("PUT",filename.c_str(),header,CLOSE, data, length, NULL);
 }
 
-
 /*
  * Get data from the server
  *
@@ -266,7 +258,6 @@ bool Http::http_get(char *pdata,int  *plength,char *typebuf)
 	return IsGood();
 }
 
-
 /*
  * Request the header
  *
@@ -315,8 +306,6 @@ bool Http::http_head(int  *plength,char *typebuf)
   return IsGood();
 }
 
-
-
 /*
  * Delete data on the server
  *
@@ -330,8 +319,6 @@ bool Http::http_head(int  *plength,char *typebuf)
 bool Http::http_delete()
 {  return http_query("DELETE",filename.c_str(),"",CLOSE, NULL, 0, NULL);
 }
-
-
 
 /* parses an url : setting the http_server and http_port global variables
  * and returning the filename to pass to http_get/put/...
@@ -352,7 +339,7 @@ bool Http::http_parse_url(const char *url)
 	filename.erase();
 	http_port=80;
 	const char* domain=url;
-	const char* endOf=strchr(domain,':');
+	char* endOf=const_cast<char*>(strchr(domain,':'));
 	if(endOf)
 	{	http_server=String(domain,endOf-domain);
 		endOf++;
@@ -364,7 +351,7 @@ bool Http::http_parse_url(const char *url)
 			ret = ERRURLP;
 			return IsGood();
 	}	}
-	endOf=strchr(domain,'/');
+	endOf= const_cast<char*>(strchr(domain,'/'));
 	if(!http_server.size())
 	{	if(endOf)
 		{	http_server=String(domain,endOf-domain);
@@ -428,5 +415,7 @@ int Http::GetSystemError()
 int Http::GetSystemError() 
 {	return 0;
 }
-
 #endif
+
+}
+

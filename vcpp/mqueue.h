@@ -5,11 +5,10 @@
 #ifndef mqueue_h
 #define mqueue_h
 
-#include <winsock2.h>
-#include <windows.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include "portable/MsgBuffer.h"
+#include "../portable/MsgBuffer.h"
 
 #ifndef __cplusplus
 #error
@@ -23,8 +22,6 @@ struct mq_attr
 };
 
 typedef long long mqd_t;
-typedef long long ssize_t;
-typedef int mode_t;
 
 inline
 int MultiByteToWideChar(LPCSTR lpMultiByteStr,LPWSTR lpWideCharStr,int bufsize)
@@ -46,6 +43,7 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 #pragma warning(disable:4996)
 	strcpy(namePath,"\\\\.\\mailslot\\");
 	strcpy(namePath+13,name+1);
+#if 0
 #pragma warning(default:4996)
 	WCHAR wName[bufsize];
 	if(!MultiByteToWideChar(namePath,wName,bufsize))
@@ -53,6 +51,7 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 		puts(msg.GetLastError());
 		return -1;
 	}
+#endif
 // This name must have the following form: \\.\mailslot\[path]name
 // LPTSTR Slot = TEXT("\\\\.\\mailslot\\sample_mailslot");
 // sprintf(ServerName, "\\\\%s\\Mailslot\\Myslot", name);
@@ -67,7 +66,7 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 		case O_CREAT | O_RDWR:
 		{	const DWORD nMaxMessageSize=0;
 			const DWORD lReadTimeout=MAILSLOT_WAIT_FOREVER;
-			HANDLE hSlot = CreateMailslot(wName, 
+			HANDLE hSlot = CreateMailslotA(namePath,
 				nMaxMessageSize,
 				lReadTimeout,
 				lpSecurityAttributes);
@@ -94,7 +93,7 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 	DWORD dwCreationDisposition=OPEN_EXISTING;
 	DWORD dwFlagsAndAttributes=FILE_ATTRIBUTE_NORMAL;
 	HANDLE hTemplateFile=NULL;
-	HANDLE hSlot = CreateFile(wName, 
+	HANDLE hSlot = CreateFileA(namePath,
 		dwDesiredAccess,
 		dwShareMode,
 		lpSecurityAttributes,

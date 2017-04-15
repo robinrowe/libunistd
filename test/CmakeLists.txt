@@ -1,0 +1,5 @@
+# libunistd/test/CMakeList.txt
+
+add_subdirectory(PosixQueue)
+add_subdirectory(UnitTest)
+add_subdirectory(WormFile)

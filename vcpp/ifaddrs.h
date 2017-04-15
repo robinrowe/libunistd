@@ -32,11 +32,13 @@ struct ifaddrs
 
 inline
 int getifaddrs(struct ifaddrs **ifap)
-STUB0(getifaddrs)
+{   STUB0(getifaddrs);
+}
 
 inline
 void freeifaddrs(struct ifaddrs *ifa)
-STUB(freeifaddrs)
+{   STUB(freeifaddrs);
+}
 
 #ifdef __cplusplus
 }

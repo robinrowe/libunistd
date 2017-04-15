@@ -123,51 +123,63 @@ typedef int speed_t;
 
 inline
 int tcgetattr(int fd, struct termios *termios_p)
-STUB0(tcgetattr)
+{   STUB0(tcgetattr);
+}
 
 inline
 int tcsetattr(int fd, int optional_actions,const struct termios *termios_p)
-STUB0(tcsetattr)
+{   STUB0(tcsetattr);
+}
 
 inline
 int tcsendbreak(int fd, int duration)
-STUB0(tcsendbreak)
+{   STUB0(tcsendbreak);
+}
 
 inline
 int tcdrain(int fd)
-STUB0(tcdrain)
+{   STUB0(tcdrain);
+}
 
 inline
 int tcflush(int fd, int queue_selector)
-STUB0(tcflush)
+{   STUB0(tcflush);
+}
 
 inline
 int tcflow(int fd, int action)
-STUB0(tcflow)
+{   STUB0(tcflow);
+}
 
 inline
 void cfmakeraw(struct termios *termios_p)
-STUB(cfmakeraw)
+{   STUB(cfmakeraw);
+}
 
 inline
 speed_t cfgetispeed(const struct termios *termios_p)
-STUB0(cfgetispeed)
+{   STUB0(cfgetispeed);
+}
 
 inline
 speed_t cfgetospeed(const struct termios *termios_p)
-STUB0(cfgetospeed)
+{   STUB0(cfgetospeed);
+}
 
 inline
 int cfsetispeed(struct termios *termios_p, speed_t speed)
-STUB0(cfsetispeed)
+{   STUB0(cfsetispeed);
+}
 
 inline
 int cfsetospeed(struct termios *termios_p, speed_t speed)
-STUB0(cfsetospeed)
+{   STUB0(cfsetospeed);
+}
 
 inline
 int cfsetspeed(struct termios *termios_p, speed_t speed)
-STUB0(cfsetspeed)
+{   STUB0(cfsetspeed);
+}
 
 #if 0
 

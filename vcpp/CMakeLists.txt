@@ -7,3 +7,6 @@ add_library (libunistd
 	gettimeofday.cpp
 	uni_signal.cpp
 )
+
+target_include_directories (libunistd PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries (libunistd LINK_PUBLIC libportable)

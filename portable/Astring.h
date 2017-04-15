@@ -26,6 +26,9 @@ public:
 	Astring(const char* s)
 	{	assign(s);
 	}
+    Astring(const char* s,size_t count)
+    {   assign(s, 0, count);
+    }
 	Astring(const char* s,size_t pos,size_t count)
 	{	assign(s,pos,count);
 	}

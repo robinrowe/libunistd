@@ -154,7 +154,8 @@ public:
 	{	this->name = name;
 	}
 	static int sem_unlink(const char *)
-	STUB0(sem_unlink)
+	{   STUB0(sem_unlink);
+    }
 };
 
 inline

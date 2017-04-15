@@ -5,6 +5,7 @@
 #ifndef sys_statvfs_h
 #define sys_statvfs_h
 
+#include <sys/vfs.h>
 #include "../portable/stub.h"
 
 #ifdef __cplusplus
@@ -12,9 +13,6 @@ extern "C" {
 #else
 #define inline __inline
 #endif
-
-typedef unsigned long fsblkcnt_t;
-typedef unsigned long fsfilcnt_t;
 
 struct statvfs 
 {	unsigned long  f_bsize;    /* Filesystem block size */
@@ -43,13 +41,15 @@ enum
 };
 
 // On success, zero is returned.  On error, -1 is returned, and errno is set appropriately.
-
+#if 0
 int statvfs(const char *path, struct statvfs *buf)
-STUB0(statvfs)
+{   STUB0(statvfs);
+}
 
 int fstatvfs(int fd, struct statvfs *buf)
-STUB0(fstatvfs)
-
+{   STUB0(fstatvfs);
+}
+#endif
 #ifdef __cplusplus
 }
 #endif

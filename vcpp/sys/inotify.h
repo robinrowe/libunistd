@@ -42,19 +42,23 @@ struct inotify_event
 
 inline
 int inotify_init(void)
-STUB0(inotify_init)
+{   STUB0(inotify_init);
+}
 
 inline
 int inotify_init1(int flags)
-STUB0(inotify_init1)
+{   STUB0(inotify_init1);
+}
 
 inline
 int inotify_add_watch(int fd, const char *pathname, uint32_t mask)
-STUB0(inotify_add_watch)
+{   STUB0(inotify_add_watch);
+}
 
 inline
 int inotify_rm_watch(int fd, int wd)
-STUB0(inotify_rm_watch)
+{   STUB0(inotify_rm_watch);
+}
 
 #ifdef __cplusplus
 }
