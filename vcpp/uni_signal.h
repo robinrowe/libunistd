@@ -5,6 +5,7 @@
 #ifndef uni_signal_h
 #define uni_signal_h
 
+#include "unistd.h"
 #include <signal.h>
 #include <time.h>
 #include "../portable/stub.h"
