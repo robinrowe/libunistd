@@ -11,6 +11,9 @@ int gettimeofday(struct timeval* tv, struct timezone* tz);
 
 inline
 int settimeofday(const struct timeval *tv, const struct timezone *tz)
-STUB0(0)
+{	(void)tv;
+	(void)tz;
+	STUB0(0);
+}
 
 #endif

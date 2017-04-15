@@ -9,8 +9,8 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-#if defined(_WINDOWS_) || defined(_INC_WINDOWS)
-#error unistd.h must be included before Windows.h
+#if  ((defined(_WINDOWS_) || defined(_INC_WINDOWS))) && !defined(WIN32_LEAN_AND_MEAN)
+#error unistd.h must be included before Windows.h or #define WIN32_LEAN_AND_MEAN
 #endif
 
 //#define _CRT_SECURE_NO_DEPRECATE 
@@ -57,11 +57,22 @@
 
 inline
 int snprintb(char *buf, size_t buflen, const char *fmt, uint64_t val)
-STUB0(snprintb)
+{	(void)buf;
+	(void)buflen;
+	(void)fmt;
+	(void)val;
+	STUB0(snprintb);
+}
 
 inline
 int snprintb_m(char *buf, size_t buflen, const char *fmt, uint64_t val,size_t max)
-STUB0(snprintb_m)
+{	(void)buf;
+	(void)buflen;
+	(void)fmt;
+	(void)val;
+	(void)max;
+	STUB0(snprintb_m);
+}
 
 inline
 int uni_open(const char* filename,unsigned oflag,int mode)
@@ -77,7 +88,11 @@ int mkdir(const char* path,int)
 
 inline
 int fcntl(int handle,int mode,int mode2)
-STUB0(fcntl)
+{	(void)handle;
+	(void)mode;
+	(void)mode2;
+	STUB0(fcntl);
+}
 
 #else
 #pragma warning(disable : 4996)
@@ -183,7 +198,9 @@ int mkdir(const char* path)
 
 inline
 int kill(pid_t p, int x)
-{	return -1;
+{	(void)p;
+	(void)x;
+	return -1;
 }
 
 #define R_OK 4
@@ -245,12 +262,14 @@ From WIN32 sys/stat.h:
 
 inline 
 int setgid(gid_t g)
-{	return -1;
+{	(void)g;
+	return -1;
 }
 
 inline 
 int setuid(uid_t g)
-{	return -1;
+{	(void)g;
+	return -1;
 }
 
 #if 0
@@ -281,7 +300,8 @@ int write(int fd,const void *buffer,unsigned int count)
 
 inline
 const char* getsysconfdir()
-STUB0(getsysconfdir)
+{	STUB0(getsysconfdir);
+}
 
 inline 
 int mkstemp(char *filename)
@@ -292,15 +312,20 @@ int mkstemp(char *filename)
 
 inline
 int fchmod(int a, mode_t b)
-STUB0(fchmod)
+{	(void)a;
+	(void)b;
+	STUB0(fchmod);
+}
 
 inline
 uid_t getuid()
-STUB0(getuid)
+{	STUB0(getuid);
+}
 
 inline
 uid_t geteuid()
-STUB0(geteuid)
+{	STUB0(geteuid);
+}
 
 #define PATH_MAX 255
 
@@ -317,8 +342,12 @@ char* realpath(const char *path, char *resolved_path)
 }
 
 inline
-ssize_t readlink(const char *path, char *buf, size_t bufsiz)
-STUB0(readlink)
+ssize_t readlink(const char *path, char *buf, size_t bufsize)
+{	(void)path;
+	(void)buf;
+	(void)bufsize;
+	STUB0(readlink);
+}
 
 inline
 int fsync (int fd)
@@ -344,7 +373,10 @@ int syncfs(int fd)
 
 inline
 int fcntl(int handle,int mode)
-STUB0(fcntl)
+{	(void)handle;
+	(void)mode;
+	STUB0(fcntl);
+}
 
 #define EBADFD 200
 #define ESHUTDOWN 201
@@ -366,14 +398,14 @@ typedef int Atom;
 
 inline
 int gethostname(char *name, size_t len)
-{   DWORD bufsize = len;
+{   DWORD bufsize = (DWORD) len;
     BOOL ok = GetComputerNameA(name,&bufsize);
     return ok? 0:-1;
 }
 
 inline
 int getlogin_r(char *buf, size_t len)
-{   DWORD bufsize = len;
+{   DWORD bufsize = (DWORD) len;
     BOOL ok = GetUserNameA(buf,&bufsize);
     return ok? 0:-1;
 }

@@ -14,8 +14,7 @@
 #include <unistd.h>
 #endif
 #include <stdio.h>
-#include <string.h>
-#include <signal.h>
+#include <string>
 
 inline
 void SysLogMsg(const char* msg,const char* function)
@@ -35,6 +34,17 @@ void SysLogError(const char* msg,const char* function)
 #endif
 #endif
 }
+
+inline
+void LogMsg(const std::string& msg)
+{	puts(msg.c_str());
+}
+
+inline
+void LogError(const std::string& msg)
+{	printf("ERROR: %s",msg.c_str());
+}
+
 #endif
 
 #ifdef LOGGER_QUIET

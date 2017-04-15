@@ -8,6 +8,7 @@
 #include "unistd.h"
 #include <signal.h>
 #include <time.h>
+#include <memory.h>
 #include "../portable/stub.h"
 
 #ifdef __cplusplus
@@ -113,19 +114,30 @@ int sigemptyset(sigset_t *set)
 
 inline
 int sigfillset(sigset_t *set)
-STUB0(sigfillset)
+{	(void)set;
+	STUB0(sigfillset);
+}
 
 inline
 int sigaddset(sigset_t *set, int signum)
-STUB0(sigaddset)
+{	(void)set;
+	(void)signum;
+	STUB0(sigaddset);
+}
 
 inline
 int sigdelset(sigset_t *set, int signum)
-STUB0(sigdelset)
+{	(void)set;
+	(void)signum;
+	STUB0(sigdelset);
+}
 
 inline
 int sigismember(const sigset_t *set, int signum)
-STUB0(sigismember)
+{	(void)set;
+	(void)signum;
+	STUB0(sigismember);
+}
 
 extern void (*CtrlCHandler)(int, struct siginfo_t *, void *);
 BOOL WindowsCtrlCHandler(DWORD fdwCtrlType) ;
@@ -133,15 +145,23 @@ int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact)
 
 inline
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
-STUB0(sigprocmask)
+{	(void)how;
+	(void)set;
+	(void)oldset;
+	STUB0(sigprocmask);
+}
 
 inline
 int sigpending(sigset_t *set)
-STUB0(sigpending)
+{	(void)set;
+	STUB0(sigpending);
+}
 
 inline
 int sigsuspend(const sigset_t *mask)
-STUB0(sigsuspend)
+{	(void)mask;
+	STUB0(sigsuspend);
+}
 
 #ifdef __cplusplus
 }

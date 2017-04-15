@@ -33,3 +33,5 @@ Release
 Debug
 build
 *.sdf
+*.filters
+.vs
