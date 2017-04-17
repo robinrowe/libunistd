@@ -17,7 +17,7 @@ inline
 void *mmap(void *addr, size_t length, int prot, int flags,int fd, off_t offset)
 {	char* p = new char[length];
 	memset(p,0,length);
-	const int bytes = _read(fd,p,length);
+	const int bytes = _read(fd,p,(unsigned) length);
 	return p;
 }
 

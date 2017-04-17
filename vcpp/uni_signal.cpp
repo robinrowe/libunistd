@@ -2,6 +2,7 @@
 // Libunistd Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT 
 
+#include "unistd.h"
 #include "uni_signal.h"
 
 #ifdef __cplusplus

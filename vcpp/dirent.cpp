@@ -74,7 +74,7 @@ struct dirent* readdir(DIR* dir)
 	{	return nullptr;	
 	}
 	if(dir->dd_stat == 0)
-	{	dir->dd_handle = _findfirst (dir->dd_name, &(dir->dd_dta));
+	{	dir->dd_handle = (long) _findfirst (dir->dd_name, &(dir->dd_dta));
 		if(dir->dd_handle == -1)
 		{	dir->dd_stat = -1;
 			return nullptr;

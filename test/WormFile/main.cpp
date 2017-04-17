@@ -14,7 +14,7 @@ int main()
 		return 1;
 	}
 	const char* data = "Hello World";
-	const unsigned length = strlen(data)+1;
+	const size_t length = strlen(data)+1;
 	unsigned offset = wormFile.Write(data, length);
 	if(!offset)
 	{	cout <<"Can't write "<<filename<<endl;

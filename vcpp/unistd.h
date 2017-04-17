@@ -196,8 +196,6 @@ int mkdir(const char* path)
 {	 return _mkdir(path);
 }
 
-typedef int pid_t;
-
 inline
 int kill(pid_t p, int x)
 {	(void)p;
