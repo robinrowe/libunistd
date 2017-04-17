@@ -76,7 +76,7 @@ int Http::http_read_buffer (int fd,char *buffer,int length)
 bool Http::http_query(const char *command, const char *url,const char *additional_header, querymode mode, char* data, int length, int *pfd)
 {	struct  sockaddr_in server;
 	char header[MAXBUF];
-	int  hlg;
+	int hlg;
 	if (pfd) 
 	{	*pfd=-1;
 	}
@@ -89,7 +89,7 @@ bool Http::http_query(const char *command, const char *url,const char *additiona
 	memmove((char *) &server.sin_addr, hp->h_addr, hp->h_length);
 	server.sin_family = hp->h_addrtype;
 	server.sin_port = htons( http_proxy_server.size() ? u_short(http_proxy_port):u_short(http_port) );
-	int s = socket(AF_INET, SOCK_STREAM, 0);
+	int s = (int) socket(AF_INET, SOCK_STREAM, 0);
 	if(s < 0)
 	{	ret = ERRSOCK;
 		return IsGood();
@@ -124,7 +124,7 @@ bool Http::http_query(const char *command, const char *url,const char *additiona
 		http_user_agent, 
 		additional_header);
 	}
-	hlg=strlen(header);
+	hlg=(int)strlen(header);
 	if(write(s,header,hlg)!=hlg)
 	{	ret=ERRWRHD;
 		close(s);

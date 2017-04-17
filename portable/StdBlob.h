@@ -46,7 +46,7 @@ public:
 		}
 		memcpy(data,this->data,length);
 		offset += length;
-		return bytes;
+		return (int) bytes;
 	}
 	void Skip(unsigned charCount)
 	{	if(charCount+offset>=bytes)
@@ -102,7 +102,7 @@ public:
 	{	if(!IsGood())
 		{	return false;
 		}
-		return offset;
+		return (long) offset;
 	}
 	void Rewind()
 	{	if(IsGood())

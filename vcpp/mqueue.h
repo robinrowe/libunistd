@@ -113,7 +113,7 @@ int mq_send(mqd_t mqdes, const char *msg,size_t msg_len, unsigned msg_prio)
 	}
 	HANDLE hSlot = (HANDLE) mqdes;
 	DWORD cbWritten; 
-	const BOOL fResult = WriteFile(hSlot,msg,msg_len,&cbWritten,(LPOVERLAPPED) NULL); 
+	const BOOL fResult = (0 != WriteFile(hSlot,msg,(DWORD)msg_len,&cbWritten,(LPOVERLAPPED) NULL)); 
 	if (!fResult) 
 	{	return -1;
 	} 
@@ -143,7 +143,7 @@ ssize_t mq_receive(mqd_t mqdes,char* msg,size_t msg_len,unsigned* msg_prio)
 #endif	
 	DWORD numRead; 
     LPOVERLAPPED lpOverlapped = 0;
-	BOOL ok = ReadFile(handle, msg, msg_len, &numRead, lpOverlapped);
+	const BOOL ok = (0!=ReadFile(handle, msg, (DWORD) msg_len, &numRead, lpOverlapped));
 	if(!ok) // || msgSize != numRead)
 	{	portable::MsgBuffer<80> msg;
 		puts(msg.GetLastError());

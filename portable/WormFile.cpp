@@ -77,7 +77,7 @@ unsigned WormFile::Write(const char* data,size_t length)
 	{	if(!WriteFileHeader())
 		{	return 0;
 	}	}
-	if(!WriteBlockHeader(length))
+	if(!WriteBlockHeader((unsigned)length))
 	{	return 0;
 	}
 	if(!ioFile.Write(data,length))
