@@ -36,6 +36,11 @@ void SysLogError(const char* msg,const char* function)
 }
 
 inline
+void LogMsg(const char* msg)
+{	puts(msg);
+}
+
+inline
 void LogMsg(const std::string& msg)
 {	puts(msg.c_str());
 }

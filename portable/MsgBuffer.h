@@ -26,11 +26,11 @@ namespace portable
 template<unsigned bufsize>
 class MsgBuffer
 {	char buffer[bufsize];
-	void MsgBuffer::SetPerErrno()
+	void SetPerErrno()
 	{	char* p=strerror(errno);
 		Append(p);
 	}
-	void MsgBuffer::SetPerLastError()
+	void SetPerLastError()
 	{	const unsigned len=length();
 #ifdef _WIN32
 		const DWORD num = FormatMessageA(
