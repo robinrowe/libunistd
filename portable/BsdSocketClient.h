@@ -48,12 +48,15 @@ class BsdSocketClient
 		{	SocketReset("Socket closed",packet);
 			return false;
 		}
+		if(0==bytes)
+		{	return false;
+		}
 		if(bytes<sizeof(int))
 		{	status.packetFragments++;
 			return false;
 		}
 		packetSize = packet.GetPacketSize();
-		if(packetSize < bytes)
+		if(packetSize > bytes)
 		{	status.packetFragments++;
 			return false;
 		}

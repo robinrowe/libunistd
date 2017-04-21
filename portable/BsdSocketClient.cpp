@@ -71,10 +71,6 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 #if 0
 	printf("bytes: %i packetSize: %i\n",bytes,packetSize);
 #endif
-	if(!bytes)
-	{	puts("No bytes at begin");
-		return 0;
-	}
 	unsigned packetId = 0;
 	//LogMsg("Receive packet");
 	for(;;)
