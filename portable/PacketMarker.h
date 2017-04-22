@@ -49,7 +49,7 @@ class PacketHash
 public:
 	PacketHash(PacketWriter& packet)
 	:	packet(packet)
-	{	offset = packet.GetPayloadSize();
+	{	offset = packet.GetPacketSize();
 	}
 	PacketHash(PacketReader& packet)
 	:	packet(packet)
