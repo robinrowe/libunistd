@@ -62,6 +62,10 @@ public:
 		const unsigned size=GetPacketSize();
 		memcpy(end,packet,size);
 	}
+	bool WriteHash()
+	{	const XXH64_hash_t packetHash = CalcHash(GetPacketSize());
+		return Write((const char*) &packetHash,sizeof(packetHash));
+	}
 };
 
 template <typename T>

@@ -31,6 +31,7 @@ class PacketReader
 	}
 	void InitReader()
 	{	readOffset=sizeof(T);
+		dumpFilename=0;
 	}
 public:
 	PacketReader(const PacketSizer& sizer)
@@ -92,6 +93,15 @@ public:
 	bool Read(std::string& s);
 	bool Read(const char*& s,unsigned& size);
 	void Dump() const;
+	XXH64_hash_t ReadHash() const
+	{	XXH64_hash_t packetHash;
+		const size_t hashOffset = GetPacketSize()-sizeof(packetHash);
+		memcpy(&packetHash,GetPacket()+hashOffset,sizeof(packetHash));
+		return packetHash;
+	}
+	bool IsGoodHash() const
+	{	return ReadHash() == CalcHash(GetPacketSize()-sizeof(XXH64_hash_t));
+	}
 };
 
 

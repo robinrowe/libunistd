@@ -27,7 +27,7 @@ class Packet
 protected:
 	unsigned packetId;
 	char* packet;
-	typedef int T;
+	typedef unsigned T;
 	T* packetSize;
 	const unsigned bufsize;
 	bool IsEmpty() const
@@ -67,7 +67,7 @@ public:
 	{	return bufsize;
 	}
 	T GetPacketSize() const
-	{	return *packetSize;
+	{	return bufsize<*packetSize? 0:*packetSize;
 	}
 	T GetPayloadSize() const
 	{	return GetPacketSize() - sizeof(*packetSize);
@@ -104,6 +104,9 @@ public:
 	{	char* end=GetEndPtr();
 		const unsigned size=GetPacketSize();
 		memcpy(end,packet,size);
+	}
+	XXH64_hash_t CalcHash(size_t length,unsigned long long seed = 0) const
+	{	return XXH64(GetPacket(),length,seed);
 	}
 };
 

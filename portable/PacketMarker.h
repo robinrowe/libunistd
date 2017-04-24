@@ -43,29 +43,6 @@ public:
 	}
 };
 
-class PacketHash
-{	Packet& packet;
-	unsigned offset;
-public:
-	PacketHash(PacketWriter& packet)
-	:	packet(packet)
-	{	offset = packet.GetPacketSize();
-	}
-	PacketHash(PacketReader& packet)
-	:	packet(packet)
-	{	offset = packet.GetReadOffset();
-	}
-	XXH64_hash_t  GetHash(unsigned long long seed = 0) const
-	{	const size_t length = packet.GetPayloadSize() - offset;
-		const char* data = packet.GetPayload() + offset;
-		return XXH64(data,length,seed);
-	}
-	void Print() const
-	{	const unsigned length = packet.GetPayloadSize();
-		printf("hash %u:%u %llu\n",offset,length,GetHash());
-	}
-};
-
 }
 
 #endif
