@@ -67,7 +67,10 @@ public:
 	{	return bufsize;
 	}
 	T GetPacketSize() const
-	{	return bufsize<*packetSize? 0:*packetSize;
+	{	if(bufsize<*packetSize)
+		{	return 0;
+		}	
+		return *packetSize;
 	}
 	T GetPayloadSize() const
 	{	return GetPacketSize() - sizeof(*packetSize);
@@ -106,7 +109,8 @@ public:
 		memcpy(end,packet,size);
 	}
 	XXH64_hash_t CalcHash(size_t length,unsigned long long seed = 0) const
-	{	return XXH64(GetPacket(),length,seed);
+	{	const XXH64_hash_t hash = XXH64(GetPayload(),length-sizeof(T),seed);
+		return hash;
 	}
 };
 

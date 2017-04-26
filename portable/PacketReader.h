@@ -99,11 +99,23 @@ public:
 		memcpy(&packetHash,GetPacket()+hashOffset,sizeof(packetHash));
 		return packetHash;
 	}
+	bool Skip(unsigned length) override
+	{	readOffset+=length;
+		return true;
+	}
+	void SkipHash()
+	{	Skip(sizeof(XXH64_hash_t));
+	}
 	bool IsGoodHash() const
-	{	return ReadHash() == CalcHash(GetPacketSize()-sizeof(XXH64_hash_t));
+	{	const XXH64_hash_t readHash = ReadHash();
+		const XXH64_hash_t calcHash = CalcHash(GetPacketSize()-sizeof(XXH64_hash_t));
+		if(readHash != calcHash)
+		{	printf("Error: read hash %llx mismatch packetId #%u\n"
+			       "       calc hash %llx at %llu\n",readHash,packetId,calcHash,GetPacketSize()-sizeof(XXH64_hash_t));
+		}
+		return readHash == calcHash;
 	}
 };
-
 
 template <typename T>
 PacketReader& operator>>(PacketReader& packet,T& data)

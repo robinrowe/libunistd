@@ -78,20 +78,17 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		{	puts("No bytes at middle");
 			return 0;
 		}
-		if(status.IsActive())
-		{	status.packetCount++;
-			//status.Print(packetId,bytes,packetSize);
-		}
+		//status.Print(packetId,bytes,packetSize);
 		if(bytes<packetSize)
-		{	status.packetFragments++;
+		{	stats.fragments++;
 			//printf("Packet fragment %u < %u\n",bytes,packetSize);
 			//SocketReset("Packet size overflow bytes",packet);
 			return bytes;
 		}
 		const int capacity = packet.GetCapacity();
 		if(packetSize > capacity)
-		{	status.packetErrors++;
-			status.Print(packetId,bytes,packetSize, capacity);
+		{	stats.errors++;
+			stats.Print(packetId,bytes,packetSize, capacity);
 			SocketReset("Packet size corrupted",packet);
 			return 0;
 		}
@@ -100,7 +97,7 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		if(0==packetId)
 		{//	LogMsg("Reading header");
 			if(!ReadHeader(packet))
-			{	status.Print(packetId,bytes,packetSize, capacity);
+			{	stats.Print(packetId,bytes,packetSize, capacity);
 				SocketReset("Packet header corrupted",packet);
 				return 0;
 		}	}
@@ -108,6 +105,8 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		{//	LogMsg("Reading frame");
 			ReadFrame(packet,packetId);
 		}
+		packet.SkipHash();
+		stats.Received(packetId);
 		const unsigned readOffset=packet.GetReadOffset();
 		if(readOffset!=packetSize || bytes<packetSize)
 		{	std::string s("readOffset/packetSize = ");
@@ -120,6 +119,7 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		if(!bytes)
 		{	return 0;
 		}
+		stats.pipelined++;
 		packet.NextInPipeline();
 #if 0
 		std::string msg("Pipelining #");
@@ -131,7 +131,7 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		puts(msg.c_str());
 #endif
 		if(bytes<=sizeof(unsigned))
-		{	status.Print(packetId,bytes,packetSize, capacity);
+		{	stats.Print(packetId,bytes,packetSize, capacity);
 			SocketReset("Packet receive underflow bytes",packet);
 			return 0;
 		}
@@ -143,7 +143,7 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		puts(msg.c_str());
 #endif
 		if(packetSize<sizeof(packetSize))
-		{	status.Print(packetId,bytes,packetSize, capacity);
+		{	stats.Print(packetId,bytes,packetSize, capacity);
 			SocketReset("Packet size underflow packet",packet);
 			return 0;
 		}	
