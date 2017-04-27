@@ -7,38 +7,15 @@
 #define BsdSocketClient_h
 
 #include "BsdSocket.h"
+#include "PacketStats.h"
 
 namespace portable 
 {
-struct PacketStatus
-{	unsigned packetCount;
-	unsigned printStatusMax;
-	unsigned packetFragments;
-	unsigned packetErrors;
-	PacketStatus()
-	:	packetCount(0)
-	,	packetFragments(0)
-	,	packetErrors(0)
-	{	printStatusMax = 60*60;
-		dumpFilename = "PacketDump.bin";
-	}
-	bool IsActive() const
-	{	return 0 != printStatusMax;
-	}
-	const char* dumpFilename;
-	void Print(unsigned id,int bytes,int packetSize, int capacity)
-	{	//if(packetCount >= printStatusMax || packetErrors == 1)
-		{	packetCount = 0;
-			printf("id: %u packets: %i bytes: %i packetSize: %i capacity: %u fragments: %u errors: %u\n",
-					id,    packetCount,bytes,   packetSize, capacity, packetFragments,packetErrors);	
-	}	}
-};
 
 class BsdSocketClient
 :	public BsdSocket
 {	std::thread worker;
 	const unsigned bufsize;
-	PacketStatus status;
 	int packetSize;
 	static void Main(BsdSocketClient* self)
     {   self->Run();
@@ -52,12 +29,12 @@ class BsdSocketClient
 		{	return false;
 		}
 		if(bytes<sizeof(int))
-		{	status.packetFragments++;
+		{	stats.fragments++;
 			return false;
 		}
 		packetSize = packet.GetPacketSize();
 		if(packetSize > bytes)
-		{	status.packetFragments++;
+		{	stats.fragments++;
 			return false;
 		}
 		return true;
@@ -69,13 +46,11 @@ protected:
 	virtual void SocketReset(const char* msg,portable::PacketReader& packet);
 	int OnPacket(int bytes,portable::PacketReader& packet) override;
 public:
+	PacketStats stats;
 	BsdSocketClient(unsigned bufsize)
 	:	bufsize(bufsize)
 	,	packetSize(0)
 	{}
-	void PrintStatusMax(unsigned maxPackets)
-	{	status.printStatusMax = maxPackets;
-	}
 	void Close()
 	{	Stop();
 		if(socketfd)

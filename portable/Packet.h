@@ -67,7 +67,10 @@ public:
 	{	return bufsize;
 	}
 	T GetPacketSize() const
-	{	return bufsize<*packetSize? 0:*packetSize;
+	{	if(bufsize<*packetSize)
+		{	return 0;
+		}	
+		return *packetSize;
 	}
 	T GetPayloadSize() const
 	{	return GetPacketSize() - sizeof(*packetSize);
