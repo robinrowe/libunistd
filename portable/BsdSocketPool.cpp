@@ -39,32 +39,27 @@ bool BsdSocketPool::ReleaseSlot(SOCKET* sock)
 	return false;
 }
 
-int BsdSocketPool::DirectMulticast(Packet* headerPacket,Packet* framePacket,unsigned verboseCount)
-{	if(!headerPacket || !headerPacket->IsGood() || !framePacket || !framePacket->IsGood())
+int BsdSocketPool::DirectMulticast(Packet* framePacket)
+{	if(!framePacket || !framePacket->IsGood())
 	{	return -1;
 	}
 	SoftLock softlock(framePacket->ownership);
 	if(!softlock)
 	{	return -1;
 	}
+#if 0
 	const unsigned maxShowPacketId = 10;
 	if(verboseCount)
 	{	static portable::VerboseCounter counter(600);
 		counter++;
 		if (counter)
-		{	printf("Muticast packet #%d\n", framePacket->GetPacketId());
+		{	printf("Multicast packet #%d\n", framePacket->GetPacketId());
 	}	}
+#endif
 	int count = 0;
 	for(unsigned i=0;i<socketfd.size();i++)
 	{	if(!socketfd[i])
 		{	continue;
-		}
-		if (!isHeaderSent[i])
-		{	if(SendPacket(headerPacket,i))
-			{	SendPacket(framePacket,i);
-			}
-			count++;
-			continue;
 		}
 		if(!isStreaming)
 		{	continue;
@@ -72,6 +67,7 @@ int BsdSocketPool::DirectMulticast(Packet* headerPacket,Packet* framePacket,unsi
 		SendPacket(framePacket,i);
 		count++;
 	}
+//	printf("%u>",count);
 	return count;
 }
 

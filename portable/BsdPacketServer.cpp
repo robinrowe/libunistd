@@ -45,12 +45,14 @@ bool BsdPacketServer::Login(SOCKET* slot,SOCKET fd)
 #endif
 			pool.socketfd[i] = fd;
 			pool.counter++;
+#if 0
 			std::string msg;
 			BsdSocket bsdSocket(fd);
 			bsdSocket.GetPeerName(msg);
 			msg+=" Connected";
 			LogMsg(msg);
-			return true;
+#endif
+			return 	SendHeaderPacket(fd);
 	}	}
 	LogMsg("Can't subscribe");
 	return false;

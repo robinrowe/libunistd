@@ -48,7 +48,8 @@ public:
     ,	object("TimerPump")
     {}
     virtual ~TimerPump()
-    {   isGo=false;
+    {   Stop();
+		Stop();
     }
     bool Start(int millis=0,const char* description="")
     {   if(isGo)

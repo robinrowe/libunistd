@@ -62,8 +62,11 @@ public:
 		const unsigned size=GetPacketSize();
 		memcpy(end,packet,size);
 	}
-	bool WriteHash()
+	bool WriteHash(XXH64_hash_t* hashReturn = nullptr)
 	{	const XXH64_hash_t packetHash = CalcHash(GetPacketSize());
+		if(hashReturn)
+		{	*hashReturn = packetHash;
+		}
 		return Write((const char*) &packetHash,sizeof(packetHash));
 	}
 };

@@ -18,13 +18,12 @@ class BsdMulticast
 {	Packet* headerPacket;
 	Packet* framePacket;
 	BsdSocketPool& socketPool;
-	unsigned verboseCount;
 protected:
 #if 1
 	virtual void Action(bool isTimeout) override
 	{	(void)isTimeout;
 		if(framePacket)
-		{	socketPool.DirectMulticast(headerPacket, framePacket, verboseCount);
+		{	socketPool.DirectMulticast(framePacket);
 		}
 //		puts("Unexpected call to pool Action");
 	}
@@ -35,7 +34,6 @@ public:
 	,	framePacket(nullptr)
 	,	socketPool(socketPool)
 	{	TimerPump::Start();
-		verboseCount = 60*10;
 	}
 	void SetIsStreaming(bool isStreaming = true)
 	{	socketPool.SetIsStreaming(isStreaming);

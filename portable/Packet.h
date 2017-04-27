@@ -106,7 +106,8 @@ public:
 		memcpy(end,packet,size);
 	}
 	XXH64_hash_t CalcHash(size_t length,unsigned long long seed = 0) const
-	{	return XXH64(GetPacket(),length,seed);
+	{	const XXH64_hash_t hash = XXH64(GetPayload(),length-sizeof(T),seed);
+		return hash;
 	}
 };
 

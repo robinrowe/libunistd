@@ -34,11 +34,12 @@ void BsdSocketServer::ListenRun()
 	{	if(socketfd>0)
 		{	SOCKET sock = ListenAccept();
 			SOCKET* s = pool.GetSlot();
-			if(!Login(s,sock))
-			{	continue;
+			const bool isConnected = Login(s,sock);
+			if(isConnected)
+			{	pool.counter++;
+				*s = sock;
 			}
-			pool.counter++;
-			*s = sock;
+			OnConnect(sock);
 		}
 	}
 	OnStop();

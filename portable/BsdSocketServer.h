@@ -58,6 +58,9 @@ public:
 			packetWorker.detach();
 	}	}
 	virtual void ListenRun();
+	virtual void OnConnect(SOCKET sock) const
+	{	(void) sock;
+	}
 	virtual void PacketRun();
 };
 

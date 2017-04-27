@@ -49,19 +49,20 @@ public:
 	{}
 	~BsdPacketServer()
 	{}
+#if 0
 	void MulticastHeaderPacket()
-	{	
-		multicast.SetHeaderPacket(&headerPacket);
+	{	multicast.SetHeaderPacket(&headerPacket);
 		MulticastFramePacket();
 	}
+#endif
 	void MulticastFramePacket()
 	{	if(pool.IsEmpty())
-		{	return;
+		{	//puts("pool empty");
+			return;
 		}
 		multicast.SetFramePacket(&framePacket.GetBaked());
 		multicast.Wake();
 	}
-#if 0
 	bool SendFramePacket(SOCKET fd)
 	{	if(framePacket.GetBaked().GetPacketSize()<=4)
 		{	puts("Packet not ready");
@@ -89,7 +90,6 @@ public:
 		printf("Sent header packet to %s\n",ip.c_str());
 		return SendFramePacket(fd);
 	}
-#endif
 	void SetIsStreaming(bool isStreaming = true)
 	{	this->isStreaming = isStreaming;
 	}

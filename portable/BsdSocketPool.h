@@ -16,13 +16,10 @@ class BsdSocketPool
 {	bool isStreaming;
 public:
 	std::vector<SOCKET> socketfd;
-	std::vector<bool> isHeaderSent;
 	AtomicCounter<unsigned> counter;	
 	void Reset(unsigned size)
 	{	socketfd.resize(size);
 		socketfd.assign(size,0);
-		isHeaderSent.resize(size);
-		isHeaderSent.assign(size, false);
 		counter=0;
 	}
 	bool IsEmpty() const
@@ -40,18 +37,16 @@ public:
 	void BsdSocketPool::ReleaseSlot(unsigned slot)
 	{	if(slot < socketfd.size())
 		{	socketfd[slot]=0;
-			isHeaderSent[slot]=false;
 	}	}
 	bool SendPacket(Packet* packet,unsigned i)
 	{	BsdSocket bsdSocket(socketfd[i]);
 		if(bsdSocket.SendTo(*packet))
-		{	isHeaderSent[i] = true;
-			return true;
+		{	return true;
 		}
 		ReleaseSlot(i);
 		return false;
 	}
-	int DirectMulticast(Packet* headerPacket, Packet* framePacket, unsigned verboseCount );
+	int DirectMulticast(Packet* framePacket);
 };
 
 }
