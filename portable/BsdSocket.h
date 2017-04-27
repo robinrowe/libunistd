@@ -59,11 +59,14 @@ public:
 	,	isGo(false)
 	{}
 	BsdSocket(const BsdSocket&) = default;
+	bool IsGood() const
+	{	return socketfd > 0;
+	}
 	bool IsOpen() const
 	{	return isGo;
 	}
 	bool SendTo(const char* msg,unsigned len)
-	{	if(socketfd<=0)
+	{	if(!IsGood())
 		{	return false;
 		}
 		int slen = sizeof(sockaddr_in);
@@ -74,11 +77,14 @@ public:
 		return true;
 	}
 	bool SendTo(Packet& packet)
-	{	static VerboseCounter counter(600);
+	{	
+#if 0
+		static VerboseCounter counter(600);
 		counter++;
 		if (counter)
 		{	printf("Packet #%u send %i\n", packet.GetPacketId(), packet.GetPacketSize());
 		}
+#endif
 		return SendTo(packet.GetPacket(),packet.GetPacketSize());
 	}
 	void Close()
@@ -119,6 +125,22 @@ public:
 	{	(void)msg;
 		(void)len;
 		puts(errorMsg.GetLastError());
+	}
+	bool SetBlockingMode(bool isBlocking = true)
+	{	if(!IsGood())
+		{	return false;
+		}
+#ifdef _WIN32
+		unsigned long mode = isBlocking ? 0 : 1;
+		return (ioctlsocket(socketfd, FIONBIO, &mode) == 0) ? true : false;
+#else
+		int flags = fcntl(socketfd, F_GETFL, 0);
+		if (flags < 0) 
+		{	return false;
+		}
+		flags = isBlocking ? (flags&~O_NONBLOCK) : (flags | O_NONBLOCK);
+		return (fcntl(socketfd, F_SETFL, flags) == 0) ? true : false;
+#endif
 	}
 	static bool GetIp(const char* hostname,std::string& ip);
 };
