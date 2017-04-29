@@ -28,17 +28,21 @@ SOCKET BsdSocketServer::ListenAccept()
 	return newsockfd;
 } 
 
-
 void BsdSocketServer::ListenRun()
 {	while(isGo)
 	{	if(socketfd>0)
 		{	SOCKET sock = ListenAccept();
 			SOCKET* s = pool.GetSlot();
-			const bool isConnected = Login(s,sock);
-			if(isConnected)
-			{	pool.counter++;
-				*s = sock;
+			if(!s)
+			{	puts("WARN: no socket slots");
+				continue;
 			}
+			if(!Login(sock))
+			{	puts("ERROR: socket connect failed");
+				pool.ReleaseSlot(s);
+				continue;
+			}
+			*s = sock;
 			OnConnect(sock);
 		}
 	}

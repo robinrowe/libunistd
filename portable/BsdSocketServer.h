@@ -36,7 +36,7 @@ public:
 	,	isPacketRun(true)
 	{}
 	unsigned GetConnectionCount() const
-	{	return pool.counter;
+	{	return pool.GetCount();
 	}
 	bool Open(int serverPort,int maxStreams,bool isPacketRun=true);
 	void Close()
@@ -45,10 +45,9 @@ public:
 		{	closesocket(socketfd);
 			socketfd=0;
 	}	}
-	virtual bool Login(SOCKET* slot,SOCKET fd)
-	{	(void)slot;
-		(void)fd;
-		return false;
+	virtual bool Login(SOCKET fd)
+	{	(void)fd;
+		return false;// nobody can login, override function to set true
 	}
 	void Start() override
 	{	listenWorker=std::thread(ListenMain,this);
@@ -60,6 +59,9 @@ public:
 	virtual void ListenRun();
 	virtual void OnConnect(SOCKET sock) const
 	{	(void) sock;
+	}
+	virtual void OnDisonnect(SOCKET sock) const
+	{	(void)sock;
 	}
 	virtual void PacketRun();
 };

@@ -31,7 +31,9 @@ class BsdPacketServer
 	{	return fd<=0;
 	}
 	void LogSocketError(const BsdSocket& bsdSocket);
-	virtual bool Login(SOCKET* slot,SOCKET fd) override;
+	bool Login(SOCKET fd) override
+	{	return SendHeaderPacket(fd);
+	}
 	bool Subscribe(SOCKET fd);
 	BsdMulticast multicast;
 	bool isStreaming;
@@ -77,7 +79,7 @@ public:
 		return SendTo(framePacket.GetBaked(),fd);
 	}
 	bool SendHeaderPacket(SOCKET fd)
-	{	if(headerPacket.GetPacketSize()<=4)
+	{	if(headerPacket.GetPacketSize()<=sizeof(unsigned))
 		{	puts("Packet not ready");
 			return false;
 		}

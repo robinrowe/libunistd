@@ -13,27 +13,28 @@ namespace portable
 SOCKET* BsdSocketPool::GetSlot()
 {	for(unsigned i =0;i<socketfd.size();i++)
 	{	if(!socketfd[i])
-		{	return &socketfd[i];
+		{	counter++;
+			return &socketfd[i];
 	}	}
 	return GetZombieSlot();
 }
 
 SOCKET* BsdSocketPool::GetZombieSlot()
-{	SOCKET* s = 0;
-	for(unsigned i =0;i<socketfd.size();i++)
+{	for(unsigned i =0;i<socketfd.size();i++)
 	{	if(socketfd[i])
 		{	BsdSocket bsdSocket(socketfd[i]);
 			if(!bsdSocket.SendTo("",0))
 			{	ReleaseSlot(i);
+				return &socketfd[i];
 	}	}	}
-	return s;
+	return nullptr;
 }
-
 
 bool BsdSocketPool::ReleaseSlot(SOCKET* sock)
 {	for(unsigned i =0;i<socketfd.size();i++)
 	{	if(sock == &socketfd[i])
 		{	ReleaseSlot(i);
+			puts("released socket");
 			return true;
 	}	}
 	return false;
@@ -42,6 +43,9 @@ bool BsdSocketPool::ReleaseSlot(SOCKET* sock)
 int BsdSocketPool::DirectMulticast(Packet* framePacket)
 {	if(!framePacket || !framePacket->IsGood())
 	{	return -1;
+	}
+	if(!counter)
+	{	return 0;
 	}
 	SoftLock softlock(framePacket->ownership);
 	if(!softlock)
@@ -64,10 +68,13 @@ int BsdSocketPool::DirectMulticast(Packet* framePacket)
 		if(!isStreaming)
 		{	continue;
 		}
-		SendPacket(framePacket,i);
+		if(!SendPacket(framePacket,i))
+		{	ReleaseSlot(i);
+			continue;
+		}
 		count++;
 	}
-//	printf("%u>",count);
+	printf("%u:%u>",count,(unsigned) counter);
 	return count;
 }
 

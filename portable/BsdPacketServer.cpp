@@ -27,6 +27,7 @@ void BsdPacketServer::LogSocketError(const BsdSocket& bsdSocket)
 	LogMsg(msg);
 }
 
+#if 0
 bool BsdPacketServer::Login(SOCKET* slot,SOCKET fd) 
 {	if(!slot)
 	{	puts("No slot");
@@ -57,5 +58,7 @@ bool BsdPacketServer::Login(SOCKET* slot,SOCKET fd)
 	LogMsg("Can't subscribe");
 	return false;
 }
+#endif
 
 }
+

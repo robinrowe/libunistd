@@ -3,10 +3,23 @@
 // License MIT Open Source
 //
 
+#include <chrono>
 #include "TimerPump.h"
 
 namespace portable 
 {
+
+using namespace std::chrono_literals;
+
+TimerPump::~TimerPump()
+{	Stop();
+	Stop();
+#if 0
+	while(isWake))
+	{	std::this_thread::sleep_for(50ms);
+	}
+#endif
+}
 
 void TimerPump::Run()
 {//   qDebug()<<"Starting pump "<<object;

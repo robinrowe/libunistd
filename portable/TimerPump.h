@@ -47,10 +47,7 @@ public:
 	,	isWake(false)
     ,	object("TimerPump")
     {}
-    virtual ~TimerPump()
-    {   Stop();
-		Stop();
-    }
+    virtual ~TimerPump();
     bool Start(int millis=0,const char* description="")
     {   if(isGo)
         {   return false;
