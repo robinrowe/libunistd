@@ -51,15 +51,13 @@ void BsdSocketClient::Run()
 	unsigned offset=0;
 	while(isGo)
 	{	const int bytes = RecvFrom(buffer.get(),bufsize,offset);
-#if 0
 		if(bytes<=0)
 		{	//if(!OnBadPacket(bytes))
 			offset = 0;
 			continue;
 		}
-#endif
 		packet.Init();
-		offset=OnPacket(bytes,packet);
+		offset=OnPacket(bytes+offset,packet);
 	}
 	OnStop();
 }
