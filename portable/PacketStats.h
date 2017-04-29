@@ -5,6 +5,8 @@
 #ifndef PacketStats_h
 #define PacketStats_h
 
+#include <chrono>
+
 namespace portable
 {
 
@@ -16,8 +18,9 @@ class PacketStats
 	T dropped;
 	T polled;
 	T received;
+	std::chrono::system_clock::time_point startTime;
 	unsigned GetRecentDrops(unsigned packetId)
-	{	if(!last)
+	{	if(!last || last == packetId)
 		{	return 0;
 		}
 		unsigned recentDrops = 0;
@@ -34,20 +37,23 @@ public:
 	T pipelined;
 	T fragments;
 	T errors;
+	T skipped;
 	float fps;
 	PacketStats()
 	{	Reset();
 		isVerbose = true;
+		startTime = std::chrono::system_clock::now();
 	}
 	void Reset()
 	{	first = 0;
 		last = 0;
 		dropped = 0;
 		received = 0;
-		polled;
+		polled = 0;
 		pipelined = 0;
 		fragments = 0;
 		errors = 0;
+		skipped = 0;
 		fps = 0.;
 	}
 	void Received(unsigned packetId)
@@ -69,7 +75,15 @@ public:
 		}
 		const unsigned recent  = received - polled;
 		polled = received;
-		printf("%u: fps=%.2f received=%u recent=%u dropped=%u\n",last,fps,received,recent,dropped);
+		std::chrono::system_clock::time_point nowTime = std::chrono::system_clock::now();
+	    std::chrono::duration<double> elapsed = nowTime - startTime;
+		unsigned s = (unsigned) elapsed.count();
+		const unsigned h = s/3600;
+		s %= 3600;
+		const unsigned m = s/60;
+		s %= 60;
+		printf("Packet #%u: fps=%.2f:%u actual=%u total=%u lost=%u [%02u:%02u:%02u]\n", last,fps,recent+skipped, recent,received,dropped,h,m,s);
+		skipped = 0;
 	}
 	void Print(unsigned id,int bytes,int packetSize, int capacity)
 	{	printf("id: %u packets: %i bytes: %i packetSize: %i capacity: %u fragments: %u errors: %u\n",
@@ -77,30 +91,5 @@ public:
 	}
 };
 
-#if 0
-struct PacketStatus
-{	unsigned packetCount;
-	unsigned printStatusMax;
-	unsigned packetFragments;
-	unsigned packetErrors;
-	PacketStatus()
-	:	packetCount(0)
-	,	packetFragments(0)
-	,	packetErrors(0)
-	{	printStatusMax = 60*60;
-		dumpFilename = "PacketDump.bin";
-	}
-	bool IsActive() const
-	{	return 0 != printStatusMax;
-	}
-	const char* dumpFilename;
-	void Print(unsigned id,int bytes,int packetSize, int capacity)
-	{	//if(packetCount >= printStatusMax || packetErrors == 1)
-		{	packetCount = 0;
-			printf("id: %u packets: %i bytes: %i packetSize: %i capacity: %u fragments: %u errors: %u\n",
-					id,    packetCount,bytes,   packetSize, capacity, packetFragments,packetErrors);	
-	}	}
-};
-#endif
 }
 #endif

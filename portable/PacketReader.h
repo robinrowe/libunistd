@@ -37,7 +37,6 @@ public:
 	PacketReader(const PacketSizer& sizer)
 	:	Packet(sizer)
 	{	InitReader();
-
 	}
 	PacketReader(char* buffer,unsigned bufsize)
 	:	Packet(buffer,bufsize)
@@ -53,7 +52,7 @@ public:
 	{	return !IsInvalid();
 	}
 	void Init()
-	{	Packet::Init();
+	{	//Packet::Init();
 		InitReader();
 	}	
 	void NextInPipeline()
