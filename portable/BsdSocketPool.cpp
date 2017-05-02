@@ -74,7 +74,7 @@ int BsdSocketPool::DirectMulticast(Packet* framePacket)
 		}
 		count++;
 	}
-	printf("%u:%u>",count,(unsigned) counter);
+	printf("%u:%u #%u hash=%llu\n",count,(unsigned) counter,framePacket->GetPacketId(),framePacket->ReadHash());
 	return count;
 }
 

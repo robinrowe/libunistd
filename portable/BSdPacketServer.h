@@ -36,7 +36,7 @@ class BsdPacketServer
 	}
 	bool Subscribe(SOCKET fd);
 	BsdMulticast multicast;
-	bool isStreaming;
+//	bool isStreaming;
 public:
 	PacketWriter headerPacket;
 	PacketQueue<bufSize> framePacket;
@@ -47,7 +47,7 @@ public:
 	,	headerBuffer(bufSize)
 	,	headerPacket(&headerBuffer[0],bufSize)
 	,	multicast(pool)
-	,	isStreaming(false)
+//	,	isStreaming(false)
 	{}
 	~BsdPacketServer()
 	{}
@@ -93,7 +93,7 @@ public:
 		return SendFramePacket(fd);
 	}
 	void SetIsStreaming(bool isStreaming = true)
-	{	this->isStreaming = isStreaming;
+	{	multicast.SetIsStreaming(isStreaming);
 	}
 	bool Start(int serverPort,unsigned maxStreams);
 	//virtual void OnStop() const;
