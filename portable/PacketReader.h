@@ -92,12 +92,6 @@ public:
 	bool Read(std::string& s);
 	bool Read(const char*& s,unsigned& size);
 	void Dump() const;
-	XXH64_hash_t ReadHash() const
-	{	XXH64_hash_t packetHash;
-		const size_t hashOffset = GetPacketSize()-sizeof(packetHash);
-		memcpy(&packetHash,GetPacket()+hashOffset,sizeof(packetHash));
-		return packetHash;
-	}
 	bool Skip(unsigned length) override
 	{	readOffset+=length;
 		return true;

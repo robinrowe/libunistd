@@ -113,6 +113,12 @@ public:
 	{	const XXH64_hash_t hash = XXH64(GetPayload(),length-sizeof(T),seed);
 		return hash;
 	}
+	XXH64_hash_t ReadHash() const
+	{	XXH64_hash_t packetHash;
+		const size_t hashOffset = GetPacketSize()-sizeof(packetHash);
+		memcpy(&packetHash,GetPacket()+hashOffset,sizeof(packetHash));
+		return packetHash;
+	}
 };
 
 }
