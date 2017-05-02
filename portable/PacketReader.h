@@ -104,7 +104,7 @@ public:
 		const XXH64_hash_t calcHash = CalcHash(GetPacketSize()-sizeof(XXH64_hash_t));
 		if(readHash != calcHash)
 		{	printf("Error: read hash %llx mismatch packetId #%u\n"
-			       "       calc hash %llx at %llu\n",readHash,packetId,calcHash,GetPacketSize()-sizeof(XXH64_hash_t));
+			       "       calc hash %llx at %u\n",readHash,packetId,calcHash,unsigned(GetPacketSize()-sizeof(XXH64_hash_t)));
 			return false;
 		}
 		return true;
