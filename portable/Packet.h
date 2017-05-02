@@ -68,7 +68,8 @@ public:
 	}
 	T GetPacketSize() const
 	{	if(bufsize<*packetSize)
-		{	return 0;
+		{	printf("ERROR: packet size overflow %u<%u\n",bufsize,*packetSize);
+			return 0;
 		}	
 		return *packetSize;
 	}

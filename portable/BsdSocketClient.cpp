@@ -92,6 +92,7 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		}
 		packetId = 0;
 		packet>>packetId;
+		packet.SetPacketId(packetId);
 		if(0==packetId)
 		{//	LogMsg("Reading header");
 			if(!ReadHeader(packet))

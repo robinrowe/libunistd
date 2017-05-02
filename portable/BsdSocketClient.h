@@ -28,7 +28,7 @@ class BsdSocketClient
 		if(0==bytes)
 		{	return false;
 		}
-		if(bytes<sizeof(int))
+		if(bytes<sizeof(unsigned))
 		{	stats.fragments++;
 			return false;
 		}

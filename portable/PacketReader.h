@@ -111,8 +111,9 @@ public:
 		if(readHash != calcHash)
 		{	printf("Error: read hash %llx mismatch packetId #%u\n"
 			       "       calc hash %llx at %llu\n",readHash,packetId,calcHash,GetPacketSize()-sizeof(XXH64_hash_t));
+			return false;
 		}
-		return readHash == calcHash;
+		return true;
 	}
 };
 
