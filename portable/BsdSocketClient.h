@@ -16,11 +16,11 @@ class BsdSocketClient
 :	public BsdSocket
 {	std::thread worker;
 	const unsigned bufsize;
-	int packetSize;
+	unsigned packetSize;
 	static void Main(BsdSocketClient* self)
     {   self->Run();
     }
-	bool ReadyStream(int bytes,portable::PacketReader& packet) 
+	bool ReadyStream(unsigned bytes,portable::PacketReader& packet) 
 	{	if(bytes<0)
 		{	SocketReset("Socket closed",packet);
 			return false;
@@ -33,6 +33,13 @@ class BsdSocketClient
 			return false;
 		}
 		packetSize = packet.GetPacketSize();
+		if(!packetSize)
+		{	return false;
+		}
+		if(packetSize>bufsize)
+		{	printf("ERROR overflow: packetSize %i > bufSize %i\n",packetSize,bufsize);
+			return false;
+		}
 		if(packetSize > bytes)
 		{	stats.fragments++;
 			return false;
@@ -44,7 +51,7 @@ protected:
 	virtual bool ReadHeader(portable::PacketReader& packet) = 0;
 	virtual bool ReadFrame(portable::PacketReader& packet,unsigned packetId) = 0;
 	virtual void SocketReset(const char* msg,portable::PacketReader& packet);
-	int OnPacket(int bytes,portable::PacketReader& packet) override;
+	unsigned OnPacket(unsigned bytes,portable::PacketReader& packet) override;
 public:
 	PacketStats stats;
 	BsdSocketClient(unsigned bufsize)

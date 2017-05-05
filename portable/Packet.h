@@ -117,6 +117,9 @@ public:
 	{	XXH64_hash_t packetHash;
 		const size_t hashOffset = GetPacketSize()-sizeof(packetHash);
 		memcpy(&packetHash,GetPacket()+hashOffset,sizeof(packetHash));
+		if(!packetHash)
+		{	puts("zero hash");
+		}
 		return packetHash;
 	}
 };

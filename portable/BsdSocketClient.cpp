@@ -4,12 +4,14 @@
 // License open source MIT
 
 #include "BsdSocketClient.h"
+#include <portable/Logger.h>
 
 namespace portable 
 {
 
 bool BsdSocketClient::Open(const char* serverName,int serverPort)
-{	if(!serverName || !*serverName || !serverPort)
+{	puts("libunistd 1.1 " __DATE__ " " __TIME__);
+	if(!serverName || !*serverName || !serverPort)
 	{	errorMsg.Set("No server to open specified");
 		return false;
 	}
@@ -62,7 +64,7 @@ void BsdSocketClient::Run()
 	OnStop();
 }
 
-int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
+unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet)
 {	if(!ReadyStream(bytes,packet))
 	{	return bytes;
 	}
@@ -83,7 +85,7 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 			//SocketReset("Packet size overflow bytes",packet);
 			return bytes;
 		}
-		const int capacity = packet.GetCapacity();
+		const unsigned capacity = packet.GetCapacity();
 		if(packetSize > capacity)
 		{	stats.errors++;
 			stats.Print(packetId,bytes,packetSize, capacity);
@@ -93,8 +95,11 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		packetId = 0;
 		packet>>packetId;
 		packet.SetPacketId(packetId);
+		if(!stats.GetLast())
+		{	printf("reading packet #%u\n",packetId);
+		}
 		if(0==packetId)
-		{//	LogMsg("Reading header");
+		{	LogMsg("Reading header");
 			if(!ReadHeader(packet))
 			{	stats.Print(packetId,bytes,packetSize, capacity);
 				SocketReset("Packet header corrupted",packet);
@@ -103,6 +108,9 @@ int BsdSocketClient::OnPacket(int bytes,portable::PacketReader& packet)
 		else
 		{//	LogMsg("Reading frame");
 			ReadFrame(packet,packetId);
+#if _DEBUG
+			printf(".");
+#endif
 		}
 		packet.SkipHash();
 		stats.Received(packetId);
