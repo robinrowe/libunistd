@@ -73,6 +73,21 @@ public:
 		}	
 		return *packetSize;
 	}
+	T GetPacketSize(unsigned bytes)
+	{	const unsigned fullSize = GetPacketSize();
+		if(!fullSize)
+		{	return 0;
+		}
+		if(fullSize>bufsize)
+		{	printf("ERROR overflow: packetSize %u > bufSize %u\n",fullSize,bufsize);
+			return false;
+		}
+		if(fullSize > bytes)
+		{//	stats.fragments++;
+			return 0;
+		}
+		return fullSize;
+	}
 	T GetPayloadSize() const
 	{	return GetPacketSize() - sizeof(*packetSize);
 	}

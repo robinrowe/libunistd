@@ -20,32 +20,6 @@ class BsdSocketClient
 	static void Main(BsdSocketClient* self)
     {   self->Run();
     }
-	bool ReadyStream(unsigned bytes,portable::PacketReader& packet) 
-	{	if(bytes<0)
-		{	SocketReset("Socket closed",packet);
-			return false;
-		}
-		if(0==bytes)
-		{	return false;
-		}
-		if(bytes<sizeof(unsigned))
-		{	stats.fragments++;
-			return false;
-		}
-		packetSize = packet.GetPacketSize();
-		if(!packetSize)
-		{	return false;
-		}
-		if(packetSize>bufsize)
-		{	printf("ERROR overflow: packetSize %i > bufSize %i\n",packetSize,bufsize);
-			return false;
-		}
-		if(packetSize > bytes)
-		{	stats.fragments++;
-			return false;
-		}
-		return true;
-	}
 protected:
 	void Run() override;
 	virtual bool ReadHeader(portable::PacketReader& packet) = 0;

@@ -65,7 +65,15 @@ void BsdSocketClient::Run()
 }
 
 unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet)
-{	if(!ReadyStream(bytes,packet))
+{	if(0==bytes)
+	{	return bytes;
+	}
+	if(bytes<sizeof(unsigned))
+	{	stats.fragments++;
+		return bytes;
+	}
+	packetSize = packet.GetPacketSize();
+	if(!packetSize)
 	{	return bytes;
 	}
 #if 0
@@ -108,9 +116,6 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 		else
 		{//	LogMsg("Reading frame");
 			ReadFrame(packet,packetId);
-#if _DEBUG
-			printf(".");
-#endif
 		}
 		packet.SkipHash();
 		stats.Received(packetId);
