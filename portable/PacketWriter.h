@@ -28,7 +28,7 @@ public:
 	}
 	void Reset()
 	{	packetId = 0;
-		*packetSize=sizeof(T);
+		*packetSize=GetMinimumPacketSize();
 	}
 	bool Skip(unsigned length) override
 	{	if (*packetSize + length > bufsize)
@@ -67,7 +67,8 @@ public:
 		if(hashReturn)
 		{	*hashReturn = packetHash;
 		}
-		return Write((const char*) &packetHash,sizeof(packetHash));
+		memcpy(packet,(const char*) &packetHash,sizeof(packetHash));
+		return true;
 	}
 };
 

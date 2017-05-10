@@ -65,6 +65,9 @@ public:
 	bool IsOpen() const
 	{	return isGo;
 	}
+	bool SendClose()
+	{	return SendTo("", 0);
+	}
 	bool SendTo(const char* msg,unsigned len)
 	{	if(!IsGood())
 		{	return false;
@@ -87,7 +90,7 @@ public:
 #endif
 		return SendTo(packet.GetPacket(),packet.GetPacketSize());
 	}
-	void Close()
+	virtual void Close()
 	{	puts("Socket close");
 		isGo=false;
 		if(socketfd)
@@ -126,12 +129,12 @@ public:
 		(void)len;
 		puts(errorMsg.GetLastError());
 	}
-	bool SetBlockingMode(bool isBlocking = true)
+	bool SetAsyncMode(bool isAsync = true)
 	{	if(!IsGood())
 		{	return false;
 		}
 #ifdef _WIN32
-		unsigned long mode = isBlocking ? 0 : 1;
+		unsigned long mode = isAsync ? 1 : 0;
 		return (ioctlsocket(socketfd, FIONBIO, &mode) == 0) ? true : false;
 #else
 		int flags = fcntl(socketfd, F_GETFL, 0);

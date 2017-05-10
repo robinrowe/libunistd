@@ -40,6 +40,11 @@ bool BsdSocketPool::ReleaseSlot(SOCKET* sock)
 	return false;
 }
 
+void BsdSocketPool::ReleaseSlots()
+{	for (unsigned i = 0; i<socketfd.size(); i++)
+	{	ReleaseSlot(i);
+}	}
+
 int BsdSocketPool::DirectMulticast(Packet* framePacket)
 {	if(!framePacket || !framePacket->IsGood())
 	{	return -1;
@@ -49,7 +54,8 @@ int BsdSocketPool::DirectMulticast(Packet* framePacket)
 	}
 	SoftLock softlock(framePacket->ownership);
 	if(!softlock)
-	{	return -1;
+	{	puts("Can't lock frame packet");
+		return -1;
 	}
 #if 0
 	const unsigned maxShowPacketId = 10;
@@ -69,13 +75,30 @@ int BsdSocketPool::DirectMulticast(Packet* framePacket)
 		{	continue;
 		}
 		if(!SendPacket(framePacket,i))
-		{	ReleaseSlot(i);
-			continue;
+		{	continue;
 		}
 		count++;
 	}
-	printf("%u:%u #%u hash=%llu\n",count,(unsigned) counter,framePacket->GetPacketId(),framePacket->ReadHash());
+	const unsigned packetSize = framePacket->GetPacketSize();
+	const unsigned packetId = framePacket->GetPacketId();
+	const XXH64_hash_t hash = framePacket->ReadHash();
+	printf("%u:%u #%u size=%u hash=%llx\n",count,(unsigned) counter,packetId,packetSize,hash);
 	return count;
 }
+
+void BsdSocketPool::ReleaseSlot(unsigned slot)
+{	if (slot >= socketfd.size())
+	{	return;
+	}
+	if (0 >= socketfd[slot])
+	{	return;
+	}
+	BsdSocket bsdSocket(socketfd[slot]);
+	bsdSocket.SendClose();
+	socketfd[slot] = 0;
+	counter--;
+	printf("Released slot %u, connections = %u\n", slot, (unsigned)counter);
+}
+
 
 }

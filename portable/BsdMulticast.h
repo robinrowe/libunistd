@@ -35,6 +35,12 @@ public:
 	,	socketPool(socketPool)
 	{	TimerPump::Start();
 	}
+	~BsdMulticast()
+	{	Close();
+	}
+	void Close()
+	{	socketPool.Close();
+	}
 	void SetIsStreaming(bool isStreaming = true)
 	{	socketPool.SetIsStreaming(isStreaming);
 	}

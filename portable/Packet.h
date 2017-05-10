@@ -53,6 +53,9 @@ public:
 	,	packetId(0)
 	{	Init();
 	}
+	unsigned GetMinimumPacketSize()
+	{	return sizeof(XXH64_hash_t) + sizeof(T);
+	}
 	unsigned GetPacketId() const
 	{	return packetId;
 	}
@@ -115,8 +118,11 @@ public:
 	}
 	XXH64_hash_t ReadHash() const
 	{	XXH64_hash_t packetHash;
-		const size_t hashOffset = GetPacketSize()-sizeof(packetHash);
+		const size_t hashOffset = sizeof(T);
 		memcpy(&packetHash,GetPacket()+hashOffset,sizeof(packetHash));
+		if(packetHash == 0xcdcdcdcdcdcdcdcdull)
+		{	puts("Invalid memory");
+		}
 		return packetHash;
 	}
 };

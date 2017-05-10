@@ -50,7 +50,12 @@ public:
 //	,	isStreaming(false)
 	{}
 	~BsdPacketServer()
-	{}
+	{	Close();
+	}
+	void Close() override
+	{	BsdSocketServer::Close();
+		multicast.Close();
+	}
 #if 0
 	void MulticastHeaderPacket()
 	{	multicast.SetHeaderPacket(&headerPacket);

@@ -34,17 +34,16 @@ public:
 	BsdSocketServer(unsigned bufsize)
 	:	bufsize(bufsize)
 	,	isPacketRun(true)
-	{}
+	{	SetAsyncMode();
+	}
 	unsigned GetConnectionCount() const
 	{	return pool.GetCount();
 	}
 	bool Open(int serverPort,int maxStreams,bool isPacketRun=true);
-	void Close()
+	void Close() override
 	{	Stop();
-		if(socketfd)
-		{	closesocket(socketfd);
-			socketfd=0;
-	}	}
+		BsdSocket::Close();
+	}
 	virtual bool Login(SOCKET fd)
 	{	(void)fd;
 		return false;// nobody can login, override function to set true
