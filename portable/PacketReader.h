@@ -33,7 +33,13 @@ public:
 	void Reset()
 	{	readOffset = 0;
 		dumpFilename = 0;
+	}
+	bool ReadHeader(int bytes)
+	{	if(bytes < (int) header.GetSize())
+		{	return false;
+		}
 		header.Read(packet);
+		return true;
 	}
 	PacketReader(const PacketSizer& sizer)
 	:	Packet(sizer)
@@ -91,9 +97,6 @@ public:
 	bool Skip(unsigned length) override
 	{	readOffset+=length;
 		return true;
-	}
-	void SkipHash()
-	{	Skip(sizeof(XXH64_hash_t));
 	}
 	bool IsGoodHash() const
 	{	const XXH64_hash_t readHash = ReadHash();

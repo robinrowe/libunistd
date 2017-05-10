@@ -59,7 +59,7 @@ void BsdSocketClient::Run()
 			Stop();
 			continue;
 		}
-		if(bytes<sizeof(unsigned))
+		if(!packet.ReadHeader(bytes))
 		{	stats.fragments++;
 			offset += bytes;
 			continue;
@@ -122,7 +122,6 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 		{//	LogMsg("Reading frame");
 			ReadFrame(packet,packetId);
 		}
-		packet.SkipHash();
 		stats.Received(packetId);
 #if 0
 		const unsigned readOffset=packet.GetReadOffset();
