@@ -87,13 +87,7 @@ public:
 #endif
 		return SendTo(packet.GetPacket(),packet.GetPacketSize());
 	}
-	void Close()
-	{	puts("Socket close");
-		isGo=false;
-		if(socketfd)
-		{	closesocket(socketfd);
-			socketfd=0;
-	}	}
+	void Close();
 	int RecvFrom(char* buffer,unsigned bufsize,unsigned offset=0)
 	{	int slen = sizeof(sockaddr_in);
 		if(socketfd<=0)
@@ -102,10 +96,11 @@ public:
 		}	
 		return recvfrom(socketfd,buffer+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
 	}
-	void SocketReset(const char* msg)
+	void SocketReset(const char* msg = nullptr)
 	{	socketfd=0;
-		puts(msg);
-	}
+		if(msg)
+		{	puts(msg);
+	}	}
 	virtual void Stop()
 	{	if(isGo)
 		{	isGo=false;

@@ -54,28 +54,27 @@ void BsdSocketClient::Run()
 	while(isGo)
 	{	const int bytes = RecvFrom(buffer.get(),bufsize,offset);
 		if(bytes<=0)
-		{	//if(!OnBadPacket(bytes))
+		{	printf("ERROR: socket received %i\n",bytes);
 			offset = 0;
+			Stop();
+			continue;
+		}
+		if(bytes<sizeof(unsigned))
+		{	stats.fragments++;
+			offset += bytes;
 			continue;
 		}
 		packet.Init();
 		offset=OnPacket(bytes+offset,packet);
-	}
+		if(offset)
+		{	printf("memmove buffer %u\n",offset);
+			memmove(buffer.get(),buffer.get()+bytes-offset,offset);
+	}	}
 	OnStop();
 }
 
 unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet)
-{	if(0==bytes)
-	{	return bytes;
-	}
-	if(bytes<sizeof(unsigned))
-	{	stats.fragments++;
-		return bytes;
-	}
-	packetSize = packet.GetPacketSize();
-	if(!packetSize)
-	{	return bytes;
-	}
+{	packetSize = packet.GetPacketSize(bytes);
 #if 0
 	printf("bytes: %i packetSize: %i\n",bytes,packetSize);
 #endif
@@ -85,6 +84,9 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 	{	if(!bytes)
 		{	puts("No bytes at middle");
 			return 0;
+		}
+		if(!packetSize)
+		{	return bytes;
 		}
 		//status.Print(packetId,bytes,packetSize);
 		if(bytes<packetSize)
@@ -103,7 +105,10 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 		packetId = 0;
 		packet>>packetId;
 		packet.SetPacketId(packetId);
+//#ifndef _DEBUG
+#if 0
 		if(!stats.GetLast())
+#endif
 		{	printf("reading packet #%u\n",packetId);
 		}
 		if(0==packetId)
@@ -119,6 +124,7 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 		}
 		packet.SkipHash();
 		stats.Received(packetId);
+#if 0
 		const unsigned readOffset=packet.GetReadOffset();
 		if(readOffset!=packetSize || bytes<packetSize)
 		{	std::string s("readOffset/packetSize = ");
@@ -127,6 +133,7 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 			s+=std::to_string(packetSize);
 			puts(s.c_str());
 		}
+#endif
 		bytes-=packetSize;
 		if(!bytes)
 		{	return 0;
@@ -148,17 +155,12 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 			return 0;
 		}
 //		packet>>packetSize;
-		packetSize=packet.GetPacketSize();
+		packetSize=packet.GetPacketSize(bytes);
 #if 0
 		msg="Pipelined packetSize = ";
 		msg+=std::to_string(packetSize);
 		puts(msg.c_str());
 #endif
-		if(packetSize<sizeof(packetSize))
-		{	stats.Print(packetId,bytes,packetSize, capacity);
-			SocketReset("Packet size underflow packet",packet);
-			return 0;
-		}	
 	}
 }
 

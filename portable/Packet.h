@@ -73,7 +73,7 @@ public:
 		}	
 		return *packetSize;
 	}
-	T GetPacketSize(unsigned bytes)
+	T GetPacketSize(unsigned bytes) const
 	{	const unsigned fullSize = GetPacketSize();
 		if(!fullSize)
 		{	return 0;
