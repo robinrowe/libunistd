@@ -46,13 +46,18 @@ struct PacketHeader
 		memcpy(&hash, packet, sizeof(XXH64_hash_t));
 		memcpy(&packetSize,packet+sizeof(XXH64_hash_t),sizeof(packetSize));
 		memcpy(&packetId,  packet+sizeof(XXH64_hash_t)+sizeof(packetSize),sizeof(packetId));
+		Dump();
 	}
 	void Write(char* packet, XXH64_hash_t packetHash)
-	{	memcpy(packet,(const char*) &hash,sizeof(hash));
+	{	hash = packetHash;
+		memcpy(packet,(const char*) &hash,sizeof(hash));
 		memcpy(packet+sizeof(XXH64_hash_t),(const char*) &packetSize, sizeof(packetSize));
 		memcpy(packet+sizeof(XXH64_hash_t)+sizeof(packetSize),(const char*) &packetId, sizeof(packetId));
+		Dump();
 	}
-
+	void Dump() const
+	{	printf("packet id #%u size=%u hash=%llx\n",packetId,packetSize,hash);
+	}
 };
 
 class Packet
