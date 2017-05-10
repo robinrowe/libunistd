@@ -10,6 +10,14 @@
 namespace portable 
 {
 
+void BsdSocket::Close()
+{	puts("Socket close");
+	isGo=false;
+	if(socketfd)
+	{	closesocket(socketfd);
+		socketfd=0;
+}	}
+
 bool BsdSocket::GetIp(const char* hostname,std::string& ip)
 {	struct hostent *he;
 #pragma warning(disable:4996)

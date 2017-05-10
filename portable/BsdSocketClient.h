@@ -16,35 +16,16 @@ class BsdSocketClient
 :	public BsdSocket
 {	std::thread worker;
 	const unsigned bufsize;
-	int packetSize;
+	unsigned packetSize;
 	static void Main(BsdSocketClient* self)
     {   self->Run();
     }
-	bool ReadyStream(int bytes,portable::PacketReader& packet) 
-	{	if(bytes<0)
-		{	SocketReset("Socket closed",packet);
-			return false;
-		}
-		if(0==bytes)
-		{	return false;
-		}
-		if(bytes<sizeof(unsigned))
-		{	stats.fragments++;
-			return false;
-		}
-		packetSize = packet.GetPacketSize();
-		if(packetSize > bytes)
-		{	stats.fragments++;
-			return false;
-		}
-		return true;
-	}
 protected:
 	void Run() override;
 	virtual bool ReadHeader(portable::PacketReader& packet) = 0;
 	virtual bool ReadFrame(portable::PacketReader& packet,unsigned packetId) = 0;
 	virtual void SocketReset(const char* msg,portable::PacketReader& packet);
-	int OnPacket(int bytes,portable::PacketReader& packet) override;
+	unsigned OnPacket(unsigned bytes,portable::PacketReader& packet) override;
 public:
 	PacketStats stats;
 	BsdSocketClient(unsigned bufsize)

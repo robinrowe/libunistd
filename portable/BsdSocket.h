@@ -38,7 +38,7 @@ class BsdSocket
 protected:
 	virtual void Run()
 	{}
-	virtual int OnPacket(int bytes,portable::PacketReader& packet)
+	virtual unsigned OnPacket(unsigned bytes,portable::PacketReader& packet)
 	{	(void)bytes;
 		(void)packet;
 		return 0;
@@ -90,13 +90,7 @@ public:
 #endif
 		return SendTo(packet.GetPacket(),packet.GetPacketSize());
 	}
-	virtual void Close()
-	{	puts("Socket close");
-		isGo=false;
-		if(socketfd)
-		{	closesocket(socketfd);
-			socketfd=0;
-	}	}
+	virtual void Close();
 	int RecvFrom(char* buffer,unsigned bufsize,unsigned offset=0)
 	{	int slen = sizeof(sockaddr_in);
 		if(socketfd<=0)
@@ -105,10 +99,11 @@ public:
 		}	
 		return recvfrom(socketfd,buffer+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
 	}
-	void SocketReset(const char* msg)
+	void SocketReset(const char* msg = nullptr)
 	{	socketfd=0;
-		puts(msg);
-	}
+		if(msg)
+		{	puts(msg);
+	}	}
 	virtual void Stop()
 	{	if(isGo)
 		{	isGo=false;

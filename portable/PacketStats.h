@@ -95,6 +95,9 @@ public:
 	void AddSkipped(unsigned skipped)
 	{	this->skipped += skipped;
 	}
+	T GetLast() const
+	{	return last;
+	}
 };
 
 }

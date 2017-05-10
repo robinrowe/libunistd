@@ -8,10 +8,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <algorithm>
+#include "../vcpp/unistd.h"
 
 namespace portable
 {
-	
+
+inline
+void OpenConsole()
+{
+#ifdef _WIN32
+	AllocConsole();
+#pragma warning(disable: 4996) 	
+	freopen("CONOUT$", "w", stdout);
+#pragma warning(default: 4996)
+#endif
+}
+
 class PrintTask
 {
 public:
