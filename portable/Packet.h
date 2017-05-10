@@ -56,8 +56,8 @@ struct PacketHeader
 };
 
 class Packet
-{	char* const buffer;
-protected:
+{protected:
+	char* const buffer;
 	typedef unsigned T;
 	char* packet;
 	PacketHeader header;

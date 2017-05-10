@@ -64,7 +64,7 @@ void BsdSocketClient::Run()
 			offset += bytes;
 			continue;
 		}
-		packet.Init();
+		packet.Reset();
 		offset=OnPacket(bytes+offset,packet);
 		if(offset)
 		{	printf("memmove buffer %u\n",offset);

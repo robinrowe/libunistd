@@ -55,7 +55,7 @@ void BsdSocketServer::PacketRun()
 	unsigned offset=0;
 	while(isGo)
 	{	const int bytes = RecvFrom(buffer.get(),bufsize,offset);
-		packet.Init();
+		packet.Reset();
 		offset=OnPacket(bytes,packet);
 	}
 	OnStop();

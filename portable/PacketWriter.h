@@ -66,7 +66,7 @@ public:
 		if(hashReturn)
 		{	*hashReturn = packetHash;
 		}
-		header.Write(packet,packetHash);
+		header.Write(buffer,packetHash);
 		return true;
 	}
 };
