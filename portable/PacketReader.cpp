@@ -57,7 +57,7 @@ void PacketReader::Dump() const
 		{	printf("Can't open dump file %s\n",dumpFilename);
 			return;
 		}
-		file.Write(packet,GetPacketSize()+sizeof(*packetSize));
+		file.Write(packet,GetPacketSize());
 	}
 }
 

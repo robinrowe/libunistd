@@ -22,59 +22,86 @@
 namespace portable 
 {
 
+struct PacketHeader
+{	XXH64_hash_t hash;
+	unsigned packetSize;
+	unsigned packetId;
+	PacketHeader()
+	{	Reset();
+	}
+	void Reset()
+	{	hash = 0;
+		packetSize = 0;
+		packetId = 0;
+	}
+	void ResetWrite()
+	{	packetSize = GetSize();
+		packetId = 0;
+	}
+	unsigned GetSize() const
+	{	return sizeof(XXH64_hash_t) + 2 * sizeof(unsigned);
+	}
+	void Read(const char* packet)
+	{	Reset();
+		memcpy(&hash, packet, sizeof(XXH64_hash_t));
+		memcpy(&packetSize,packet+sizeof(XXH64_hash_t),sizeof(packetSize));
+		memcpy(&packetId,  packet+sizeof(XXH64_hash_t)+sizeof(packetSize),sizeof(packetId));
+	}
+	void Write(char* packet, XXH64_hash_t packetHash)
+	{	memcpy(packet,(const char*) &hash,sizeof(hash));
+		memcpy(packet+sizeof(XXH64_hash_t),(const char*) &packetSize, sizeof(packetSize));
+		memcpy(packet+sizeof(XXH64_hash_t)+sizeof(packetSize),(const char*) &packetId, sizeof(packetId));
+	}
+
+};
+
 class Packet
 {	char* const buffer;
 protected:
-	unsigned packetId;
-	char* packet;
 	typedef unsigned T;
-	T* packetSize;
+	char* packet;
+	PacketHeader header;
 	const unsigned bufsize;
 	bool IsEmpty() const
 	{	const bool isEmpty = packet >= buffer + bufsize;
 //		std::cout << "isEmpty = "<<isEmpty << std::endl;
 		return isEmpty;
 	}
-	void Init()
+	void Reset()
 	{	packet=buffer;
-		packetSize=(T*) buffer;
+		header.Reset();
 	}	
 public:			
 	AtomicMutex ownership;
 	Packet(const PacketSizer& sizer)
 	:	buffer(sizer.buffer)
 	,	bufsize(sizer.bufsize)
-	,	packetId(0)
-	{	Init();
+	{	Reset();
 	}
 	Packet(char* buffer,unsigned bufsize)
 	:	buffer(buffer)
 	,	bufsize(bufsize)
-	,	packetId(0)
-	{	Init();
-	}
-	unsigned GetMinimumPacketSize()
-	{	return sizeof(XXH64_hash_t) + sizeof(T);
+	{	Reset();
 	}
 	unsigned GetPacketId() const
-	{	return packetId;
+	{	return header.packetId;
 	}
 #pragma warning(disable: 4458)
 	void SetPacketId(unsigned packetId)
-	{	this->packetId = packetId;
+	{	header.packetId = packetId;
 	}
 	const char* GetPayload() const 
-	{	return packet+sizeof(*packetSize);
+	{	return packet+ header.GetSize();
 	}
 	T GetCapacity() const
 	{	return bufsize;
 	}
 	T GetPacketSize() const
-	{	if(bufsize<*packetSize)
-		{	printf("ERROR: packet size overflow %u<%u\n",bufsize,*packetSize);
+	{	if(bufsize<header.packetSize)
+		{	printf("ERROR: packet size overflow %u<%u\n",bufsize, header.packetSize);
 			return 0;
 		}	
-		return *packetSize;
+		return header.packetSize;
 	}
 	T GetPacketSize(unsigned bytes) const
 	{	const unsigned fullSize = GetPacketSize();
@@ -92,7 +119,7 @@ public:
 		return fullSize;
 	}
 	T GetPayloadSize() const
-	{	return GetPacketSize() - sizeof(*packetSize);
+	{	return GetPacketSize() - header.GetSize();
 	}
 	bool IsGood() const
 	{	if(GetPacketSize()>GetCapacity())
@@ -107,10 +134,10 @@ public:
 	{	return packet;
 	}
 	char* GetEndPtr() const
-	{	return packet+*packetSize;
+	{	return packet+header.packetSize;
 	}
 	void Dump() const
-	{	printf("Dump Packet: size = %d, bufsize = %d",*packetSize,bufsize);
+	{	printf("Dump Packet: size = %d, bufsize = %d",header.packetSize,bufsize);
 	}
 #if 0
 	XXH64_hash_t GetHash(size_t offset,unsigned long long seed = 0)
@@ -128,20 +155,17 @@ public:
 		memcpy(end,packet,size);
 	}
 	XXH64_hash_t CalcHash(size_t length,unsigned long long seed = 0) const
-	{	const XXH64_hash_t hash = XXH64(GetPayload(),length-sizeof(T),seed);
+	{	const XXH64_hash_t hash = XXH64(GetPayload(),GetPayloadSize(),seed);
 		return hash;
 	}
 	XXH64_hash_t ReadHash() const
-	{	XXH64_hash_t packetHash;
-		const size_t hashOffset = sizeof(T);
-		memcpy(&packetHash,GetPacket()+hashOffset,sizeof(packetHash));
-		if(packetHash == 0xcdcdcdcdcdcdcdcdull)
+	{	if(header.hash == 0xcdcdcdcdcdcdcdcdull)
 		{	puts("Invalid memory");
 		}
-		if(!packetHash)
+		if(!header.hash)
 		{	puts("zero hash");
 		}
-		return packetHash;
+		return header.hash;
 	}
 };
 

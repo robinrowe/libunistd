@@ -27,23 +27,22 @@ public:
 	{	Reset();
 	}
 	void Reset()
-	{	packetId = 0;
-		*packetSize=GetMinimumPacketSize();
+	{	header.ResetWrite();
 	}
 	bool Skip(unsigned length) override
-	{	if (*packetSize + length > bufsize)
+	{	if (header.packetSize + length > bufsize)
 		{	return false;
 		}
-		*packetSize+=length;
+		header.packetSize += length;
 		return true;
 	}
 	bool Write(const char* data,unsigned length)
-	{	if (*packetSize + length > bufsize)
+	{	if (header.packetSize + length > bufsize)
 		{	puts("Packet write failed");
 			return false;
 		}
 		memcpy(GetEndPtr(),data,length);
-		*packetSize+=length;
+		header.packetSize += length;
 		return true;
 	}
 	bool Write(const std::string& s)
@@ -67,7 +66,7 @@ public:
 		if(hashReturn)
 		{	*hashReturn = packetHash;
 		}
-		memcpy(packet,(const char*) &packetHash,sizeof(packetHash));
+		header.Write(packet,packetHash);
 		return true;
 	}
 };

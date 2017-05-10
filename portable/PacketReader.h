@@ -29,18 +29,19 @@ class PacketReader
 	char* GetReadPtr()
 	{	return packet+readOffset;
 	}
-	void InitReader()
-	{	readOffset=sizeof(T);
-		dumpFilename=0;
-	}
 public:
+	void Reset()
+	{	readOffset = 0;
+		dumpFilename = 0;
+		header.Read(packet);
+	}
 	PacketReader(const PacketSizer& sizer)
 	:	Packet(sizer)
-	{	InitReader();
+	{	Reset();
 	}
 	PacketReader(char* buffer,unsigned bufsize)
 	:	Packet(buffer,bufsize)
-	{	InitReader();
+	{	Reset();
 	}
 	void SeekEnd()
 	{	readOffset = GetPacketSize();
@@ -51,14 +52,9 @@ public:
 	bool IsGood() const
 	{	return !IsInvalid();
 	}
-	void Init()
-	{	//Packet::Init();
-		InitReader();
-	}	
 	void NextInPipeline()
-	{	packet+=*packetSize;
-		packetSize=(T*)packet;
-		InitReader();
+	{	packet += header.packetSize;
+		Reset();
 	}
 #if 0
 		const unsigned signature=1234567789;
@@ -104,7 +100,7 @@ public:
 		const XXH64_hash_t calcHash = CalcHash(GetPacketSize()-sizeof(XXH64_hash_t));
 		if(readHash != calcHash)
 		{	printf("Error: read hash %llx mismatch packetId #%u\n"
-			       "       calc hash %llx at %u\n",readHash,packetId,calcHash,unsigned(GetPacketSize()-sizeof(XXH64_hash_t)));
+			       "       calc hash %llx at %u\n",readHash,header.packetId,calcHash,unsigned(GetPacketSize()-sizeof(XXH64_hash_t)));
 			return false;
 		}
 		return true;
