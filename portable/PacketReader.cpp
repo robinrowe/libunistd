@@ -32,25 +32,26 @@ bool PacketReader::Read(const char*& s,unsigned& stringLength)
 	if(IsEmpty())
 	{	return false;
 	}
-	const char* readPtr = GetReadPtr();
-	const char* p = readPtr;
-	const unsigned size = unsigned(GetEndPtr() - p);
-	for(unsigned i=0;i<size;i++)
-	{	if(0 == p[i])
-		{	stringLength = i;
-			s = readPtr;
-			readOffset += i;
-			readOffset++;
+	s = packet;
+	stringLength = 0;
+	while(packet<endPtr)
+	{	if(0 == *packet)
+		{	stringLength = unsigned(packet-s);
+			packet++;
 			return true;
 		}
+		packet++;
 	}
+	stringLength = unsigned(packet-s);
 	return false;
 }
 
 void PacketReader::Dump() const
 {	Packet::Dump();
-	const char* p=packet+readOffset;
+#if 0
+const char* p=packet+readOffset;
 	printf(", readOffset = %d, reading: %d, %d, %d, %d\n",readOffset,unsigned(p[0]),unsigned(p[1]),unsigned(p[2]),unsigned(p[3]));
+#endif
 	if(dumpFilename)
 	{	StdFile file;
 		if(!file.Open(dumpFilename,"wb"))

@@ -81,7 +81,7 @@ int BsdSocketPool::DirectMulticast(Packet* framePacket)
 	}
 	const unsigned packetSize = framePacket->GetPacketSize();
 	const unsigned packetId = framePacket->GetPacketId();
-	const XXH64_hash_t hash = framePacket->ReadHash();
+	const PacketHeader::hash_t hash = framePacket->GetHash();
 	printf("%u:%u #%u size=%u hash=%llx\n",count,(unsigned) counter,packetId,packetSize,hash);
 	return count;
 }
