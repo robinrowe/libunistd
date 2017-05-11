@@ -27,6 +27,7 @@ struct PacketHeader
 	hash_t hash;
 	unsigned packetSize;
 	unsigned packetId;
+	bool isGood;
 	PacketHeader()
 	{	Reset();
 	}
@@ -34,6 +35,7 @@ struct PacketHeader
 	{	hash = 0;
 		packetSize = 0;
 		packetId = 0;
+		isGood = false;
 	}
 	void ResetWrite()
 	{	packetSize = GetSize();
@@ -45,8 +47,10 @@ struct PacketHeader
 	void Read(const char* packet)
 	{	Reset();
 		memcpy(&hash, packet, sizeof(XXH64_hash_t));
-		memcpy(&packetSize,packet+sizeof(XXH64_hash_t),sizeof(packetSize));
-		memcpy(&packetId,  packet+sizeof(XXH64_hash_t)+sizeof(packetSize),sizeof(packetId));
+		packet += sizeof(XXH64_hash_t);
+		memcpy(&packetSize,packet,sizeof(packetSize));
+		packet += sizeof(packetSize);
+		memcpy(&packetId, packet,sizeof(packetId));
 		Dump();
 	}
 	void Write(char* packet, XXH64_hash_t packetHash)
@@ -56,6 +60,7 @@ struct PacketHeader
 		memcpy(packet,(const char*) &packetSize, sizeof(packetSize));
 		packet += sizeof(packetSize);
 		memcpy(packet,(const char*) &packetId, sizeof(packetId));
+		isGood = true;
 		Dump();
 	}
 	void Dump() const
@@ -129,7 +134,7 @@ public:
 		}
 		return fullSize;
 	}
-	bool IsGood() const
+	virtual bool IsGood() const
 	{	if(GetPacketSize()>GetCapacity())
 		{	return false;
 		}

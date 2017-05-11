@@ -26,6 +26,12 @@ public:
 	:	Packet(&v[0],unsigned(v.size()))
 	{	Reset();
 	}
+	bool IsGood() const override
+	{	if(!header.isGood)
+		{	return false;
+		}
+		return Packet::IsGood();
+	}
 	void Reset()
 	{	header.ResetWrite();
 	}

@@ -80,7 +80,7 @@ public:
 		{	puts("Frame packet has invalid packetID, not sent");
 			return false;
 		}
-		printf("Send Frame #%d\n",packetId);
+		printf("Send Frame #%d size=%u\n",packetId, headerPacket.header.packetSize);
 		return SendTo(framePacket.GetBaked(),fd);
 	}
 	bool SendHeaderPacket(SOCKET fd)
@@ -94,7 +94,7 @@ public:
 		}
 		std::string ip;
 		BsdSocket::GetPeerName(fd,ip);
-		printf("Sent header packet to %s\n",ip.c_str());
+		printf("Send header packet to %s size=%u\n",ip.c_str(), headerPacket.header.packetSize);
 		return SendFramePacket(fd);
 	}
 	void SetIsStreaming(bool isStreaming = true)
