@@ -16,7 +16,6 @@ class BsdSocketClient
 :	public BsdSocket
 {	std::thread worker;
 	const unsigned bufsize;
-	unsigned packetSize;
 	static void Main(BsdSocketClient* self)
     {   self->Run();
     }
@@ -30,7 +29,6 @@ public:
 	PacketStats stats;
 	BsdSocketClient(unsigned bufsize)
 	:	bufsize(bufsize)
-	,	packetSize(0)
 	{}
 	void Close()
 	{	Stop();

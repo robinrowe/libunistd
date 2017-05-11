@@ -56,6 +56,9 @@ public:
 		const unsigned zlength = (unsigned) strlen(s)+1;
 		return Write(s,zlength);
 	}
+	char* GetEndPtr() const
+	{	return packet+header.packetSize;
+	}
 	void Duplicate()
 	{	char* end=GetEndPtr();
 		const unsigned size=GetPacketSize();

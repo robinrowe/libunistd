@@ -23,7 +23,8 @@ namespace portable
 {
 
 struct PacketHeader
-{	XXH64_hash_t hash;
+{	typedef XXH64_hash_t hash_t;
+	hash_t hash;
 	unsigned packetSize;
 	unsigned packetId;
 	PacketHeader()
@@ -65,18 +66,14 @@ class Packet
 	char* const buffer;
 	typedef unsigned T;
 	char* packet;
-	PacketHeader header;
 	const unsigned bufsize;
 	bool IsEmpty() const
 	{	const bool isEmpty = packet >= buffer + bufsize;
 //		std::cout << "isEmpty = "<<isEmpty << std::endl;
 		return isEmpty;
 	}
-	void Reset()
-	{	packet=buffer;
-		header.Reset();
-	}	
 public:			
+	PacketHeader header;
 	AtomicMutex ownership;
 	Packet(const PacketSizer& sizer)
 	:	buffer(sizer.buffer)
@@ -88,6 +85,10 @@ public:
 	,	bufsize(bufsize)
 	{	Reset();
 	}
+	void Reset()
+	{	packet=buffer;
+		header.Reset();
+	}
 	unsigned GetPacketId() const
 	{	return header.packetId;
 	}
@@ -95,8 +96,11 @@ public:
 	void SetPacketId(unsigned packetId)
 	{	header.packetId = packetId;
 	}
-	const char* GetPayload() const 
-	{	return packet+ header.GetSize();
+	const char* GetPayload() const // Whole packet except hash
+	{	return packet+sizeof(PacketHeader::hash_t);
+	}
+	T GetPayloadSize() const
+	{	return GetPacketSize() - sizeof(PacketHeader::hash_t);
 	}
 	T GetCapacity() const
 	{	return bufsize;
@@ -123,9 +127,6 @@ public:
 		}
 		return fullSize;
 	}
-	T GetPayloadSize() const
-	{	return GetPacketSize() - header.GetSize();
-	}
 	bool IsGood() const
 	{	if(GetPacketSize()>GetCapacity())
 		{	return false;
@@ -137,9 +138,6 @@ public:
 	}
 	const char* GetPacket() const
 	{	return packet;
-	}
-	char* GetEndPtr() const
-	{	return packet+header.packetSize;
 	}
 	void Dump() const
 	{	printf("Dump Packet: size = %d, bufsize = %d",header.packetSize,bufsize);
@@ -154,16 +152,18 @@ public:
 	{	(void) length;
 		return true;
 	}
+#if 0
 	void Duplicate()
 	{	char* end=GetEndPtr();
 		const unsigned size=GetPacketSize();
 		memcpy(end,packet,size);
 	}
-	XXH64_hash_t CalcHash(size_t length,unsigned long long seed = 0) const
+#endif
+	PacketHeader::hash_t CalcHash(unsigned long long seed = 0) const
 	{	const XXH64_hash_t hash = XXH64(GetPayload(),GetPayloadSize(),seed);
 		return hash;
 	}
-	XXH64_hash_t ReadHash() const
+	PacketHeader::hash_t GetHash() const
 	{	if(header.hash == 0xcdcdcdcdcdcdcdcdull)
 		{	puts("Invalid memory");
 		}

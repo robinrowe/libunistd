@@ -12,8 +12,13 @@ namespace portable
 
 class PacketReader
 :	public Packet
-{	unsigned readOffset;
-	const char* dumpFilename;
+{	const char* dumpFilename;
+	const char* endPtr;
+	bool IsInvalid() const
+	{//	std::cout << "readOffset "<<readOffset << std::endl;
+		return !packet;
+	}
+#if 0
 	bool IsOverflow(unsigned length) const
 	{	const unsigned size = GetPacketSize();
 		if(readOffset + length > size)
@@ -22,35 +27,32 @@ class PacketReader
 		}
 		return false;
 	}
-	bool IsInvalid() const
-	{//	std::cout << "readOffset "<<readOffset << std::endl;
-		return !readOffset;
-	}
 	char* GetReadPtr()
 	{	return packet+readOffset;
 	}
+#endif
 public:
-	void Reset()
-	{	readOffset = 0;
-		dumpFilename = 0;
-	}
-	bool ReadHeader(int bytes)
+	bool ReadPacketHeader(int bytes)
 	{	if(bytes < (int) header.GetSize())
 		{	return false;
 		}
 		header.Read(packet);
+		endPtr = packet + header.packetSize;
+		if(packet+bytes<endPtr)
+		{	return false;
+		}
+		packet += header.GetSize();
 		return true;
 	}
 	PacketReader(const PacketSizer& sizer)
 	:	Packet(sizer)
+	,	dumpFilename(nullptr)
 	{	Reset();
 	}
 	PacketReader(char* buffer,unsigned bufsize)
 	:	Packet(buffer,bufsize)
+	,	dumpFilename(nullptr)
 	{	Reset();
-	}
-	void SeekEnd()
-	{	readOffset = GetPacketSize();
 	}
 	void SetDumpFilename(const char* dumpFilename)
 	{	this->dumpFilename = dumpFilename;
@@ -69,44 +71,51 @@ public:
 		}
 		packetSize++;
 		readOffset+=sizeof(signature);
-#endif
+	void SeekEnd()
+	{	readOffset = GetPacketSize();
+	}
 	unsigned GetReadOffset() const
 	{	return readOffset;
 	}
+#endif
 	void Invalidate()
 	{	TRACE("Packet Invalidated");
-		readOffset=0;
+		packet=0;
 	}
 	bool Read(char* data,unsigned length)
 	{	if(IsInvalid())
 		{	return false;
 		}
-#if 1
+#if 0
 		if(IsOverflow(length))
 		{	Invalidate();
 			return false;
 		}
 #endif
-		memcpy(data,GetReadPtr(),length);
-		readOffset+=length;
+		memcpy(data,packet,length);
+		packet+=length;
 		return true;
 	}
 	bool Read(std::string& s);
 	bool Read(const char*& s,unsigned& size);
 	void Dump() const;
 	bool Skip(unsigned length) override
-	{	readOffset+=length;
+	{	packet+=length;
 		return true;
 	}
 	bool IsGoodHash() const
-	{	const XXH64_hash_t readHash = ReadHash();
-		const XXH64_hash_t calcHash = CalcHash(GetPacketSize()-sizeof(XXH64_hash_t));
+	{	const XXH64_hash_t readHash = GetHash();
+		const XXH64_hash_t calcHash = CalcHash();
 		if(readHash != calcHash)
 		{	printf("Error: read hash %llx mismatch packetId #%u\n"
-			       "       calc hash %llx at %u\n",readHash,header.packetId,calcHash,unsigned(GetPacketSize()-sizeof(XXH64_hash_t)));
+			       "       calc hash %llx\n",readHash,header.packetId,calcHash);
 			return false;
 		}
 		return true;
+	}
+	void PrintOffsets() const
+	{	const unsigned remaining = unsigned(endPtr-packet);
+		printf("PacketReader size=%u offset=%u remaining=%u\n",header.packetSize,header.packetSize-remaining,remaining);
 	}
 };
 
