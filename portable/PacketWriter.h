@@ -65,7 +65,7 @@ public:
 		memcpy(end,packet,size);
 	}
 	bool WriteHash(XXH64_hash_t* hashReturn = nullptr)
-	{	const XXH64_hash_t packetHash = CalcHash(GetPacketSize());
+	{	const XXH64_hash_t packetHash = CalcHash();
 		if(hashReturn)
 		{	*hashReturn = packetHash;
 		}

@@ -161,8 +161,9 @@ public:
 		memcpy(end,packet,size);
 	}
 #endif
-	PacketHeader::hash_t CalcHash(unsigned long long seed = 0) const
-	{	const XXH64_hash_t hash = XXH64(GetPayload(),GetPayloadSize(),seed);
+	PacketHeader::hash_t CalcHash() const
+	{	const unsigned long long seed = 0;
+		const XXH64_hash_t hash = XXH64(GetPayload(),GetPayloadSize(),seed);
 		return hash;
 	}
 	PacketHeader::hash_t GetHash() const
