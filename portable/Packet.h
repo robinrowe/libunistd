@@ -52,8 +52,10 @@ struct PacketHeader
 	void Write(char* packet, XXH64_hash_t packetHash)
 	{	hash = packetHash;
 		memcpy(packet,(const char*) &hash,sizeof(hash));
-		memcpy(packet+sizeof(XXH64_hash_t),(const char*) &packetSize, sizeof(packetSize));
-		memcpy(packet+sizeof(XXH64_hash_t)+sizeof(packetSize),(const char*) &packetId, sizeof(packetId));
+		packet += sizeof(XXH64_hash_t);
+		memcpy(packet,(const char*) &packetSize, sizeof(packetSize));
+		packet += sizeof(packetSize);
+		memcpy(packet,(const char*) &packetId, sizeof(packetId));
 		Dump();
 	}
 	void Dump() const
@@ -159,8 +161,9 @@ public:
 		memcpy(end,packet,size);
 	}
 #endif
-	PacketHeader::hash_t CalcHash(unsigned long long seed = 0) const
-	{	const XXH64_hash_t hash = XXH64(GetPayload(),GetPayloadSize(),seed);
+	PacketHeader::hash_t CalcHash() const
+	{	const unsigned long long seed = 0;
+		const XXH64_hash_t hash = XXH64(GetPayload(),GetPayloadSize(),seed);
 		return hash;
 	}
 	PacketHeader::hash_t GetHash() const

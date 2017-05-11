@@ -64,6 +64,9 @@ public:
 	{	packet += header.packetSize;
 		Reset();
 	}
+	void SeekEnd()
+	{	packet = (char*) endPtr;
+	}
 #if 0
 		const unsigned signature=1234567789;
 		if(*packetSize!=signature)
@@ -71,9 +74,6 @@ public:
 		}
 		packetSize++;
 		readOffset+=sizeof(signature);
-	void SeekEnd()
-	{	readOffset = GetPacketSize();
-	}
 	unsigned GetReadOffset() const
 	{	return readOffset;
 	}
