@@ -35,3 +35,4 @@ build
 *.sdf
 *.filters
 .vs
+x64
