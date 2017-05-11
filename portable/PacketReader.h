@@ -107,8 +107,8 @@ public:
 	{	const XXH64_hash_t readHash = GetHash();
 		const XXH64_hash_t calcHash = CalcHash();
 		if(readHash != calcHash)
-		{	printf("Error: read hash %llx mismatch packetId #%u\n"
-			       "       calc hash %llx\n",readHash,header.packetId,calcHash);
+		{	printf("Error:   read hash %llx packetId #%u\n"
+			       "mismatch calc hash %llx size=%u\n",readHash,header.packetId,calcHash,header.packetSize);
 			return false;
 		}
 		return true;
