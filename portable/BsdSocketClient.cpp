@@ -52,19 +52,20 @@ void BsdSocketClient::Run()
 	PacketReader packet(buffer.get(),bufsize);
 	unsigned offset=0;
 	while(isGo)
-	{	const int bytes = RecvFrom(buffer.get(),bufsize,offset);
+	{	const int bytes = RecvFrom(buffer.get(),bufsize-offset,offset);
 		if(bytes<=0)
 		{	printf("ERROR: socket received %i\n",bytes);
 			offset = 0;
 			Stop();
 			continue;
 		}
-		if(!packet.ReadPacketHeader(bytes))
+		const unsigned packetBytes = bytes+offset;
+		if(!packet.ReadPacketHeader(packetBytes))
 		{	stats.fragments++;
 			offset += bytes;
 			continue;
 		}
-		offset=OnPacket(bytes+offset,packet);
+		offset=OnPacket(packetBytes,packet);
 		if(offset)
 		{	printf("memmove buffer %u\n",offset);
 			memmove(buffer.get(),buffer.get()+bytes-offset,offset);

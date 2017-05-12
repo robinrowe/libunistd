@@ -44,22 +44,22 @@ struct PacketHeader
 	unsigned GetSize() const
 	{	return sizeof(XXH64_hash_t) + 2 * sizeof(unsigned);
 	}
-	void Read(const char* packet)
+	void Read(const char* data)
 	{	Reset();
-		memcpy(&hash, packet, sizeof(XXH64_hash_t));
-		packet += sizeof(XXH64_hash_t);
-		memcpy(&packetSize,packet,sizeof(packetSize));
-		packet += sizeof(packetSize);
-		memcpy(&packetId, packet,sizeof(packetId));
+		memcpy(&hash, data, sizeof(XXH64_hash_t));
+		data += sizeof(XXH64_hash_t);
+		memcpy(&packetSize,data,sizeof(packetSize));
+		data += sizeof(packetSize);
+		memcpy(&packetId, data,sizeof(packetId));
 		Dump();
 	}
-	void Write(char* packet, XXH64_hash_t packetHash)
+	void Write(char* data, XXH64_hash_t packetHash)
 	{	hash = packetHash;
-		memcpy(packet,(const char*) &hash,sizeof(hash));
-		packet += sizeof(XXH64_hash_t);
-		memcpy(packet,(const char*) &packetSize, sizeof(packetSize));
-		packet += sizeof(packetSize);
-		memcpy(packet,(const char*) &packetId, sizeof(packetId));
+		memcpy(data,(const char*) &hash,sizeof(hash));
+		data += sizeof(XXH64_hash_t);
+		memcpy(data,(const char*) &packetSize, sizeof(packetSize));
+		data += sizeof(packetSize);
+		memcpy(data,(const char*) &packetId, sizeof(packetId));
 		isGood = true;
 		Dump();
 	}
@@ -74,11 +74,13 @@ class Packet
 	typedef unsigned T;
 	char* packet;
 	const unsigned bufsize;
+#if 0
 	bool IsEmpty() const
 	{	const bool isEmpty = packet >= buffer + bufsize;
 //		std::cout << "isEmpty = "<<isEmpty << std::endl;
 		return isEmpty;
 	}
+#endif
 public:			
 	PacketHeader header;
 	AtomicMutex ownership;
@@ -92,9 +94,18 @@ public:
 	,	bufsize(bufsize)
 	{	Reset();
 	}
-	void Reset()
+	virtual void Reset()
 	{	packet=buffer;
 		header.Reset();
+	}
+	virtual bool IsGood() const
+	{	if(GetPacketSize()>GetCapacity())
+		{	return false;
+		}
+		if(!GetPacketSize())
+		{	return false;
+		}
+		return true;
 	}
 	unsigned GetPacketId() const
 	{	return header.packetId;
@@ -134,41 +145,21 @@ public:
 		}
 		return fullSize;
 	}
-	virtual bool IsGood() const
-	{	if(GetPacketSize()>GetCapacity())
-		{	return false;
-		}
-		if(!GetPacketSize())
-		{	return false;
-		}
-		return true;
-	}
 	const char* GetPacket() const
 	{	return packet;
 	}
 	void Dump() const
 	{	printf("Dump Packet: size = %d, bufsize = %d",header.packetSize,bufsize);
 	}
-#if 0
-	XXH64_hash_t GetHash(size_t offset,unsigned long long seed = 0)
-	{	const size_t length = GetPacketSize() - offset;
-		return XXH64(GetPayload()+offset,length,seed);
-	}
-#endif
 	virtual bool Skip(unsigned length)
 	{	(void) length;
 		return true;
 	}
-#if 0
-	void Duplicate()
-	{	char* end=GetEndPtr();
-		const unsigned size=GetPacketSize();
-		memcpy(end,packet,size);
-	}
-#endif
 	PacketHeader::hash_t CalcHash() const
 	{	const unsigned long long seed = 0;
-		const XXH64_hash_t hash = XXH64(GetPayload(),GetPayloadSize(),seed);
+		const char* payload = GetPayload();
+		const unsigned payloadSize = GetPayloadSize();
+		const XXH64_hash_t hash = XXH64(payload,payloadSize,seed);
 		return hash;
 	}
 	PacketHeader::hash_t GetHash() const
