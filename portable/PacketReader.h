@@ -12,38 +12,14 @@ namespace portable
 
 class PacketReader
 :	public Packet
-{	const char* dumpFilename;
+{	const char* readPtr;
 	const char* endPtr;
+	const char* dumpFilename;
 	bool IsInvalid() const
 	{//	std::cout << "readOffset "<<readOffset << std::endl;
-		return !packet;
+		return !readPtr;
 	}
-#if 0
-	bool IsOverflow(unsigned length) const
-	{	const unsigned size = GetPacketSize();
-		if(readOffset + length > size)
-		{	printf("ERROR: overflow at offset %d, length %d, size %d\n",readOffset,length,size);
-			return true;
-		}
-		return false;
-	}
-	char* GetReadPtr()
-	{	return packet+readOffset;
-	}
-#endif
 public:
-	bool ReadPacketHeader(int bytes)
-	{	if(bytes < (int) header.GetSize())
-		{	return false;
-		}
-		header.Read(packet);
-		endPtr = packet + header.packetSize;
-		if(packet+bytes<endPtr)
-		{	return false;
-		}
-		packet += header.GetSize();
-		return true;
-	}
 	PacketReader(const PacketSizer& sizer)
 	:	Packet(sizer)
 	,	dumpFilename(nullptr)
@@ -54,53 +30,53 @@ public:
 	,	dumpFilename(nullptr)
 	{	Reset();
 	}
+	void Reset() override
+	{	readPtr = 0;
+		endPtr = 0;
+		Packet::Reset();
+	}
+	bool ReadPacketHeader(int bytes)
+	{	if(bytes < (int) header.GetSize())
+		{	return false;
+		}
+		header.Read(packet);
+		endPtr = packet + header.packetSize;
+		if(packet+bytes<endPtr)
+		{	return false;
+		}
+		readPtr = packet + header.GetSize();
+		return true;
+	}
 	void SetDumpFilename(const char* dumpFilename)
 	{	this->dumpFilename = dumpFilename;
 	}
-	bool IsGood() const
+	bool IsGood() const override
 	{	return !IsInvalid();
 	}
 	void NextInPipeline()
-	{	packet += header.packetSize;
+	{	readPtr += header.packetSize;
 		Reset();
 	}
 	void SeekEnd()
-	{	packet = (char*) endPtr;
+	{	readPtr = (char*) endPtr;
 	}
-#if 0
-		const unsigned signature=1234567789;
-		if(*packetSize!=signature)
-		{	std::cout<<"Bad packet"<< std::endl;
-		}
-		packetSize++;
-		readOffset+=sizeof(signature);
-	unsigned GetReadOffset() const
-	{	return readOffset;
-	}
-#endif
 	void Invalidate()
 	{	TRACE("Packet Invalidated");
-		packet=0;
+		readPtr=0;
 	}
 	bool Read(char* data,unsigned length)
 	{	if(IsInvalid())
 		{	return false;
 		}
-#if 0
-		if(IsOverflow(length))
-		{	Invalidate();
-			return false;
-		}
-#endif
-		memcpy(data,packet,length);
-		packet+=length;
+		memcpy(data,readPtr,length);
+		readPtr+=length;
 		return true;
 	}
 	bool Read(std::string& s);
 	bool Read(const char*& s,unsigned& size);
 	void Dump() const;
 	bool Skip(unsigned length) override
-	{	packet+=length;
+	{	readPtr+=length;
 		return true;
 	}
 	bool IsGoodHash() const
@@ -114,7 +90,7 @@ public:
 		return true;
 	}
 	void PrintOffsets() const
-	{	const unsigned remaining = unsigned(endPtr-packet);
+	{	const unsigned remaining = unsigned(endPtr-readPtr);
 		printf("PacketReader size=%u offset=%u remaining=%u\n",header.packetSize,header.packetSize-remaining,remaining);
 	}
 };

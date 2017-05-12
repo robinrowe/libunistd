@@ -29,9 +29,6 @@ bool PacketReader::Read(const char*& s,unsigned& stringLength)
 	if(IsInvalid())
 	{	return false;
 	}
-	if(IsEmpty())
-	{	return false;
-	}
 	s = packet;
 	stringLength = 0;
 	while(packet<endPtr)
