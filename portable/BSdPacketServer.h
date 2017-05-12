@@ -80,7 +80,7 @@ public:
 		{	puts("Frame packet has invalid packetID, not sent");
 			return false;
 		}
-		printf("Send Frame #%d size=%u\n",packetId, headerPacket.header.packetSize);
+		printf("Send Frame #%d size=%u\n",packetId, framePacket.GetBaked().header.packetSize);
 		return SendTo(framePacket.GetBaked(),fd);
 	}
 	bool SendHeaderPacket(SOCKET fd)
