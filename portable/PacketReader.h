@@ -85,6 +85,7 @@ public:
 		if(readHash != calcHash)
 		{	printf("Error:   read hash %llx packetId #%u\n"
 			       "mismatch calc hash %llx size=%u\n",readHash,header.packetId,calcHash,header.packetSize);
+			PrintOffsets();
 			return false;
 		}
 		return true;

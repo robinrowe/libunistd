@@ -71,11 +71,12 @@ public:
 		memcpy(end,packet,size);
 	}
 	bool WriteHash(XXH64_hash_t* hashReturn = nullptr)
-	{	const XXH64_hash_t packetHash = CalcHash();
+	{	header.WriteSizeId(buffer);
+		const XXH64_hash_t packetHash = CalcHash();
 		if(hashReturn)
 		{	*hashReturn = packetHash;
 		}
-		header.Write(buffer,packetHash);
+		header.WriteHash(buffer,packetHash);
 		return true;
 	}
 };
