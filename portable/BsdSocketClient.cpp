@@ -60,11 +60,6 @@ void BsdSocketClient::Run()
 			continue;
 		}
 		const unsigned packetBytes = bytes+offset;
-		if(!packet.ReadPacketHeader(packetBytes))
-		{	stats.fragments++;
-			offset += bytes;
-			continue;
-		}
 		offset=OnPacket(packetBytes,packet);
 		if(offset)
 		{	printf("memmove buffer %u\n",offset);
@@ -80,12 +75,17 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 #endif
 	//LogMsg("Receive packet");
 	while(bytes)
-	{	
-//#ifndef _DEBUG
+	{	if(!packet.ReadPacketHeader(bytes))
+		{	stats.fragments++;
+			return bytes;
+		}
 #if 0
 		if(!stats.GetLast())
 #endif
 		{	printf("reading packet #%u\n",packet.header.packetId);
+		}
+		if(!packet.header.packetSize)
+		{	LogError("invalid packet");
 		}
 		if(0==packet.header.packetId)
 		{	LogMsg("Reading header");

@@ -29,17 +29,17 @@ bool PacketReader::Read(const char*& s,unsigned& stringLength)
 	if(IsInvalid())
 	{	return false;
 	}
-	s = packet;
+	s = readPtr;
 	stringLength = 0;
-	while(packet<endPtr)
-	{	if(0 == *packet)
-		{	stringLength = unsigned(packet-s);
-			packet++;
+	while(readPtr<endPtr)
+	{	if(0 == *readPtr)
+		{	stringLength = unsigned(readPtr-s);
+			readPtr++;
 			return true;
 		}
-		packet++;
+		readPtr++;
 	}
-	stringLength = unsigned(packet-s);
+	stringLength = unsigned(readPtr-s);
 	return false;
 }
 

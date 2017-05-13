@@ -82,7 +82,7 @@ public:
 		s %= 3600;
 		const unsigned m = s/60;
 		s %= 60;
-		printf("Packet #%u: fps=%.2f:%u %u+%u total=%u lost=%u [%02u:%02u:%02u]\n", last,fps,recent+skipped, recent,skipped,received,dropped,h,m,s);
+		printf("Packet #%u: fps=%.2f:%u (%u+%u) total=%u lost=%u [%02u:%02u:%02u]\n", last,fps,recent+skipped, recent,skipped,received,dropped,h,m,s);
 		skipped = 0;
 	}
 	void Print(unsigned id,int bytes,int packetSize, int capacity)
@@ -94,6 +94,10 @@ public:
 	}
 	void AddSkipped(unsigned skipped)
 	{	this->skipped += skipped;
+		printf("skipped = %u\n",this->skipped);
+		if(this->skipped > 1000)
+		{	puts("skipped out");
+		}
 	}
 	T GetLast() const
 	{	return last;

@@ -54,7 +54,7 @@ public:
 	{	return !IsInvalid();
 	}
 	void NextInPipeline()
-	{	readPtr += header.packetSize;
+	{	readPtr = endPtr;
 		Reset();
 	}
 	void SeekEnd()
