@@ -65,9 +65,6 @@ public:
 	bool IsOpen() const
 	{	return isGo;
 	}
-	bool SendClose()
-	{	return SendTo("", 0);
-	}
 	bool SendTo(const char* msg,unsigned len)
 	{	if(!IsGood())
 		{	return false;
@@ -139,6 +136,9 @@ public:
 		flags = isBlocking ? (flags&~O_NONBLOCK) : (flags | O_NONBLOCK);
 		return (fcntl(socketfd, F_SETFL, flags) == 0) ? true : false;
 #endif
+	}
+	bool SendEmptyPacket()
+	{	return SendTo("", 0);
 	}
 	static bool GetIp(const char* hostname,std::string& ip);
 };

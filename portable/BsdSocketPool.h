@@ -17,6 +17,12 @@ class BsdSocketPool
 	std::vector<SOCKET> socketfd;
 	AtomicCounter<unsigned> counter;
 	void ReleaseSlots();
+	bool IsGood(SOCKET sid) const
+	{	if(!sid || -1==sid)
+		{	return false;
+		}
+		return true;
+	}
 public:
 	void Close()
 	{	ReleaseSlots();
@@ -38,10 +44,6 @@ public:
 	void SetIsStreaming(bool isStreaming)
 	{	this->isStreaming = isStreaming;
 	}
-	SOCKET* GetSlot();
-	SOCKET* GetZombieSlot();
-	bool ReleaseSlot(SOCKET* sock);
-	void BsdSocketPool::ReleaseSlot(unsigned slot);
 	bool SendPacket(Packet* packet,unsigned i)
 	{	BsdSocket bsdSocket(socketfd[i]);
 		if(bsdSocket.SendTo(*packet))
@@ -50,6 +52,10 @@ public:
 		ReleaseSlot(i);
 		return false;
 	}
+	bool SetSlot(SOCKET sid);
+	bool SetZombieSlot(SOCKET sid);
+	bool ReleaseSlot(SOCKET* sock);
+	void BsdSocketPool::ReleaseSlot(unsigned slot);
 	int DirectMulticast(Packet* framePacket);
 };
 

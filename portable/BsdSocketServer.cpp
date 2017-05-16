@@ -32,17 +32,15 @@ void BsdSocketServer::ListenRun()
 {	while(isGo)
 	{	if(socketfd>0)
 		{	SOCKET sock = ListenAccept();
-			SOCKET* s = pool.GetSlot();
-			if(!s)
+			if(!pool.SetSlot(sock))
 			{	puts("WARN: no socket slots");
 				continue;
 			}
 			if(!Login(sock))
 			{	puts("ERROR: socket connect failed");
-				pool.ReleaseSlot(s);
+				pool.ReleaseSlot(sock);
 				continue;
 			}
-			*s = sock;
 			OnConnect(sock);
 		}
 	}
