@@ -10,24 +10,25 @@
 namespace portable 
 {
 
-SOCKET* BsdSocketPool::GetSlot()
+bool BsdSocketPool::SetSlot(SOCKET sid)
 {	for(unsigned i =0;i<socketfd.size();i++)
-	{	if(!socketfd[i])
-		{	counter++;
-			return &socketfd[i];
+	{	if(!IsGood(socketfd[i]))
+		{	socketfd[i] = sid;
+			counter++;
+			return true;
 	}	}
-	return GetZombieSlot();
+	return SetZombieSlot(sid);
 }
 
-SOCKET* BsdSocketPool::GetZombieSlot()
+bool BsdSocketPool::SetZombieSlot(SOCKET sid)
 {	for(unsigned i =0;i<socketfd.size();i++)
-	{	if(socketfd[i])
+	{	if(IsGood(socketfd[i]))
 		{	BsdSocket bsdSocket(socketfd[i]);
-			if(!bsdSocket.SendTo("",0))
-			{	ReleaseSlot(i);
-				return &socketfd[i];
+			if(!bsdSocket.SendEmptyPacket())
+			{	socketfd[i] = sid;
+				return true;
 	}	}	}
-	return nullptr;
+	return false;
 }
 
 bool BsdSocketPool::ReleaseSlot(SOCKET* sock)
@@ -57,15 +58,6 @@ int BsdSocketPool::DirectMulticast(Packet* framePacket)
 	{	puts("Can't lock frame packet");
 		return -1;
 	}
-#if 0
-	const unsigned maxShowPacketId = 10;
-	if(verboseCount)
-	{	static portable::VerboseCounter counter(600);
-		counter++;
-		if (counter)
-		{	printf("Multicast packet #%d\n", framePacket->GetPacketId());
-	}	}
-#endif
 	int count = 0;
 	for(unsigned i=0;i<socketfd.size();i++)
 	{	if(!socketfd[i])
@@ -94,9 +86,14 @@ void BsdSocketPool::ReleaseSlot(unsigned slot)
 	{	return;
 	}
 	BsdSocket bsdSocket(socketfd[slot]);
-	bsdSocket.SendClose();
+	bsdSocket.Close();
 	socketfd[slot] = 0;
-	counter--;
+	if(!counter)
+	{	puts("Socket counter underflow");
+	}
+	else
+	{	counter--;
+	}
 	printf("Released slot %u, connections = %u\n", slot, (unsigned)counter);
 }
 

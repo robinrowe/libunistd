@@ -14,7 +14,8 @@ void BsdSocket::Close()
 {	puts("Socket close");
 	isGo=false;
 	if(socketfd)
-	{	closesocket(socketfd);
+	{	SendEmptyPacket();
+		closesocket(socketfd);
 		socketfd=0;
 }	}
 
