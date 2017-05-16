@@ -79,7 +79,7 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 		{	stats.fragments++;
 			return bytes;
 		}
-#if 0
+#if 1
 		if(!stats.GetLast())
 #endif
 		{	printf("reading packet #%u\n",packet.header.packetId);

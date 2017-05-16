@@ -52,12 +52,12 @@ struct PacketHeader
 		data += sizeof(packetSize);
 		memcpy(&packetId, data,sizeof(packetId));
 		isGood = true;
-		Dump();
+//		Dump();
 	}
 	void WriteHash(char* data, XXH64_hash_t packetHash)
 	{	hash = packetHash;
 		memcpy(data,(const char*) &hash,sizeof(hash));
-		Dump();
+//		Dump();
 	}
 	void WriteSizeId(char* data)
 	{	data += sizeof(XXH64_hash_t);

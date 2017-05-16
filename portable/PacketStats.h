@@ -94,7 +94,7 @@ public:
 	}
 	void AddSkipped(unsigned skipped)
 	{	this->skipped += skipped;
-		printf("skipped = %u\n",this->skipped);
+//		printf("skipped = %u\n",this->skipped);
 		if(this->skipped > 1000)
 		{	puts("skipped out");
 		}
