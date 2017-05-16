@@ -54,7 +54,7 @@ void BsdSocketClient::Run()
 	while(isGo)
 	{	const int bytes = RecvFrom(buffer.get(),bufsize-offset,offset);
 		if(bytes<=0)
-		{	printf("ERROR: socket received %i\n",bytes);
+		{	printf("ERROR: socket received %i bytes (closed)\n",bytes);
 			offset = 0;
 			Stop();
 			continue;
