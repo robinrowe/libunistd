@@ -74,11 +74,11 @@ int BsdSocketPool::DirectMulticast(Packet* framePacket)
 	const unsigned packetSize = framePacket->GetPacketSize();
 	const unsigned packetId = framePacket->GetPacketId();
 	const PacketHeader::hash_t hash = framePacket->GetHash();
-	printf("%u:%u #%u size=%u hash=%llx\n",count,(unsigned) counter,packetId,packetSize,hash);
+//	printf("%u:%u #%u size=%u hash=%llx\n",count,(unsigned) counter,packetId,packetSize,hash);
 	return count;
 }
 
-void BsdSocketPool::ReleaseSlot(unsigned slot)
+void BsdSocketPool::ReleaseSlot(SOCKET slot)
 {	if (slot >= socketfd.size())
 	{	return;
 	}
@@ -94,7 +94,7 @@ void BsdSocketPool::ReleaseSlot(unsigned slot)
 	else
 	{	counter--;
 	}
-	printf("Released slot %u, connections = %u\n", slot, (unsigned)counter);
+	printf("Released slot %u, connections = %u\n", (unsigned)slot, (unsigned)counter);
 }
 
 
