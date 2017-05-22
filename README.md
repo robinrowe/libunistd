@@ -8,7 +8,7 @@ Usage: Set the include path in your VC++ project to include the directory libuni
 
 Doing this will include the magic to make basic Linux APIs work in Windows. Because unistd.h exists in Linux as a standard header file, making this change for Windows will not break Linux code. Avoid conditional defined _WIN32 ugliness in your code. Simply write C++ code as you would for Linux, and it should build in Visual Studio 2017 or 2015.
 
-Libunisd is more than unistd.h. It implements many other header files that are POSIX equivalents, such as, pthreads.h. When porting a Linux program to Windows for the first time, you may have to include more POSIX headers in your Linux code. Because Linux headers may implicitly include other header files, sometimes Linux code will compile without explicitly calling all its required header files. You can see the same quirks when porting your Linux code to FreeBSD or Mac OS X, that they may also object to unknown POSIX functions. The solution is simple. Look up to the Linux man page for the unknown function and include all the header files it requires.
+Libunisd is more than unistd.h. It implements many other header files that are POSIX equivalents, such as, pthreads.h. When porting your Linux program to Windows for the first time, you may have to include more POSIX headers in your Linux code. Because Linux headers may implicitly include other header files, sometimes Linux code will compile without explicitly calling all its required header files. You can see the same quirks when porting your Linux code to FreeBSD or Mac OS X, that they may also object to unknown POSIX functions. The solution is simple. Look up to the Linux man page for the unknown function and include all the header files it requires.
 
 Libunistd includes some additional small libraries that are not POSIX, but are very useful to those of us developing cross-platform code. Libunistd has no dependencies on these. Included for convenience.
 
@@ -25,8 +25,6 @@ Most of the Libunistd library is header-only. However, there are a few functions
 ## Author
 
 Robin.Rowe@cinepaint.org Hollywood, California 310-359-8796
-
-Revised 2016/9/21
 
 Note to myself, to maintain separate open source and commercial git projects, here's how I set my open source local user info...
 
