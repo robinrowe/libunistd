@@ -94,10 +94,12 @@ public:
 	}
 	void AddSkipped(unsigned skipped)
 	{	this->skipped += skipped;
-//		printf("skipped = %u\n",this->skipped);
+#if 0
 		if(this->skipped > 1000)
-		{	puts("skipped out");
+		{	puts("ERROR: skipped out");
+			printf("skipped = %u\n",this->skipped);
 		}
+#endif
 	}
 	T GetLast() const
 	{	return last;

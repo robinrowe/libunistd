@@ -86,6 +86,7 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 		}
 		if(!packet.header.packetSize)
 		{	LogError("invalid packet");
+			return 0;
 		}
 		if(0==packet.header.packetId)
 		{	LogMsg("Reading header");

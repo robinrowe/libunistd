@@ -40,6 +40,9 @@ public:
 		{	return false;
 		}
 		header.Read(packet);
+		if(!header.packetSize)
+		{	return false;
+		}
 		endPtr = packet + header.packetSize;
 		if(packet+bytes<endPtr)
 		{	return false;
