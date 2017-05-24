@@ -60,11 +60,15 @@ void BsdSocketClient::Run()
 			continue;
 		}
 		const unsigned packetBytes = bytes+offset;
-		offset=OnPacket(packetBytes,packet);
-		if(offset)
-		{	printf("memmove buffer %u\n",offset);
-			memmove(buffer.get(),buffer.get()+bytes-offset,offset);
-	}	}
+		offset = OnPacket(packetBytes,packet);
+		if(offset == packetBytes)
+		{	offset = 0; 
+			continue;
+		}
+		const unsigned consumed = packetBytes-offset;
+		printf("memmove buffer %u\n",offset);
+		memmove(buffer.get(),buffer.get()+consumed,offset);
+	}	
 	OnStop();
 }
 
