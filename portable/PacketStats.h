@@ -17,7 +17,7 @@ class PacketStats
 	T last;
 	T dropped;
 	T polled;
-	T received;
+	T transmitted;
 	T skipped;
 	float fps;
 	std::chrono::system_clock::time_point startTime;
@@ -48,7 +48,7 @@ public:
 	{	first = 0;
 		last = 0;
 		dropped = 0;
-		received = 0;
+		transmitted = 0;
 		polled = 0;
 		pipelined = 0;
 		fragments = 0;
@@ -56,7 +56,7 @@ public:
 		skipped = 0;
 		fps = 0.;
 	}
-	void Received(unsigned packetId)
+	void Transmit(unsigned packetId)
 	{	const unsigned recentDrops = GetRecentDrops(packetId);
 		dropped += recentDrops;
 		if(isVerbose && 0!=recentDrops)
@@ -66,15 +66,15 @@ public:
 		if(!first)
 		{	first = packetId;
 		}
-		received++;	
+		transmitted++;
 	}
 	void Print()
-	{	if(polled == received)
+	{	if(polled == transmitted)
 		{	printf(".");
 			return;
 		}
-		const unsigned recent  = received - polled;
-		polled = received;
+		const unsigned recent  = transmitted - polled;
+		polled = transmitted;
 		std::chrono::system_clock::time_point nowTime = std::chrono::system_clock::now();
 	    std::chrono::duration<double> elapsed = nowTime - startTime;
 		unsigned s = (unsigned) elapsed.count();
@@ -82,12 +82,12 @@ public:
 		s %= 3600;
 		const unsigned m = s/60;
 		s %= 60;
-		printf("Packet #%u: fps=%.2f:%u (%u+%u) total=%u lost=%u [%02u:%02u:%02u]\n", last,fps,recent+skipped, recent,skipped,received,dropped,h,m,s);
+		printf("Packet #%u: fps=%.2f:%u (%u+%u) total=%u lost=%u [%02u:%02u:%02u]\n", last,fps,recent+skipped, recent,skipped, transmitted,dropped,h,m,s);
 		skipped = 0;
 	}
 	void Print(unsigned id,int bytes,int packetSize, int capacity)
 	{	printf("id: %u packets: %i bytes: %i packetSize: %i capacity: %u fragments: %u errors: %u\n",
-				id, received,bytes, packetSize, capacity, fragments,errors);	
+				id, transmitted,bytes, packetSize, capacity, fragments,errors);
 	}
 	void SetFps(float fps)
 	{	this->fps = fps;

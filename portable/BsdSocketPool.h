@@ -8,6 +8,7 @@
 
 #include "BsdSocket.h"
 #include "PacketWriter.h"
+#include "PacketStats.h"
 
 namespace portable 
 {
@@ -24,6 +25,7 @@ class BsdSocketPool
 		return true;
 	}
 public:
+	PacketStats stats;
 	void Close()
 	{	ReleaseSlots();
 	}
@@ -31,6 +33,7 @@ public:
 	{	socketfd.resize(size);
 		socketfd.assign(size,0);
 		counter=0;
+		stats.Reset();
 	}
 	unsigned GetCount() const
 	{	return counter;
@@ -47,7 +50,8 @@ public:
 	bool SendPacket(Packet* packet,unsigned i)
 	{	BsdSocket bsdSocket(socketfd[i]);
 		if(bsdSocket.SendTo(*packet))
-		{	return true;
+		{	stats.Transmit(packet->GetPacketId()); 
+			return true;	
 		}
 		ReleaseSlot(i);
 		return false;

@@ -99,7 +99,7 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 		{//	LogMsg("Reading frame");
 			ReadFrame(packet,packet.header.packetId);
 		}
-		stats.Received(packet.header.packetId);
+		stats.Transmit(packet.header.packetId);
 #if 0
 		const unsigned readOffset=packet.GetReadOffset();
 		if(readOffset!=packetSize || bytes<packetSize)

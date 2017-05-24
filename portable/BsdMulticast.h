@@ -50,6 +50,12 @@ public:
 	void SetFramePacket(Packet* packet)
 	{	framePacket=packet;
 	}
+	void AddSkipped(unsigned skipped)
+	{	socketPool.stats.AddSkipped(skipped);
+	}
+	void PrintStats()
+	{	socketPool.stats.Print();
+	}
 };
 
 }

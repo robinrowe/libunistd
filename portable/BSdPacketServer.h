@@ -100,6 +100,12 @@ public:
 	void SetIsStreaming(bool isStreaming = true)
 	{	multicast.SetIsStreaming(isStreaming);
 	}
+	void AddSkipped(unsigned skipped)
+	{	multicast.AddSkipped(skipped);
+	}
+	void PrintStats()
+	{	multicast.PrintStats();
+	}
 	bool Start(int serverPort,unsigned maxStreams);
 	//virtual void OnStop() const;
 };
