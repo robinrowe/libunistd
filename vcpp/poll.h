@@ -23,6 +23,9 @@ int poll(struct pollfd *fds, nfds_t nfds, int mille_timeout)
 	timeout.tv_usec=1000000*mille_timeout%1000; 
 //	std::vector<fd_set> fd(2*nfds);
 	struct fd_set* fd=(fd_set*) malloc(2*nfds*sizeof(fd_set));
+	if(!fd)
+	{	return -1;
+	}
 	u_int* readerCount=&fd[0].fd_count;
 	*readerCount=0;
 	SOCKET* fdReader=fd[0].fd_array;

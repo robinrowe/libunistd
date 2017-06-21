@@ -24,7 +24,9 @@ int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact)
 	{	return -1;
 	}
 	if(SIGINT == signum)
-	{	CtrlCHandler = act->sa_sigaction;
+	{	if(act)
+		{	CtrlCHandler = act->sa_sigaction;
+		}
 		SetConsoleCtrlHandler( (PHANDLER_ROUTINE) WindowsCtrlCHandler,TRUE);
 		return 0;
 	}	

@@ -50,23 +50,28 @@ void BsdSocketClient::Run()
 {	isGo = true;
 	std::unique_ptr<char[]> buffer(new char[bufsize]);
 	PacketReader packet(buffer.get(),bufsize);
-	unsigned offset=0;
+	unsigned totalBytes = 0;
 	while(isGo)
-	{	const int bytes = RecvFrom(buffer.get(),bufsize-offset,offset);
-		if(bytes<=0)
-		{	printf("ERROR: socket received %i bytes (closed)\n",bytes);
-			offset = 0;
+	{	const int recvBytes = RecvFrom(buffer.get(),bufsize-totalBytes,totalBytes);
+		if(recvBytes<=0)
+		{	printf("ERROR: socket received %i bytes (closed)\n",recvBytes);
 			Stop();
 			continue;
 		}
-		const unsigned packetBytes = bytes+offset;
-		offset = OnPacket(packetBytes,packet);
-		if(!offset)
+		totalBytes += recvBytes;
+		const unsigned consumedBytes = OnPacket(totalBytes,packet);
+		if(!consumedBytes)
 		{	continue;
 		}
-		const unsigned consumed = packetBytes-offset;
-		printf("memmove buffer %u, consumed %u of %u\n",offset,consumed,packetBytes);
-		memmove(buffer.get(),buffer.get()+consumed,offset);
+		if(consumedBytes==totalBytes)
+		{	totalBytes = 0;
+		}
+		else
+		{	const unsigned remainingBytes = totalBytes - consumedBytes;
+			printf("memmove(buffer,buffer+%u,%u)\n",consumedBytes,remainingBytes);
+			memmove(buffer.get(),buffer.get()+consumedBytes,remainingBytes);
+			totalBytes = remainingBytes;
+		}
 	}	
 	OnStop();
 }
