@@ -132,7 +132,7 @@ public:
 	}
 	T GetPacketSize() const
 	{	if(bufsize<header.packetSize)
-		{	printf("ERROR: packet size overflow %u<%u\n",bufsize, header.packetSize);
+		{	printf("ERROR: packet size overflow, bufsize %u < %u\n",bufsize, header.packetSize);
 			return 0;
 		}	
 		return header.packetSize;
