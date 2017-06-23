@@ -36,7 +36,7 @@ public:
 		{	closesocket(socketfd);
 			socketfd=0;
 	}	}
-	bool Open(const char* serverName,int serverPort);
+	bool Open(const char* serverName,int serverPort,bool isReuseSocket=true);
 	void Start() override
 	{	worker=std::thread(Main,this);
 		worker.detach();

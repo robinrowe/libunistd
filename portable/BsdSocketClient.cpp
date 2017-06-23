@@ -9,7 +9,7 @@
 namespace portable 
 {
 
-bool BsdSocketClient::Open(const char* serverName,int serverPort)
+bool BsdSocketClient::Open(const char* serverName,int serverPort,bool isReuseSocket)
 {	puts("libunistd 1.1 " __DATE__ " " __TIME__);
 	if(!serverName || !*serverName || !serverPort)
 	{	errorMsg.Set("No server to open specified");
@@ -34,6 +34,11 @@ bool BsdSocketClient::Open(const char* serverName,int serverPort)
 		errorMsg.GetLastError();
 		return false;
 	}
+	if(isReuseSocket)
+	{	const bool ok = SetReuse(socketfd);
+		if(!ok)
+		{	puts("Can't reuse socket");
+	}	}
 	const int ok = connect(socketfd, (struct sockaddr*)&server_sockaddr, sizeof(server_sockaddr));
 	if(ok<0) 
 	{	puts("connect failed");

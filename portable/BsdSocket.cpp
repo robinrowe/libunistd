@@ -13,6 +13,7 @@ namespace portable
 void BsdSocket::Close()
 {	puts("Socket close");
 	isGo=false;
+	isConnected=false;
 	if(socketfd)
 	{	SendEmptyPacket();
 		closesocket(socketfd);

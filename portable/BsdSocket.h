@@ -27,6 +27,7 @@ class BsdSocket
 {protected:
 	SOCKET socketfd;
 	bool isGo;
+	bool isConnected;
 	sockaddr_in server_sockaddr;
 	std::thread packetWorker;
 	int OpenSocket(bool isTcp=true)
@@ -44,7 +45,8 @@ protected:
 		return 0;
 	}
 	virtual void OnStop()
-	{	puts("Soscket stream stopping");
+	{	puts("Socket stream stopping");
+		isConnected = false;
 	}
 public:
 	MsgBuffer<120> errorMsg;
@@ -53,10 +55,12 @@ public:
 	BsdSocket()
 	:	socketfd(0)
 	,	isGo(false)
+	,	isConnected(false)
 	{}
 	BsdSocket(SOCKET socketfd)
 	:	socketfd(socketfd)
 	,	isGo(false)
+	,	isConnected(false)
 	{}
 	BsdSocket(const BsdSocket&) = default;
 	bool IsGood() const
