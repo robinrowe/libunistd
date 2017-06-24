@@ -73,7 +73,7 @@ void BsdSocketClient::Run()
 		}
 		else
 		{	const unsigned remainingBytes = totalBytes - consumedBytes;
-			printf("memmove(buffer,buffer+%u,%u)\n",consumedBytes,remainingBytes);
+			// printf("memmove(buffer,buffer+%u,%u)\n",consumedBytes,remainingBytes);
 			memmove(buffer.get(),buffer.get()+consumedBytes,remainingBytes);
 			totalBytes = remainingBytes;
 		}
