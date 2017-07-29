@@ -5,7 +5,8 @@
 #include "unistd.h"
 
 int gettimeofday(struct timeval* tv, struct timezone* tz)
-{	FILETIME ft;
+{	(void)tz;
+    FILETIME ft;
 	ULARGE_INTEGER t;
 	ULONGLONG x;
 	ULONGLONG m=1000000;

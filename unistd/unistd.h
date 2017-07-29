@@ -400,12 +400,16 @@ int fcntl(int handle,int mode)
 
 typedef int Atom;
 
+#if _MSC_VER <= 1900
+
 inline
 int gethostname(char *name, size_t len)
 {   DWORD bufsize = (DWORD) len;
     BOOL ok = GetComputerNameA(name,&bufsize);
     return ok? 0:-1;
 }
+
+#endif
 
 inline
 int getlogin_r(char *buf, size_t len)

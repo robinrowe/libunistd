@@ -249,7 +249,11 @@ enum
 
 inline
 void humanize_number(char* buf, int len,int64_t bytes,const char*,int flags,int)
-{   STUB(humanize_number);
+{   (void)buf;
+    (void)len;
+    (void)bytes;
+    (void)flags;
+    STUB(humanize_number);
 }
 
 enum

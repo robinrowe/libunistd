@@ -99,7 +99,7 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 		}
 		if(!packet.header.packetSize)
 		{	LogError("invalid packet");
-			return 0;
+			return bytes;
 		}
 		if(0==packet.header.packetId)
 		{	LogMsg("Reading header");
@@ -141,7 +141,7 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 		if(bytes<=sizeof(unsigned))
 		{//	stats.Print(packetId,bytes,packetSize, capacity);
 			SocketReset("Packet receive underflow bytes",packet);
-			return 0;
+			return bytes;
 		}
 //		packet>>packetSize;
 //		packetSize=packet.GetPacketSize(bytes);
@@ -155,7 +155,8 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 }
 
 void BsdSocketClient::SocketReset(const char* msg,portable::PacketReader& packet)
-{	packet.Dump();
+{	(void)msg;
+    packet.Dump();
 	BsdSocket bsdSocket(socketfd);
 	bsdSocket.Close();
 	socketfd = 0;

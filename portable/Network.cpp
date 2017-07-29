@@ -3,11 +3,11 @@
 // License open source MIT
 
 #ifdef _WIN32
-#include "../vcpp/unistd.h"
-#include "../vcpp/sys/socket.h"
-#include "../vcpp/netinet/in.h"
-#include "../vcpp/arpa/inet.h"
-#include "../vcpp/net/if.h"
+#include "../unistd/unistd.h"
+#include "../unistd/sys/socket.h"
+#include "../unistd/netinet/in.h"
+#include "../unistd/arpa/inet.h"
+#include "../unistd/net/if.h"
 #else
 #include <unistd.h>
 #include <sys/ioctl.h>

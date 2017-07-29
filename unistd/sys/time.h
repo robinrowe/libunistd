@@ -32,12 +32,17 @@ struct timeval
 
 inline
 int getitimer(int which, struct itimerval *curr_value)
-{   STUB0(getitimer);
+{   (void)which;
+    (void)curr_value;
+    STUB0(getitimer);
 }
 
 inline
 int setitimer(int which, const struct itimerval *new_value,struct itimerval *old_value)
-{   STUB0(setitimer);
+{   (void)which;
+    (void)new_value;
+    (void)old_value;
+    STUB0(setitimer);
 }
 
 enum

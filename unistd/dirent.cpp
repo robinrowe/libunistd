@@ -26,7 +26,7 @@ DIR* opendir(const char *path)
 	{	errno = ENOTDIR;
 		return nullptr;
 	}
-	const unsigned int rc = GetFileAttributes(path);
+    const unsigned int rc = GetFileAttributesA(path);
 	if(rc == -1)
 	{	errno = ENOENT;
 		return nullptr;
@@ -95,7 +95,8 @@ struct dirent* readdir(DIR* dir)
 }
 
 int readdir_r(DIR *dir, struct dirent *entry, struct dirent** result)
-{	dirent* d = readdir(dir);
+{	(void)entry;
+    dirent* d = readdir(dir);
 	if(!d)
 	{	return -1;
 	}
