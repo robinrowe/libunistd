@@ -1,3 +1,8 @@
+*.pri
+*.pro.user
+Makefile
+Makefile.Release
+Makefile.Debug
 # Compiled Object files
 *.slo
 *.lo
@@ -36,3 +41,4 @@ build
 *.filters
 .vs
 x64
+
