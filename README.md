@@ -30,6 +30,12 @@ Open Source MIT/BSD. In other words, you may do pretty much whatever you want wi
 
 Robin.Rowe@cinepaint.org Hollywood, California 310-359-8796
 
+## History
+
+Libunistd was originally created to port Linux CinePaint to Windows in 2002. CinePaint is an open source HDR paint application used in making motion pictures, including the Harry Potter and Lord of the Rings films. Libunistd later moved to github and has been continuously improved, with more and more BSD and System V calls added. 
+
+Libunistd is being used for safety-critical Linux embedded systems. Not to deliver a Windows build on an embedded system, rather for testing and QA of the same embedded system codebase in Windows with access to the superb Microsoft Visual Studio debugger and its excellent static code checker that detects memory overruns. 
+
 ## Note to Myself
 
 To maintain separate open source and commercial git projects, here's how I set my open source local user info...
