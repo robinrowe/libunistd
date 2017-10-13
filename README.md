@@ -22,11 +22,17 @@ Libunistd has some additional small libraries that are not POSIX, but are very u
 
 4. xxHash: A small hash library created elsewhere.
 
+## License
+
+Open Source MIT/BSD. In other words, you may do pretty much whatever you want with it, not copyleft GNU.
+
 ## Author
 
 Robin.Rowe@cinepaint.org Hollywood, California 310-359-8796
 
-Note to myself, to maintain separate open source and commercial git projects, here's how I set my open source local user info...
+## Note to myself
+
+To maintain separate open source and commercial git projects, here's how I set my open source local user info...
 
 	git config user.name "Robin Rowe"
 	git config user.email "Robin.Rowe@cinepaint.org"
