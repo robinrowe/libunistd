@@ -24,13 +24,13 @@ Libunistd has some additional small libraries that are not POSIX, but are very u
 
 ## License
 
-Open Source MIT/BSD. In other words, you may do pretty much whatever you want with it, not copyleft GNU.
+Open Source MIT/BSD. In other words, you may do pretty much whatever you want with libunistd, not copyleft GNU. Similar for Qdecoder, Sqlite and xxHash, however you should check their license terms yourself as libunistd is not the owner of these other open source libraries.
 
 ## Author
 
 Robin.Rowe@cinepaint.org Hollywood, California 310-359-8796
 
-## Note to myself
+## Note to Myself
 
 To maintain separate open source and commercial git projects, here's how I set my open source local user info...
 
