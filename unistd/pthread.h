@@ -270,6 +270,57 @@ int pthread_cancel(pthread_t thread)
 {   STUB0(pthread_cancel);
 }
 
+inline
+pthread_t pthread_self()
+{	STUB0(pthread_self);
+}
+
+inline
+int pthread_detach(pthread_t thread)
+{	thread->detach();
+	return 0;
+}
+
+inline
+int pthread_cond_destroy(pthread_cond_t *cond)
+{	STUB0(pthread_cond_destroy);
+}
+
+inline
+int pthread_cond_init(pthread_cond_t* restrict_cond,const pthread_condattr_t* restrict_attr)
+{	STUB0(pthread_cond_destroy);
+}
+
+inline
+int pthread_cond_broadcast(pthread_cond_t *cond)
+{	STUB0(pthread_cond_broadcast);
+}
+
+inline
+int pthread_cond_signal(pthread_cond_t *cond)
+{	STUB0(pthread_cond_signal);
+}
+
+inline
+int pthread_cond_timedwait(pthread_cond_t* restrict_cond,pthread_mutex_t* restrict_mutex,const struct timespec * restrict_abstime)
+{	STUB0(pthread_cond_timedwait);
+}
+
+inline
+int pthread_cond_wait(pthread_cond_t* restrict_cond,pthread_mutex_t * restrict_mutex)
+{	STUB0(pthread_cond_wait);
+}
+
+inline
+int pthread_mutex_destroy(pthread_mutex_t *mutex)
+{	STUB0(pthread_mutex_destroy);
+}
+
+inline
+int pthread_mutex_init(pthread_mutex_t* restrict_mutex,const pthread_mutexattr_t * restrict_attr)
+{	STUB0(pthread_mutex_init);
+}
+
 #ifdef __cplusplus
 }
 #endif
