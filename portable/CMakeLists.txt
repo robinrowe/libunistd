@@ -83,4 +83,4 @@ add_library( libportable
 	${HEADERS} ${SOURCE}
 )
 
-target_include_directories (libportable PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/..")
+target_include_directories (libportable PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../unistd")

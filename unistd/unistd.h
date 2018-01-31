@@ -389,7 +389,9 @@ int fcntl(int handle,int mode)
 #define SHUT_RDWR SD_BOTH
 
 #define MSG_NOSIGNAL 0
+#ifndef TCP_KEEPCNT
 #define TCP_KEEPCNT 0
+#endif
 #define access _access
 
 #define F_GETFL 0

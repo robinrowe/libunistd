@@ -8,11 +8,7 @@
 #ifdef UNREAL_ENGINE
 #include "UnrealLogger.h"
 #else
-#ifdef _WIN32
-#include "../unistd/unistd.h"
-#else
 #include <unistd.h>
-#endif
 #include <stdio.h>
 #include <string>
 

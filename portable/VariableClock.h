@@ -6,8 +6,8 @@
 #define VariableClock_h
 
 #ifdef _WIN32
-#include "../unistd/unistd.h"
-#include "../unistd/sys/time.h"
+#include <unistd.h>
+#include <sys/time.h>
 #else
 #include <unistd.h>
 #include <sys/time.h>

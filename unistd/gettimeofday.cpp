@@ -2,7 +2,7 @@
 // Copyright 2016/06/20 robin.rowe@cinepaint.org
 // License open source MIT
 
-#include "unistd.h"
+#include <unistd.h>
 
 int gettimeofday(struct timeval* tv, struct timezone* tz)
 {	(void)tz;

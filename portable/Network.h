@@ -8,11 +8,7 @@
 #include <memory>
 #include <vector>
 #include <string.h>
-#ifdef _WIN32
-#include "../unistd/arpa/inet.h"
-#else
 #include <arpa/inet.h>
-#endif
 
 namespace portable
 {

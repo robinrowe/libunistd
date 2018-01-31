@@ -10,9 +10,9 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include "../unistd/unistd.h"
-#include "../unistd/arpa/inet.h"
-#include "../unistd/netinet/in.h"
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include "MsgBuffer.h"
 #include "PacketReader.h"
 #include "AtomicCounter.h"

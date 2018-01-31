@@ -2,20 +2,12 @@
 // Libunistd Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT
 
-#ifdef _WIN32
-#include "../unistd/unistd.h"
-#include "../unistd/sys/socket.h"
-#include "../unistd/netinet/in.h"
-#include "../unistd/arpa/inet.h"
-#include "../unistd/net/if.h"
-#else
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <net/if.h>
-#endif
 #include "Network.h"
 #include "StdFile.h"
 #include "StdBlob.h"

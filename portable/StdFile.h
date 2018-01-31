@@ -6,11 +6,7 @@
 #ifndef StdFile_h
 #define StdFile_h
 
-#ifdef _WIN32
-#include "../unistd/unistd.h"
-#else
 #include <unistd.h>
-#endif
 #include <stdio.h>
 #include <sys/stat.h>
 #include <stdarg.h>

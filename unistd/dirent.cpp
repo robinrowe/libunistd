@@ -3,7 +3,7 @@
 // Copyright (c) 2016 Robin.Rowe@CinePaint.org
 // License open source MIT
 
-#include "unistd.h"
+#include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
