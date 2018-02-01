@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <memory.h>
+#include <bsd/string.h>
 
 #ifdef _WIN32
 #define ATTRIBUTE(a,b) 
@@ -47,32 +48,10 @@ T* copy2(T* first, T* last,const A& array,unsigned offset)
 }
 
 #pragma warning(disable:4996)
-inline
-size_t strlcpy(char *dst, const char *src, size_t size)
-{	if(!dst || !src)
-	{	return 0;
-	}
-	const char* end = strncpy(dst,src,size);
-	if(end == dst + size - 1)
-	{	dst[size-1] = 0;
-		return size -1;
-	}
-	return end - dst;
-}
 
 template <typename T>
 size_t strlcpy(T& dst, const char *src)
 {	return strlcpy(&dst[0],src,dst.size());
-}
-
-inline
-size_t strlcat(char *dst, const char *src, size_t size)
-{	if(!dst || !src)
-	{	return 0;
-	}
-	const size_t length = strlen(dst);	
-	char* p = dst + length;
-	return length + strlcpy(p,src,size - length);
 }
 
 template <typename T>
