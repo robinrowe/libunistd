@@ -6,9 +6,10 @@
 #define DLFCN_H
 
 #define dlopen(mLibName,unused) LoadLibrary(mLibName)
-#define dlsym(mHandle,funcname) GetProcAddress((HMODULE)mHandle,funcname)
-#define dlclose(mHandle) FreeLibrary(mHandle)
+#define dlsym(mHandle,funcname) GetProcAddress(HMODULE(mHandle),funcname)
+#define dlclose(mHandle) FreeLibrary(HMODULE(mHandle))
 #define dlerror() "error loading dll"
 
 #endif
+
 

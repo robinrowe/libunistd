@@ -1,8 +1,5 @@
 # libunistd/test/PosixQueue/CMakeList.txt
 
-if(WIN32)
-include_directories(../../vcpp)
-endif()
-
 add_executable(UnitTest main.cpp)
+target_link_libraries (UnitTest LINK_PUBLIC libunistd)
 

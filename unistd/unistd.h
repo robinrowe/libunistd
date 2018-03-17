@@ -50,6 +50,10 @@
 #include "uni_signal.h"
 #include "../portable/stub.h"
 #include "gettimeofday.h"
+// Use: cmake -A x64 ..
+#ifdef _M_X64
+#include "Int128.h"
+#endif
 #ifdef __cplusplus
 #include "chrono.h"
 #include <cinttypes>
