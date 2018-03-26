@@ -244,6 +244,15 @@ int kill(pid_t p, int x)
 
 From WIN32 sys/stat.h:
 
+#define _S_IFMT   0xF000 // File type mask
+#define _S_IFDIR  0x4000 // Directory
+#define _S_IFCHR  0x2000 // Character special
+#define _S_IFIFO  0x1000 // Pipe
+#define _S_IFREG  0x8000 // Regular
+#define _S_IREAD  0x0100 // Read permission, owner
+#define _S_IWRITE 0x0080 // Write permission, owner
+#define _S_IEXEC  0x0040 // Execute/search permission, owner
+
 #define S_IFMT   _S_IFMT
 #define S_IFDIR  _S_IFDIR
 #define S_IFCHR  _S_IFCHR
@@ -253,6 +262,27 @@ From WIN32 sys/stat.h:
 #define S_IEXEC  _S_IEXEC
 
 */
+enum {
+	S_IFSOCK = 1,
+	S_IFLNK,
+	S_IFBLK,
+	S_IFIFO,
+	S_ISUID,
+	S_ISGID,
+	S_ISVTX
+};
+
+inline
+int S_ISCHR(int) { return 0; }
+
+inline
+int S_ISBLK(int) { return 0; }
+
+inline
+int S_ISFIFO(int) { return 0; }
+
+inline
+int S_ISSOCK(int) { return 0; }
 
 #define fileno _fileno
 #define STDIN_FILENO _fileno(stdin)

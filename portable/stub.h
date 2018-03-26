@@ -28,8 +28,8 @@ void StubBug(const char* msg)
 
 #endif
 
-#define BUG(x)	StubBug("BUG: " x)
-#define TODO(x)	StubBug("TO-DO: " x)
+#define MSG_BUG(x)	StubBug("BUG: " x)
+#define MSG_TODO(x)	StubBug("TO-DO: " x)
 
 #define STUB(functionName) StubBug("STUB:" #functionName)
 #define STUB0(functionName) StubBug("STUB:" #functionName); return 0
