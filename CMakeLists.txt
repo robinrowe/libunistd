@@ -1,7 +1,13 @@
 # libunistd/CMakeList.txt
 
 cmake_minimum_required (VERSION 3.0.0)
-project(libunistd)
+set(NAME libunistd)
+project(${NAME})
+
+if(WIN32)
+set(CMAKE_GENERATOR_TOOLSET host=x64)
+endif()
+message("--- Building ${NAME} ${CMAKE_SYSTEM_NAME}:${CMAKE_HOST_SYSTEM_PROCESSOR}:${CMAKE_GENERATOR_TOOLSET} ---")
 
 option(UE4 "Disable _ITERATOR_DEBUG_LEVEL for UE4 compatibility" OFF)
 

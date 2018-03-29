@@ -20,87 +20,41 @@ DIR* opendir(const char *path)
 {	errno = 0;
 	if(!path)
 	{	errno = EFAULT;
-		return nullptr;
+		return 0;
 	}
 	if(!path[0])
 	{	errno = ENOTDIR;
-		return nullptr;
+		return 0;
 	}
-    const unsigned int rc = GetFileAttributesA(path);
-	if(rc == -1)
-	{	errno = ENOENT;
-		return nullptr;
-	}
-	if (!(rc & FILE_ATTRIBUTE_DIRECTORY))
-	{	errno = ENOTDIR;
-		return nullptr;
-	}
-	size_t pathLength = strlen (path);
-	const size_t size = sizeof (DIR) + pathLength + 2;
-	DIR* dir = (DIR *) malloc(size);
+	DIR* dir = new DIR;
 	if (!dir)
 	{	errno = ENOMEM;
-		return nullptr;
+		return 0;
 	}
-	strcpy (dir->dd_name,path);
-	if(pathLength)
-	{	const char c = dir->dd_name[pathLength-1];
-		if(c != '/' && c != '\\')
-		{	dir->dd_name[pathLength++] = SLASH;
-			dir->dd_name[pathLength] = 0;
-	}	}
-	dir->dd_name[pathLength++] = SUFFIX;
-	dir->dd_name[pathLength] = 0;
-	dir->dd_handle = -1;
-	dir->dd_stat = 0;
-	dir->dd_dir.d_ino = 0;
-	dir->dd_dir.d_reclen = 0;
-	dir->dd_dir.d_namlen = 0;
-	dir->dd_dir.d_name = dir->dd_dta.name;
+	if(!dir->FindFirst(path))
+	{	errno = ENOENT;
+		//		errno = ENOTDIR;
+		delete dir;
+		return 0;
+	}
 	return dir;
 }
 
 struct dirent* readdir(DIR* dir)
 {	errno = 0;
-	if(!dir)
+	if(!dir || !*dir)
 	{	errno = EFAULT;
 		return nullptr;
 	}
-	if(dir->dd_dir.d_name != dir->dd_dta.name)
-	{	errno = EINVAL;
-		return nullptr;
-	}
-	if(dir->dd_stat < 0)
-	{	return nullptr;	
-	}
-	if(dir->dd_stat == 0)
-	{	dir->dd_handle = (long) _findfirst (dir->dd_name, &(dir->dd_dta));
-		if(dir->dd_handle == -1)
-		{	dir->dd_stat = -1;
-			return nullptr;
-		}
-		dir->dd_stat = 1;
-	}
-	else
-	{	if(_findnext(dir->dd_handle,&(dir->dd_dta)))
-		{	_findclose (dir->dd_handle);
-			dir->dd_handle = -1;
-			dir->dd_stat = -1;
-			return nullptr;
-		}
-		dir->dd_stat++;
-	}
-	dir->dd_dir.d_namlen = (unsigned short) strlen(dir->dd_dir.d_name);
-	return &dir->dd_dir;
+	return dir->Find();
 }
 
 int readdir_r(DIR *dir, struct dirent *entry, struct dirent** result)
-{	(void)entry;
-    dirent* d = readdir(dir);
-	if(!d)
+{	entry = readdir(dir);
+	if(!entry)
 	{	return -1;
 	}
-	*result = d;
+	*result = entry;
 	return 0;
 }
 
@@ -110,14 +64,12 @@ int closedir(DIR* dir)
 	{	errno = EFAULT;
 		return -1;
 	}
-	int rc = 0;
-	if(dir->dd_handle != -1)
-	{	rc = _findclose (dir->dd_handle);
-	}
-	free (dir);
-	return rc;
+	int retval = dir->Close();
+	delete dir;
+	return retval;
 }
 
+#if 0
 void rewinddir(DIR * dir)
 {	errno = 0;
 	if (!dir)
@@ -163,26 +115,28 @@ void seekdir(DIR * dir, long lPos)
 		;	
 	}
 }
+#endif
 
-int alphaqsort(const void* a,const void* b)
-{	void* a2 = const_cast<void*>(a);
-	void* b2 = const_cast<void*>(b);
-	return alphasort(reinterpret_cast<const dirent**>(a2),reinterpret_cast<const dirent**>(b2));
+int alphaqsort(const void* v1, const void* v2)
+{	dirent** d1 = (dirent**)v1;
+	dirent** d2 = (dirent**)v2;
+	const char* name1 = (*d1)->d_name;
+	const char* name2 = (*d2)->d_name;
+	return strcmp(name1,name2);
 }
 
 unsigned GetFileCount(DIR* dir,scandir_f selector)
 {	unsigned count = 0;
 	for(;;)
-	{	dirent* d = readdir(dir);
-		if(!d)
+	{	dirent* entry = readdir(dir);
+		if(!entry)
 		{	break;
 		}
-		if(selector != NULL && !(*selector)(d))
+		if(selector != NULL && !(*selector)(entry))
 		{	continue;
 		}
 		count++;
 	}
-	rewinddir(dir);
 	return count;
 }
 
@@ -195,32 +149,44 @@ int scandir(const char* dirname, dirent*** namesList, scandir_f selector, scandi
 	if(!count)
 	{	return -1;
 	}
-	dirent** names = (dirent **) malloc(count * sizeof(dirent*));
+	closedir(dir);
+	dirent** names = (dirent**) malloc(count * sizeof(dirent*));
 	if(!names)
+	{	return -1;
+	}
+	dir = opendir(dirname);
+	if (!dir)
 	{	return -1;
 	}
 	*namesList = names;
 	int matches = 0;
 	for(unsigned i = 0; i < count; i++)
-	{	dirent* d = readdir(dir);
-		if(!d)
+	{	dirent* temp = readdir(dir);
+		if(!temp)
 		{	break;
 		}
-		if(selector != NULL && !(*selector)(d))
+		if(selector != NULL && !(*selector)(temp))
 		{	continue;
 		}
-		matches++;
-		**names = *d;
-		const size_t length = strlen(d->d_name);
-		names[i]->d_name = (char*) malloc(length+1);
-		if(names[i]->d_name)
-		{	strcpy(names[i]->d_name,d->d_name);
+		const size_t size = sizeof(dirent) + strlen(temp->d_name);
+		dirent* entry = (dirent*) malloc(size);
+		if(!entry)
+		{	return -1;
 		}
-		names++;
+		*entry = *temp;
+		if(temp->d_name)
+		{	strcpy(entry->buffer,temp->d_name);
+		}
+		else
+		{	entry->buffer[0] = 0;
+		}
+		entry->d_name = entry->buffer;
+		names[matches] = entry;
+		matches++;
 	}
 	closedir(dir);
 	if(sorter) 
-	{	qsort(dir, matches, sizeof(*dir),alphaqsort);
+	{	qsort(names, matches, sizeof(dirent*),alphaqsort);
 	}
 	return matches;
 }

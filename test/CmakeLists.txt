@@ -1,5 +1,10 @@
 # libunistd/test/CMakeList.txt
 
+cmake_minimum_required(VERSION 3.8)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}/../unistd" 
 	"${CMAKE_CURRENT_SOURCE_DIR}/..")
@@ -7,3 +12,4 @@ include_directories(
 add_subdirectory(PosixQueue)
 add_subdirectory(UnitTest)
 add_subdirectory(WormFile)
+add_subdirectory(scandir)
