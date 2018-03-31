@@ -30,6 +30,7 @@ endif()
 add_subdirectory(portable)
 add_subdirectory(test)
 add_subdirectory(xxHash)
+add_subdirectory(lmdb)
 
 #add_subdirectory(tabstop)
 
