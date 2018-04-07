@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "lmdb.h"
+#pragma warning(disable : 4996)
 
 #define E(expr) CHECK((rc = (expr)) == MDB_SUCCESS, #expr)
 #define RES(err, expr) ((rc = expr) == (err) || (CHECK(!rc, #expr), 0))
@@ -37,7 +38,7 @@ int main(int argc,char * argv[])
 	int *values;
 	char sval[32] = "";
 
-	srand(time(NULL));
+	srand((unsigned) time(NULL));
 
 	count = (rand()%384) + 64;
 	values = (int *)malloc(count*sizeof(int));

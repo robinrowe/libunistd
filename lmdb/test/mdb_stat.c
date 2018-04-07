@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
 				char *bad = "";
 				size_t pg, prev;
 				ssize_t i, j, span = 0;
-				j = *iptr++;
+				j = (ssize_t) *iptr++;//rsr
 				for (i = j, prev = 1; --i >= 0; ) {
 					pg = iptr[i];
 					if (pg <= prev)
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
 					for (; i >= span && iptr[i-span] == pg; span++, pg++) ;
 				}
 				printf("    Transaction %"Z"u, %"Z"d pages, maxspan %"Z"d%s\n",
-					*(size_t *)key.mv_data, j, span, bad);
+					*(size_t *)key.mv_data, (long long) j,(long long) span, bad);
 				if (freinfo > 2) {
 					for (--j; j >= 0; ) {
 						pg = iptr[j];

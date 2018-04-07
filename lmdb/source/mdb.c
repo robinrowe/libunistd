@@ -283,6 +283,10 @@ typedef SSIZE_T	ssize_t;
 #endif
 
 #ifdef _WIN32
+#pragma warning(disable : 4996) // rsr
+#pragma warning(disable : 4267) // rsr
+#pragma warning(disable : 4244) // rsr
+
 #define MDB_USE_HASH	1
 #define MDB_PIDLOCK	0
 #define THREAD_RET	DWORD
@@ -1479,7 +1483,8 @@ mdb_strerror(int err)
 	 */
 #define MSGSIZE	1024
 #define PADSIZE	4096
-	char buf[MSGSIZE+PADSIZE], *ptr = buf;
+	static char buf[MSGSIZE+PADSIZE];//rsr
+	char* ptr = buf;
 #endif
 	int i;
 	if (!err)
@@ -1682,6 +1687,12 @@ mdb_cursor_chk(MDB_cursor *mc)
 		}
 	}
 }
+#else
+
+char *mdb_dkey(MDB_val *key, char *buf)
+{	return 0;
+}
+	
 #endif
 
 #if (MDB_DEBUG) > 2
@@ -6864,7 +6875,7 @@ current:
 						 * Copy end of page, adjusting alignment so
 						 * compiler may copy words instead of bytes.
 						 */
-						off = (PAGEHDRSZ + data->mv_size) & -sizeof(size_t);
+						off = (PAGEHDRSZ + data->mv_size) & -(int) sizeof(size_t);//rsr
 						memcpy((size_t *)((char *)np + off),
 							(size_t *)((char *)omp + off), sz - off);
 						sz = PAGEHDRSZ;

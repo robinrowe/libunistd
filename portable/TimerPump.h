@@ -3,78 +3,43 @@
 // License MIT Open Source
 //
 
-#ifndef TIMERPUMP_H
-#define TIMERPUMP_H
+#ifndef TimerPump_h
+#define TimerPump_h
 
-// You may get _Pad compile error if a dependant class is not defined.
-// If you embed unique_ptr anywhere in your objects, you may get this error.
-/* Also try this:
-#pragma warning(push)
-#pragma warning(disable:4265)
-#include <thread>
-#pragma warning(pop)
-*/
-
-#include <thread>
-#include <mutex>
-#include <condition_variable>
-#include <stdio.h>
-#include "SystemCall.h"
+#include "Pump.h"
 
 namespace portable 
 {
 
 class TimerPump
+:	public Pump
 {protected:
-    typedef std::unique_lock<std::mutex> Lock;
-    typedef std::thread thread;
     typedef std::chrono::milliseconds milliseconds;
-    std::mutex pumpMutex;
-    std::condition_variable pumpCon;
     milliseconds wakeDelay;
-    bool isGo;
-	bool isWake;
-    const char* object;
-    static void Main(TimerPump* self)
-    {   self->Run();
-    }
-    virtual void Action(bool isTimeout)=0;
-    virtual void Init()
-    {}
+	bool isTimeout;
+	void Wait(Lock& lock) override
+	{	isTimeout = false;
+		if(wakeDelay.count())
+        {   isTimeout = std::cv_status::timeout==cv.wait_for(lock,milliseconds(wakeDelay));
+			return;
+		}
+		cv.wait(lock);
+	}
 public:
     TimerPump()
-    :   isGo(false)
-	,	isWake(false)
-    ,	object("TimerPump")
-    {}
-    virtual ~TimerPump();
-    bool Start(int millis=0,const char* description="")
-    {   if(isGo)
-        {   return false;
-        }
-        SetTimeout(millis);
-        isGo=true;
-        std::thread worker(Main,this);
-		PrintTask("TimerPump",description);
-        worker.detach();
-        return true;
-    }
-	void Wake()
-	{	isWake = true;
-		pumpCon.notify_one();
+	:	isTimeout(false)
+	{	object = "TimerPump";
 	}
-    bool Stop()
-    {   isGo=false;
-		Wake();
-        return true;
+    bool Start(int millis=0,const char* description="")
+    {   SetTimeout(millis);
+        return Pump::Start();
     }
     void SetTimeout(int millis)
-    {   wakeDelay=milliseconds(millis);
+    {   wakeDelay = milliseconds(millis);
     }
     long long GetTimeout() const
     {	return wakeDelay.count();
     }
-    void Run();
 };
 
 }

@@ -36,6 +36,7 @@ set(HEADERS
 	PacketSizer.h
 	PacketWriter.h
 	QtHelpers.h
+	Pump.h
 	Random.h
 	SoftLock.h
 	StdBlob.h
@@ -70,7 +71,7 @@ set(SOURCE
 	Http.cpp
 	Network.cpp
 	PacketReader.cpp
-	TimerPump.cpp
+	Pump.cpp
 	VariableClock.cpp
 	WormFile.cpp
 )

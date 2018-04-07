@@ -18,6 +18,7 @@
 #include <string.h>
 #include <time.h>
 #include "lmdb.h"
+#pragma warning(disable : 4996)
 
 #define E(expr) CHECK((rc = (expr)) == MDB_SUCCESS, #expr)
 #define RES(err, expr) ((rc = expr) == (err) || (CHECK(!rc, #expr), 0))
@@ -35,12 +36,12 @@ int main(int argc,char * argv[])
 	MDB_txn *txn;
 	MDB_stat mst;
 	MDB_cursor *cursor;
-	int count;
-	int *values;
+//	int count;
+//	int *values;
 	long kval;
 	char *sval;
 
-	srand(time(NULL));
+	srand((unsigned) time(NULL));
 
 	E(mdb_env_create(&env));
 	E(mdb_env_set_mapsize(env, 10485760));

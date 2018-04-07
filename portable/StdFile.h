@@ -198,8 +198,7 @@ bool Slurp(T& file,std::vector<char>& buffer)
 	file.Rewind();
 	buffer.resize(size);
 	char* data=&buffer[0];
-	const auto bytes=file.Read(data,size);
-	return size==bytes;
+	return file.Read(data,size);
 }
 
 template <typename T>

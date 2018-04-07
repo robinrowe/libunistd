@@ -18,7 +18,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include "lmdb.h"
-
+#pragma warning(disable : 4267)
 #define PRINT	1
 #define NOHDR	2
 static int mode;

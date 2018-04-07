@@ -47,6 +47,9 @@ int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact)
 	return 0;
 }
 
+char *optarg;
+int optind, opterr, optopt;
+
 #ifdef __cplusplus
 }
 #endif

@@ -20,9 +20,8 @@ class BsdMulticast
 	BsdSocketPool& socketPool;
 protected:
 #if 1
-	virtual void Action(bool isTimeout) override
-	{	(void)isTimeout;
-		if(framePacket)
+	virtual void Action() override
+	{	if(framePacket)
 		{	socketPool.DirectMulticast(framePacket);
 		}
 //		puts("Unexpected call to pool Action");

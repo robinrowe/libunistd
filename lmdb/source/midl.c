@@ -41,7 +41,7 @@ unsigned mdb_midl_search( MDB_IDL ids, MDB_ID id )
 	unsigned base = 0;
 	unsigned cursor = 1;
 	int val = 0;
-	unsigned n = ids[0];
+	unsigned n = (unsigned) ids[0];//rsr
 
 	while( 0 < n ) {
 		unsigned pivot = n >> 1;
@@ -143,7 +143,7 @@ static int mdb_midl_grow( MDB_IDL *idp, int num )
 int mdb_midl_need( MDB_IDL *idp, unsigned num )
 {
 	MDB_IDL ids = *idp;
-	num += ids[0];
+	num += (unsigned) ids[0];//rsr
 	if (num > ids[-1]) {
 		num = (num + num/4 + (256 + 2)) & -256;
 		if (!(ids = realloc(ids-1, num * sizeof(MDB_ID))))
@@ -173,7 +173,7 @@ int mdb_midl_append_list( MDB_IDL *idp, MDB_IDL app )
 	MDB_IDL ids = *idp;
 	/* Too big? */
 	if (ids[0] + app[0] >= ids[-1]) {
-		if (mdb_midl_grow(idp, app[0]))
+		if (mdb_midl_grow(idp,(int) app[0]))//rsr
 			return ENOMEM;
 		ids = *idp;
 	}

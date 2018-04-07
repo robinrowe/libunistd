@@ -11,11 +11,12 @@
  * top-level directory of the distribution or, alternatively, at
  * <http://www.OpenLDAP.org/license.html>.
  */
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include "lmdb.h"
-
+#pragma warning(disable : 4996)
 #define E(expr) CHECK((rc = (expr)) == MDB_SUCCESS, #expr)
 #define RES(err, expr) ((rc = expr) == (err) || (CHECK(!rc, #expr), 0))
 #define CHECK(test, msg) ((test) ? (void)0 : ((void)fprintf(stderr, \
@@ -35,7 +36,7 @@ int main(int argc,char * argv[])
 	int *values;
 	char sval[32] = "";
 
-	srand(time(NULL));
+	srand((unsigned) time(NULL));
 
 	    count = (rand()%384) + 64;
 	    values = (int *)malloc(count*sizeof(int));
@@ -43,7 +44,9 @@ int main(int argc,char * argv[])
 	    for(i = 0;i<count;i++) {
 			values[i] = rand()%1024;
 	    }
-    
+
+		PrintDirectory();
+
 		E(mdb_env_create(&env));
 		E(mdb_env_set_maxreaders(env, 1));
 		E(mdb_env_set_mapsize(env, 10485760));

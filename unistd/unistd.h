@@ -47,6 +47,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <assert.h>
+#include <inttypes.h>
 #include "uni_signal.h"
 #include "../portable/stub.h"
 #include "gettimeofday.h"
@@ -56,7 +57,18 @@
 #endif
 #ifdef __cplusplus
 #include "chrono.h"
-#include <cinttypes>
+extern "C"
+{
+	extern char *optarg;
+	extern int optind, opterr, optopt;
+}
+#else
+//#define inline __inline
+
+extern char *optarg;
+extern int optind, opterr, optopt;
+#endif
+
 #pragma warning(disable : 4996)
 
 inline
@@ -83,12 +95,36 @@ int uni_open(const char* filename,unsigned oflag,int mode)
 {	return _open(filename,oflag,mode);
 }
 
-//overloaded C++ functions:
+#ifdef __cplusplus
 
-inline 
-int mkdir(const char* path,int)
-{	 return _mkdir(path);
+inline
+int uni_open(const char* filename, unsigned oflag)
+{
+	return _open(filename, oflag, 0);
 }
+
+inline
+int mkdir(const char* path, int)
+{
+	return _mkdir(path);
+}
+
+inline
+int fcntl(int handle, int mode)
+{
+	(void)handle;
+	(void)mode;
+	STUB0(fcntl);
+}
+
+#endif
+
+inline
+int mkdir(const char* path)
+{
+	return _mkdir(path);
+}
+
 
 inline
 int fcntl(int handle,int mode,int mode2)
@@ -98,17 +134,7 @@ int fcntl(int handle,int mode,int mode2)
 	STUB0(fcntl);
 }
 
-#else
-#pragma warning(disable : 4996)
-#define inline __inline
-#endif
-
 //#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
-inline
-int uni_open(const char* filename,unsigned oflag)
-{	return _open(filename,oflag,0);
-}
 
 inline 
 size_t safe_strlen(const char* s)
@@ -120,7 +146,6 @@ size_t safe_strlen(const char* s)
 }
 
 //#define strlen safe_strlen
-
 //#define inet_ntop InetNtop
 
 #define bzero(address,size) memset(address,0,size)
@@ -171,8 +196,8 @@ int strncasecmp(const char *s1, const char *s2, size_t n)
 #ifndef strcasecmp
 #define strcasecmp _stricmp
 #endif
-#define strncasecmp _strnicmp
 
+#define strncasecmp _strnicmp
 #define strtok_r strtok_s
 
 inline
@@ -194,11 +219,6 @@ typedef int ssize_t;
 
 #define lstat stat
 typedef unsigned short mode_t;
-
-inline 
-int mkdir(const char* path)
-{	 return _mkdir(path);
-}
 
 inline
 int kill(pid_t p, int x)
@@ -273,16 +293,28 @@ enum {
 };
 
 inline
-int S_ISCHR(int) { return 0; }
+int S_ISCHR(int v) 
+{	(void)v;
+	return 0; 
+}
 
 inline
-int S_ISBLK(int) { return 0; }
+int S_ISBLK(int v) 
+{	(void)v;
+	return 0;
+}
 
 inline
-int S_ISFIFO(int) { return 0; }
+int S_ISFIFO(int v) 
+{	(void)v;
+	return 0;
+}
 
 inline
-int S_ISSOCK(int) { return 0; }
+int S_ISSOCK(int v) 
+{	(void)v;
+	return 0;
+}
 
 #define fileno _fileno
 #define STDIN_FILENO _fileno(stdin)
@@ -295,6 +327,8 @@ int S_ISSOCK(int) { return 0; }
 #define getpid _getpid
 
 typedef int gid_t;
+typedef int uid_t;
+#define PATH_MAX 255
 
 inline 
 int setgid(gid_t g)
@@ -302,39 +336,11 @@ int setgid(gid_t g)
 	return -1;
 }
 
-typedef int uid_t;
-
 inline 
 int setuid(uid_t g)
 {	(void)g;
 	return -1;
 }
-
-#if 0
-#define open uni_open
-#define close _close
-#define read uni_read
-#define write uni_write
-#define lseek _lseek
-#define creat _creat
-#define chdir _chdir
-
-inline
-int open(const char* filename,int oflag)
-{	return _open(filename,oflag,0);
-}
-
-inline
-int read(int fd,void *buffer,unsigned int count)
-{	return _read(fd,buffer,count);
-}
-
-inline
-int write(int fd,const void *buffer,unsigned int count)
-{	return _write(fd,buffer,count);
-}
-
-#endif
 
 inline
 const char* getsysconfdir()
@@ -364,8 +370,6 @@ inline
 uid_t geteuid()
 {	STUB0(geteuid);
 }
-
-#define PATH_MAX 255
 
 inline
 char* realpath(const char *path, char *resolved_path)
@@ -409,13 +413,6 @@ int syncfs(int fd)
 {	fsync(fd);
 }
 
-inline
-int fcntl(int handle,int mode)
-{	(void)handle;
-	(void)mode;
-	STUB0(fcntl);
-}
-
 #define EBADFD 200
 #define ESHUTDOWN 201
 #define SHUT_RD SD_RECEIVE
@@ -454,8 +451,56 @@ int getlogin_r(char *buf, size_t len)
     return ok? 0:-1;
 }
 
+#if 0
+#define open uni_open
+#define close _close
+#define read uni_read
+#define write uni_write
+#define lseek _lseek
+#define creat _creat
+#define chdir _chdir
+
+inline
+int open(const char* filename, int oflag)
+{
+	return _open(filename, oflag, 0);
+}
+
+inline
+int read(int fd, void *buffer, unsigned int count)
+{
+	return _read(fd, buffer, count);
+}
+
+inline
+int write(int fd, const void *buffer, unsigned int count)
+{
+	return _write(fd, buffer, count);
+}
+
+#endif
+
+inline
+int getopt(int argc, char * const argv[],const char *optstring)
+{	(void)argc;
+	(void)argv;
+	(void)optstring;
+	STUB0(getopt);
+}
+
+inline
+void PrintDirectory()
+{	const char* path = _getcwd(0,0);
+	if(!path)
+	{	perror("getcwd() error");
+		return;
+	}
+	printf("pwd = %s\n", path);
+	free((void*)path);
+}
+
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
 
-
 #endif
+

@@ -3,37 +3,43 @@
 // Copyright (c) 2015 Robin.Rowe@CinePaint.org
 // OpenLDAP Public License
 
-#include <lmdb/Lmdb.h>
-#include <lmdb/Cursor.h>
-#include <lmdb/Datum.h>
+#include <lmdb/Db.h>
 #include <stdio.h>
 
 int main(int argc,char * argv[])
-{	lmdb::Lmdb db;
+{	lmdb::Db db;
 	const char* dbPath = "/Code/github/libunistd/test/lmdb";
-	if(!db.Open(dbPath,NULL))
+	const char* dbName = "test-lmdb.lmdb";
+	if(!db.Open(dbPath,0))//dbName))
 	{	return 1;
 	}
-	lmdb::Datum<int,int> datum(41,14000);
-	if(!datum.Write(db))
-	{	return 2;
-	}
-	if(!db.BeginWrite())
-	{	return 3;
-	}
+	{	lmdb::Transaction tr(db);
+		lmdb::Datum<int> key(41);
+		lmdb::Datum<int> value(14000);
+		if (!db.Put(tr,key,value))
+		{	return 2;
+	}	}
+	{	lmdb::Transaction tr(db);
+		lmdb::Datum<int> key(41);
+		lmdb::Datum<int> value(14000);
+		if (!db.Put(tr, key, value))
+		{	return 2;
+	}	}
 	lmdb::Cursor cursor(db);
 	if(!cursor)
 	{	return 4;
 	}
-	while(datum.Get(cursor))
-	{	const int& k=datum.Key();
-		const int& v=datum.Value();
-		printf("key: '%d', data: '%d'\n",k,v);
-		if(32==k)
+	lmdb::Datum<int> key;
+	lmdb::Datum<int> value;
+	bool ok = cursor.GetFirst(key,value);
+	while(ok)
+	{	printf("key: '%d', data: '%d'\n",(int)key,(int)value);
+		if(32==key)
 		{	cursor.DropDatum();
 		}
+		ok = cursor.GetNext(key,value);
 	}
-	db.Commit();
+	puts("Done");
 	return 0;
 }
 

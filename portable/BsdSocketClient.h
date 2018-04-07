@@ -36,7 +36,13 @@ public:
 		{	closesocket(socketfd);
 			socketfd=0;
 	}	}
-	bool Open(const char* serverName,int serverPort,bool isReuseSocket=true);
+	bool Open(const char* serverName,int serverPort)
+	{	if(!BsdSocket::Open(serverName,serverPort))
+		{	return false;
+		}
+		Start();
+		return true;
+	}
 	void Start() override
 	{	worker=std::thread(Main,this);
 		worker.detach();

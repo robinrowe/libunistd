@@ -11,6 +11,8 @@
 
 #endif
 
+#ifdef __cplusplus
+
 class _int128;
 class _uint128;
 extern "C" {    
@@ -381,4 +383,4 @@ unsigned int convertNumberChar(char digit);
 #define __int128 _int128
 #define __uint128 _uint128 
 
-
+#endif

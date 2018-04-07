@@ -9,48 +9,6 @@
 namespace portable 
 {
 
-bool BsdSocketClient::Open(const char* serverName,int serverPort,bool isReuseSocket)
-{	puts("libunistd 1.1 " __DATE__ " " __TIME__);
-	if(!serverName || !*serverName || !serverPort)
-	{	errorMsg.Set("No server to open specified");
-		return false;
-	}
-	socketfd=OpenSocket();
-	if(socketfd == -1)			
-	{	puts("OpenSocket failed");
-		errorMsg.GetLastError();
-		return false;
-	}
-	memset((char *) &server_sockaddr, 0, sizeof(server_sockaddr));
-	server_sockaddr.sin_family = AF_INET;
-	server_sockaddr.sin_port = htons((u_short) serverPort);  
-//		server_sockaddr.sin_addr.S_un.S_addr = inet_addr(serverName);
-	std::string hostname;
-	if(!GetIp(serverName,hostname))
-	{	hostname = serverName;
-	}
-	if(1!=inet_pton(AF_INET,hostname.c_str(),&server_sockaddr.sin_addr))
-	{	puts("inet_pton failed");
-		errorMsg.GetLastError();
-		return false;
-	}
-	if(isReuseSocket)
-	{	const bool ok = SetReuse(socketfd);
-		if(!ok)
-		{	puts("Can't reuse socket");
-	}	}
-	const int ok = connect(socketfd, (struct sockaddr*)&server_sockaddr, sizeof(server_sockaddr));
-	if(ok<0) 
-	{	puts("connect failed");
-		errorMsg.GetLastError();
-		isGo=false;
-		return false;
-	}
-	SetReuse(socketfd);
-	Start();
-	return true;
-}
-
 void BsdSocketClient::Run()
 {	isGo = true;
 	std::unique_ptr<char[]> buffer(new char[bufsize]);

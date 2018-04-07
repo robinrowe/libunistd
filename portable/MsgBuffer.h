@@ -91,6 +91,9 @@ public:
 	{	Reset();
 		Append(text);
 	}
+	void SystemLog() const
+	{	puts(buffer);
+	}
 };
 
 }

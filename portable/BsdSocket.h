@@ -30,11 +30,9 @@ class BsdSocket
 	bool isConnected;
 	sockaddr_in server_sockaddr;
 	std::thread packetWorker;
-	int OpenSocket(bool isTcp=true)
-	{	if(isTcp)
-		{	return (int) socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-		}
-		return (int) socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+	virtual int OpenSocket()
+	{	puts("OpenSocket");
+		return 0;
 	}
 protected:
 	virtual void Run()
@@ -51,7 +49,8 @@ protected:
 public:
 	MsgBuffer<120> errorMsg;
 	virtual ~BsdSocket()
-	{}
+	{	// Close(); Don't do this, might be a temp copy
+	}
 	BsdSocket()
 	:	socketfd(0)
 	,	isGo(false)
@@ -91,7 +90,6 @@ public:
 #endif
 		return SendTo(packet.GetPacket(),packet.GetPacketSize());
 	}
-	virtual void Close();
 	int RecvFrom(char* buffer,unsigned bufsize,unsigned offset=0)
 	{	int slen = sizeof(sockaddr_in);
 		if(socketfd<=0)
@@ -113,7 +111,6 @@ public:
 	virtual void Start()
 	{	puts("Soscket stream starting");
 	}
-	static void GetPeerName(SOCKET sock,std::string& s); 
 	void GetPeerName(std::string& s) const
 	{	return GetPeerName(socketfd,s);
 	}
@@ -125,26 +122,14 @@ public:
 		(void)len;
 		puts(errorMsg.GetLastError());
 	}
-	bool SetAsyncMode(bool isAsync = true)
-	{	if(!IsGood())
-		{	return false;
-		}
-#ifdef _WIN32
-		unsigned long mode = isAsync ? 1 : 0;
-		return (ioctlsocket(socketfd, FIONBIO, &mode) == 0) ? true : false;
-#else
-		int flags = fcntl(socketfd, F_GETFL, 0);
-		if (flags < 0) 
-		{	return false;
-		}
-		flags = isBlocking ? (flags&~O_NONBLOCK) : (flags | O_NONBLOCK);
-		return (fcntl(socketfd, F_SETFL, flags) == 0) ? true : false;
-#endif
-	}
 	bool SendEmptyPacket()
 	{	return SendTo("", 0);
 	}
 	static bool GetIp(const char* hostname,std::string& ip);
+	static void GetPeerName(SOCKET sock, std::string& s);
+	bool SetAsyncMode(bool isAsync = true);
+	bool Open(const char* serverName, int serverPort,bool isReuseSocket = true);
+	virtual void Close();
 };
 
 }
