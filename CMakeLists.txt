@@ -27,10 +27,11 @@ if(WIN32)
 add_subdirectory(unistd)
 endif()
 
+add_subdirectory(lmdb)
 add_subdirectory(portable)
+add_subdirectory(sqlite)
 add_subdirectory(test)
 add_subdirectory(xxHash)
-add_subdirectory(lmdb)
 
 #add_subdirectory(tabstop)
 

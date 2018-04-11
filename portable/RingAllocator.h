@@ -6,25 +6,27 @@
 #define RingAllocator_h
 
 #include <atomic>
-#include <memory>
-#include <memory.h>
 
 namespace Atomic
 {
-// Usage: const int size;
-//        Atomic::RingQueue<int> ringQueue(size);
-//        ringQueue.Push(10);
-//        const int popped=ringQueue.Pop();
+// Usage: char buffer[16];
+//      Atomic::RingAllocator a(buffer,4);
+//      char* p = a.Get(12);
+//		strcpy(p,"Hello World)
+//		WakeOtherThread();
+//			a.Free(p);
 
 class RingAllocator
 {	std::atomic<int> p;
 	char* buffer;
+	char* bufferEnd;
 	int bitmask;
 public:
 	RingAllocator(char* buffer,unsigned sizeInBits)
 	:	buffer(buffer)
 	,	p(0)
 	{	bitmask = (1 << sizeInBits) - 1;
+		bufferEnd = buffer + bitmask;
 	}
 	char* Get(unsigned blockSize)
 	{	blockSize += sizeof(int);
@@ -39,43 +41,17 @@ public:
 		{	// Too big
 			return 0;
 		}
-		int* header = (int*) buffer[before];
+		int* header = (int*) buffer + before;
 		*header = before;
-		return buffer = before + sizeof(int);
+		return buffer + before + sizeof(int);
 	}
-};
-
-class SizeTracker
-{	std::atomic<int> size;
-	int bitmask;
-public:
-	SizeTracker(unsigned sizeInBits)
-	:	size(0)
-	{	bitmask = (1 << sizeInBits) - 1;
-	}
-	int Add(int qty)
-	{	const int i = size.fetch_add(qty,std::memory_order_relaxed);
-		return i + qty;
-	}
-	int Free(int qty)
-	{	const int i = size.fetch_sub(size,std::memory_order_relaxed);
-		return i - qty;
-	}
-	int GetSize() const
-	{	const int s=size;
-		return s;
-	}
-	int GetMaxSize() const
-	{	return bitmask;
-	}
-	int GetFreeSize() const
-	{	return GetMaxSize() - GetSize();
-	}
-	bool IsFull() const
-	{	return GetSize() >= GetMaxSize();
-	}
-	bool IsEmpty() const
-	{	return GetSize() <= 0;
+	int Free(const char* p) const
+	{	p -= sizeof(int);
+		if(p < buffer || p >= bufferEnd)
+		{	return 0;
+		}
+		int* header = (int*) p;
+		return *header;
 	}
 };
 

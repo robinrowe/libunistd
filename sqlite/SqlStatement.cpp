@@ -4,6 +4,8 @@
 #include "SqlStatement.h"
 #include <memory.h>
 
+namespace sqlite {
+
 void SqlStatement::GetEscapedString(vector<char>& v,const char* from,unsigned size)
 {	if(!memchr(from,'\\',size) && !memchr(from,0,size))
     {   v.resize(size+2+1);//need extra 2 bytes for bracketing ''
@@ -117,4 +119,6 @@ bool SqlStatement::setVarbinary(vector<char>& bytes,int key)
 	const char* escaped=&v[0];
 	statement.replace(var1,1,escaped);
 	return true;
+}
+
 }

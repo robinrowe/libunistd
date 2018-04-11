@@ -15,6 +15,8 @@
 #include <string.h>
 using namespace std;
 
+namespace sqlite {
+
 class SqlStatement
 {	std::string statement;
     int GetOffset(char c) const
@@ -115,6 +117,8 @@ public:
 		return true;
 	}
 };
+
+}
 
 #endif
  

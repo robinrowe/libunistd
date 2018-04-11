@@ -15,13 +15,13 @@
 #include <time.h>
 #include <stdio.h>
 
-
 namespace portable {
 
 // At 11:01:20 UTC on 13 July 2012, the Unix time number reached 0x50000000 (1,342,177,280 seconds).
 
 #ifdef WIN32
 typedef __time64_t time64_t;
+#undef min
 #else
 typedef long long time64_t;
 #endif
@@ -31,6 +31,27 @@ typedef time64_t Micros;
 typedef time64_t Microseconds;
 
 static const bool isNow=true;
+
+struct Epoch
+{	int year;
+	int month;
+	int day;
+	int hour;
+	int min;
+	int sec;
+	int ms;
+	int us;
+	Epoch()
+	:	year(0)
+	,	month(0)
+	,	day(0)
+	,	hour(0)
+	,	min(0)
+	,	sec(0)
+	,	ms(0)
+	,	us(0)
+	{}
+};
 
 class TimeStamp
 {	time64_t microseconds;
@@ -201,20 +222,15 @@ public:
 		SYSTEMTIME localTime;
 		memset(&localTime,0,sizeof(localTime));
 	//"2012-08-12 12:00:00"
-		int year=0;
-		int month=0;
-		int day=0;
-		int hour=0;
-		int min=0;
-		int sec=0;
-		sscanf_s(cstring,"%d%*c%d%*c%d %d:%d:%d",&year,&month,&day,&hour,&min,&sec);
-		localTime.wYear=(WORD) year;
-		localTime.wMonth=(WORD) month;
+		Epoch e;
+		sscanf_s(cstring,"%d%*c%d%*c%d %d:%d:%d",&(e.year),&(e.month),&(e.day),&(e.hour),&(e.min),&(e.sec));
+		localTime.wYear=(WORD) e.year;
+		localTime.wMonth=(WORD) e.month;
 		//localTime.wDayOfWeek;
-		localTime.wDay=(WORD) day;
-		localTime.wHour=(WORD) hour;
-		localTime.wMinute=(WORD) min;
-		localTime.wSecond=(WORD) sec;
+		localTime.wDay=(WORD) e.day;
+		localTime.wHour=(WORD) e.hour;
+		localTime.wMinute=(WORD) e.min;
+		localTime.wSecond=(WORD) e.sec;
 		localTime.wMilliseconds=0;
 		SYSTEMTIME systemTime;
 		if(!TzSpecificLocalTimeToSystemTime(0,&localTime,&systemTime))

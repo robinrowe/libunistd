@@ -1,5 +1,8 @@
 # libunistd/portable/CMakeLists.txt
 
+set(NAME libportable)
+message("--- Building ${NAME} ---")
+
 set(HEADERS
 	Astring.h
 	AtomicCounter.h
@@ -80,8 +83,6 @@ if(WIN32)
 include_directories(../vcpp)
 endif()
 
-add_library( libportable
-	${HEADERS} ${SOURCE}
-)
+add_library(${NAME}	${HEADERS} ${SOURCE})
 
-target_include_directories (libportable PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../unistd")
+target_include_directories (${NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../unistd")

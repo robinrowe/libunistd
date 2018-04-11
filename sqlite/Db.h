@@ -2,8 +2,8 @@
 // Robin.Rowe@Cinepaint.org
 // 2015/8/3
 
-#ifndef Sqlite_h
-#define Sqlite_h
+#ifndef SqliteDb_h
+#define SqliteDb_h
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -11,6 +11,8 @@
 #include "sqlite3.h"
 #include <string>
 //#include <QDebug>
+
+namespace sqlite {
 
 class Db
 {
@@ -191,5 +193,7 @@ int main(int argc, char* argv[])
 }
 #endif
 //$g++ test.c -l sqlite3
+
+}
 
 #endif
