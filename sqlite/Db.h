@@ -8,17 +8,17 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "sqlite3.h"
+#include "source/sqlite3.h"
 #include <string>
 //#include <QDebug>
 
 namespace sqlite {
 
-class Db
+class DbBase
 {
 public:
 	typedef int (*dbCallback)(void*,int,char**,char**);
-	virtual ~Db()
+	virtual ~DbBase()
 	{	Close();
 	}
 	virtual bool IsExist(const char* dbName) const = 0;
@@ -56,8 +56,8 @@ void DropFile(const char* filename)
 {   remove(filename);
 }
 
-class Sqlite
-:	public Db
+class Db
+:	public DbBase
 {	sqlite3* db;
 	bool isOpen;
 	const char* errorMsg;
@@ -68,12 +68,12 @@ class Sqlite
 	}
 public:
 	std::string status;
-	Sqlite()
+	Db()
 	:	db(0),
 		errorMsg(0),
 		isOpen(false)
 	{}
-	~Sqlite()
+	~Db()
 	{   Close();
 	}
 	bool IsExist(const char* dbName) const
