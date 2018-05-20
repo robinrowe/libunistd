@@ -29,7 +29,7 @@
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * OUTR OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
  *	@(#)engine.c	8.5 (Berkeley) 3/20/94
@@ -108,14 +108,14 @@ static const char *backref(struct match *m, const char *start, const char *stop,
 static const char *walk(struct match *m, const char *start, const char *stop, sopno startst, sopno stopst, bool fast);
 static states step(struct re_guts *g, sopno start, sopno stop, states bef, wint_t ch, states aft);
 #define MAX_RECURSION	100
-#define	BOL	(OUT-1)
+#define	BOL	(OUTR-1)
 #define	EOL	(BOL-1)
 #define	BOLEOL	(BOL-2)
 #define	NOTHING	(BOL-3)
 #define	BOW	(BOL-4)
 #define	EOW	(BOL-5)
 #define	BADCHAR	(BOL-6)
-#define	NONCHAR(c)	((c) <= OUT)
+#define	NONCHAR(c)	((c) <= OUTR)
 #ifdef REDEBUG
 static void print(struct match *m, const char *caption, states st, int ch, FILE *d);
 #endif
@@ -786,7 +786,7 @@ walk(struct match *m, const char *start, const char *stop, sopno startst,
 		ASSIGN(fresh, st);
 	matchp = NULL;
 	if (start == m->offp || (start == m->beginp && !(m->eflags&REG_NOTBOL)))
-		c = OUT;
+		c = OUTR;
 	else {
 		/*
 		 * XXX Wrong if the previous character was multi-byte.
@@ -799,7 +799,7 @@ walk(struct match *m, const char *start, const char *stop, sopno startst,
 		/* next character */
 		lastc = c;
 		if (p == m->endp) {
-			c = OUT;
+			c = OUTR;
 			clen = 0;
 		} else
 			clen = XMBRTOWC(&c, p, m->endp - p, &m->mbs, BADCHAR);
@@ -811,12 +811,12 @@ walk(struct match *m, const char *start, const char *stop, sopno startst,
 		flagch = '\0';
 		i = 0;
 		if ( (lastc == '\n' && m->g->cflags&REG_NEWLINE) ||
-				(lastc == OUT && !(m->eflags&REG_NOTBOL)) ) {
+				(lastc == OUTR && !(m->eflags&REG_NOTBOL)) ) {
 			flagch = BOL;
 			i = m->g->nbol;
 		}
 		if ( (c == '\n' && m->g->cflags&REG_NEWLINE) ||
-				(c == OUT && !(m->eflags&REG_NOTEOL)) ) {
+				(c == OUTR && !(m->eflags&REG_NOTEOL)) ) {
 			flagch = (flagch == BOL) ? BOLEOL : EOL;
 			i += m->g->neol;
 		}
@@ -827,12 +827,12 @@ walk(struct match *m, const char *start, const char *stop, sopno startst,
 		}
 
 		/* how about a word boundary? */
-		if ( (flagch == BOL || (lastc != OUT && !ISWORD(lastc))) &&
-					(c != OUT && ISWORD(c)) ) {
+		if ( (flagch == BOL || (lastc != OUTR && !ISWORD(lastc))) &&
+					(c != OUTR && ISWORD(c)) ) {
 			flagch = BOW;
 		}
-		if ( (lastc != OUT && ISWORD(lastc)) &&
-				(flagch == EOL || (c != OUT && !ISWORD(c))) ) {
+		if ( (lastc != OUTR && ISWORD(lastc)) &&
+				(flagch == EOL || (c != OUTR && !ISWORD(c))) ) {
 			flagch = EOW;
 		}
 		if (flagch == BOW || flagch == EOW) {
@@ -848,7 +848,7 @@ walk(struct match *m, const char *start, const char *stop, sopno startst,
 				matchp = p;
 		}
 		if (EQ(st, empty) || p == stop || clen > (size_t)(stop - p))
-			break;		/* NOTE BREAK OUT */
+			break;		/* NOTE BREAK OUTR */
 
 		/* no, we must deal with this character */
 		ASSIGN(tmp, st);
@@ -856,7 +856,7 @@ walk(struct match *m, const char *start, const char *stop, sopno startst,
 			ASSIGN(st, fresh);
 		else
 			ASSIGN(st, empty);
-		assert(c != OUT);
+		assert(c != OUTR);
 		st = step(m->g, startst, stopst, tmp, c, st);
 		SP("saft", st, c);
 		assert(EQ(step(m->g, startst, stopst, st, NOTHING, st), st));
@@ -878,14 +878,14 @@ walk(struct match *m, const char *start, const char *stop, sopno startst,
  - step - map set of states reachable before char to set reachable after
  == static states step(struct re_guts *g, sopno start, sopno stop, \
  ==	states bef, int ch, states aft);
- == #define	BOL	(OUT-1)
+ == #define	BOL	(OUTR-1)
  == #define	EOL	(BOL-1)
  == #define	BOLEOL	(BOL-2)
  == #define	NOTHING	(BOL-3)
  == #define	BOW	(BOL-4)
  == #define	EOW	(BOL-5)
  == #define	BADCHAR	(BOL-6)
- == #define	NONCHAR(c)	((c) <= OUT)
+ == #define	NONCHAR(c)	((c) <= OUTR)
  */
 static states
 step(struct re_guts *g,

@@ -39,9 +39,9 @@
 #ifndef _REGEX_H_
 #define	_REGEX_H_
 
+#include "../unistd/unistd.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "../unistd/uni_signal.h"
 #include "sys/cdefs.h"
 #include "sys/_types.h"
 

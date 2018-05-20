@@ -56,15 +56,15 @@ typedef	char *		caddr_t;	/* core address */
 typedef	long		daddr_t;	/* disk address */
 //typedef	unsigned long	dev_t;		/* device number */
 typedef unsigned long	fixpt_t;	/* fixed point number */
-typedef	unsigned long	gid_t;		/* group id */
+//typedef	unsigned long	gid_t;		/* group id */
 //typedef	unsigned long	ino_t;		/* inode number */
 typedef	unsigned short	mode_t;		/* permissions */
 typedef	unsigned short	nlink_t;	/* link count */
 //typedef	quad_t		off_t;		/* file offset */
-typedef	long		pid_t;		/* process id */
+//typedef	long		pid_t;		/* process id */
 typedef	long		segsz_t;	/* segment size */
 typedef	long		swblk_t;	/* swap offset */
-typedef	unsigned long	uid_t;		/* user id */
+//typedef	unsigned long	uid_t;		/* user id */
 
 /*
  * This belongs in unistd.h, but is placed here to ensure that programs
@@ -127,7 +127,7 @@ typedef long	fd_mask;
 #ifndef howmany
 #define	howmany(x, y)	(((x)+((y)-1))/(y))
 #endif
-
+#if 0
 typedef	struct fd_set {
 	fd_mask	fds_bits[howmany(FD_SETSIZE, NFDBITS)];
 } fd_set;
@@ -137,6 +137,7 @@ typedef	struct fd_set {
 #define	FD_ISSET(n, p)	((p)->fds_bits[(n)/NFDBITS] & (1 << ((n) % NFDBITS)))
 #define	FD_COPY(f, t)	bcopy(f, t, sizeof(*(f)))
 #define	FD_ZERO(p)	bzero(p, sizeof(*(p)))
+#endif
 
 #if defined(__STDC__) && defined(KERNEL)
 /*

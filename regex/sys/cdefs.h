@@ -69,7 +69,7 @@
 
 #else	/* !__GNUC__ */
 #define	const				/* delete ANSI C keywords */
-#define	inline
+//#define	inline
 #define	signed
 #define	volatile
 #endif	/* !__GNUC__ */
