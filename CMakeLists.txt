@@ -29,6 +29,7 @@ endif()
 
 add_subdirectory(lmdb)
 add_subdirectory(portable)
+add_subdirectory(regex)
 add_subdirectory(sqlite)
 add_subdirectory(test)
 add_subdirectory(xxHash)

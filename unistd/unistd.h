@@ -501,6 +501,7 @@ void PrintDirectory()
 
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
-
+#define   __attribute__(x)
+//__attribute__((format (printf, 1, 2)));
 #endif
 
