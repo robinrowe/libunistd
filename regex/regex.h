@@ -40,8 +40,6 @@
 #define	_REGEX_H_
 
 #include "../unistd/unistd.h"
-#include <sys/types.h>
-#include <sys/stat.h>
 #include "sys/cdefs.h"
 #include "sys/_types.h"
 

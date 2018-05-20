@@ -48,6 +48,7 @@
 #include <sys/stat.h>
 #include <assert.h>
 #include <inttypes.h>
+#include "bsd/string.h"
 #include "uni_signal.h"
 #include "../portable/stub.h"
 #include "gettimeofday.h"
@@ -116,6 +117,18 @@ int fcntl(int handle, int mode)
 	(void)mode;
 	STUB0(fcntl);
 }
+
+enum
+{	F_DUPFD, 
+	F_GETFD,
+	F_SETFD, 
+	F_GETFL, 
+	F_SETFL, 
+	F_GETLK, 
+	F_SETLK,
+	F_SETLKW,
+	FD_CLOEXEC
+};
 
 #endif
 
@@ -497,6 +510,11 @@ void PrintDirectory()
 	}
 	printf("pwd = %s\n", path);
 	free((void*)path);
+}
+
+inline
+unsigned int alarm(unsigned int seconds)
+{	STUB0(alarm);
 }
 
 #pragma warning( error : 4013)

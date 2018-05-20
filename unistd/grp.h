@@ -3,6 +3,8 @@
 #ifndef GRP_H
 #define GRP_H
 
+#include "../portable/stub.h"
+
 struct group {
 	char   *gr_name;       /* group name */
 	char   *gr_passwd;     /* group password */
@@ -13,13 +15,13 @@ struct group {
 inline
 struct group *getgrnam(const char *name)
 {	(void) name;
-	return 0;
+	STUB0(getgrnam);
 }
 
 inline
 struct group *getgrgid(gid_t gid)
 {	(void) gid;
-	return 0;
+	STUB0(getgrgid);
 }
 
 inline
@@ -29,7 +31,7 @@ int getgrnam_r(const char *name, struct group *grp,char *buf, size_t buflen, str
 	(void)buf;
 	(void)buflen;
 	(void)result;
-	return 0;
+	STUB0(getgrnam_r);
 }
 
 inline
@@ -39,7 +41,14 @@ int getgrgid_r(gid_t gid, struct group *grp,char *buf, size_t buflen, struct gro
 	(void)buf;
 	(void)buflen;
 	(void)result;
-	return 0;
+	STUB0(getgrgid_r);
+}
+
+inline
+int initgroups(const char *user, gid_t group)
+{	(void)user;
+	(void)group;
+	STUB0(initgroups);
 }
 
 #endif
