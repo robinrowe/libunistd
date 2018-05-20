@@ -1,6 +1,6 @@
 # libunistd
 
-Libunistd is a lightweight Windows POSIX library that enables typical Linux C/C++ code to build in Windows Microsoft Visual Studio. If you're looking for a Windows POSIX compatibility library that is much lighter than Cygwin, you've come to the right place. Most of the Libunistd library is header-only. However, a few functions do have cpp files. Use the provided cmake file to link those, or cheat by dragging a few cpp files from libunistd into your Visual Studio project.
+Designed and implemented by Robin Rowe, libunistd is a lightweight Windows POSIX library that enables typical Linux C/C++ code to build in Windows Microsoft Visual Studio. If you're looking for a Windows POSIX compatibility library that is much lighter than Cygwin, you've come to the right place. Most of the Libunistd library is header-only. However, a few functions do have cpp files. Use the provided cmake file to link those, or cheat by dragging a few cpp files from libunistd into your Visual Studio project.
 
 Libunistd provides standard BSD sockets, pthreads and message queue APIs in Windows. It supports every common Linux call, except one. The call fork() is deliberately not supported. Use C++ standard threads or POSIX pthreads instead. 
 
