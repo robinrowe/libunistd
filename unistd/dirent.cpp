@@ -16,6 +16,56 @@
 #define SUFFIX	'*'
 #define	SLASH	'\\'
 
+struct Dir_t
+:	public DIR
+{public:
+	Dir_t()
+	{	hFind = INVALID_HANDLE_VALUE;
+		memset(&findFileData,0,sizeof(findFileData));
+		entry.d_name = findFileData.cFileName;
+		isFirst = true;
+		entry.d_ino=0;
+		entry.d_reclen=0;
+		entry.d_namlen=0;
+		entry.d_type=DT_UNKNOWN;
+		entry.d_name=0;
+	}
+	bool operator!() const
+	{	return hFind == INVALID_HANDLE_VALUE;
+	}
+	void Set()
+	{	entry.d_namlen = (int) strlen(entry.d_name);
+		if(findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{	entry.d_type = DT_DIR;
+		}
+		else
+		{	entry.d_type = DT_REG;
+	}	}
+	bool FindFirst(const char* path)
+	{	hFind = FindFirstFile(path, &findFileData);
+		if (!*this)
+		{	return false;
+		}
+		Set();
+		return true;
+	}
+	dirent* Find()
+	{	if(isFirst)
+		{	isFirst = false;
+			return &entry;
+		}
+		if(!FindNextFile(hFind,&findFileData))
+		{	return 0;
+		}
+		Set();
+		return &entry;
+	}
+	int Close()
+	{	const BOOL ok = FindClose(hFind);
+		return ok ? 0 : -1;
+	}
+};
+
 DIR* opendir(const char *path)
 {	errno = 0;
 	if(!path)
@@ -26,7 +76,7 @@ DIR* opendir(const char *path)
 	{	errno = ENOTDIR;
 		return 0;
 	}
-	DIR* dir = new DIR;
+	Dir_t* dir = new Dir_t;
 	if (!dir)
 	{	errno = ENOMEM;
 		return 0;
@@ -40,8 +90,9 @@ DIR* opendir(const char *path)
 	return dir;
 }
 
-struct dirent* readdir(DIR* dir)
+struct dirent* readdir(DIR* d)
 {	errno = 0;
+	Dir_t* dir = (Dir_t*) d;
 	if(!dir || !*dir)
 	{	errno = EFAULT;
 		return nullptr;
@@ -58,8 +109,9 @@ int readdir_r(DIR *dir, struct dirent *entry, struct dirent** result)
 	return 0;
 }
 
-int closedir(DIR* dir)
+int closedir(DIR* d)
 {	errno = 0;
+	Dir_t* dir = (Dir_t*) d;
 	if (!dir)
 	{	errno = EFAULT;
 		return -1;
@@ -141,7 +193,7 @@ unsigned GetFileCount(DIR* dir,scandir_f selector)
 }
 
 int scandir(const char* dirname, dirent*** namesList, scandir_f selector, scandir_alphasort sorter)
-{	DIR* dir = opendir(dirname);
+{	Dir_t* dir = (Dir_t*) opendir(dirname);
 	if(!dir)
 	{	return -1;
 	}
@@ -154,7 +206,7 @@ int scandir(const char* dirname, dirent*** namesList, scandir_f selector, scandi
 	if(!names)
 	{	return -1;
 	}
-	dir = opendir(dirname);
+	dir = (Dir_t*) opendir(dirname);
 	if (!dir)
 	{	return -1;
 	}

@@ -12,7 +12,7 @@
 #ifdef __cplusplus
 extern "C" {
 #else
-#define inline __inline
+//#define inline __inline
 #endif
 
 inline

@@ -195,7 +195,7 @@ struct syslog_data {
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 
-__BEGIN_DECLS
+//__BEGIN_DECLS
 
 inline
 void	closelog(void)
@@ -203,51 +203,74 @@ void	closelog(void)
 }
 
 inline
-void	openlog(const char *, int, int)
-{	STUB(openlog);
+void	openlog(const char *a, int b, int c)
+{	(void)a;
+	(void)b;
+	(void)c;
+	STUB(openlog);
 }
 
 inline
-int	setlogmask(int)
-{	STUB0(setlogmask);
+int	setlogmask(int a)
+{	(void)a;
+	STUB0(setlogmask);
 }
 
 inline
-void	syslog(int, const char *, ...)
-{	STUB(syslog);
+void	syslog(int a, const char *b, ...)
+{	(void)a;
+	(void)b;
+	STUB(syslog);
 }
 
 inline
-void	vsyslog(int, const char *, __va_list)
-{	STUB(vsyslog);
+void	vsyslog(int a, const char * b, __va_list c)
+{	(void)a;
+	(void)b;
+	(void)c;
+	STUB(vsyslog);
 }
 
 inline
-void	closelog_r(struct syslog_data *)
-{	STUB(closelog_r);
+void	closelog_r(struct syslog_data *a)
+{	(void)a;
+	STUB(closelog_r);
 }
 
 inline
-void	openlog_r(const char *, int, int, struct syslog_data *)
-{	STUB(openlog_r);
+void	openlog_r(const char *a, int b, int c, struct syslog_data *d)
+{	(void)a;
+	(void)b;
+	(void)c;
+	(void)d;
+	STUB(openlog_r);
 }
 
 inline
-int	setlogmask_r(int, struct syslog_data *)
-{	STUB0(setlogmask_r);
+int	setlogmask_r(int a, struct syslog_data *b)
+{	(void)a;
+	(void)b;
+	STUB0(setlogmask_r);
 }
 
 inline
-void	syslog_r(int, struct syslog_data *, const char *, ...)
-{	STUB(syslog_r);
+void	syslog_r(int a, struct syslog_data *b, const char *c, ...)
+{	(void)a;
+	(void)b;
+	(void)c;
+	STUB(syslog_r);
 }
 
 inline
-void	vsyslog_r(int, struct syslog_data *, const char *, __va_list)
-{	STUB(vsyslog_r);
+void	vsyslog_r(int a, struct syslog_data *b, const char *c, __va_list d)
+{	(void)a;
+	(void)b;
+	(void)c;
+	(void)d;
+	STUB(vsyslog_r);
 }
 
-__END_DECLS
+//__END_DECLS
 
 #else /* !_KERNEL */
 

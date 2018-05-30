@@ -517,6 +517,17 @@ unsigned int alarm(unsigned int seconds)
 {	STUB0(alarm);
 }
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+int setenv(const char *name, const char *value, int overwrite);
+int unsetenv(const char *name);
+#ifdef __cplusplus
+}
+#endif
+
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
 #define   __attribute__(x)

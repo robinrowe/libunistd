@@ -47,6 +47,40 @@ int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact)
 	return 0;
 }
 
+int setenv(const char *name, const char *value, int overwrite)
+{	if(!name || !value)
+	{	return -1;
+	}
+	if(!overwrite)
+	{	char* p = getenv(name);
+		if(p)
+		{	return -1;
+	}	}
+	const int bufsize = 256;
+	const size_t len = strlen(name) + 1 + strlen(value);
+	if(len+1 >= bufsize)
+	{	return -1;
+	}
+	char buf[bufsize];
+	buf[0] = 0;
+	strcat(buf,name);
+	strcat(buf,"=");
+	strcat(buf,value);
+	return _putenv(buf);
+}
+
+int unsetenv(const char *name)
+{	const size_t len = strlen(name) + 1;
+	const int bufsize = 256;
+	if(len+1 >= bufsize)
+	{	return -1;
+	}
+	char buf[bufsize];
+	strcpy(buf,name);
+	strcat(buf,"=");
+	return _putenv(buf);
+}
+
 char *optarg;
 int optind, opterr, optopt;
 

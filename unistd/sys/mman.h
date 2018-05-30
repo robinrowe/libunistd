@@ -15,7 +15,7 @@
 //         p = mmap(nullptr, UIMAGE_SIZE, PROT_READ, MAP_SHARED | MAP_LOCKED, fd, 0xFC0A0000));
 inline
 void *mmap(void *addr, size_t length, int prot, int flags,int fd, off_t offset)
-{	char* p = new char[length];
+{	char* p = (char*) malloc(sizeof(char)*length);
 	memset(p,0,length);
 	const int bytes = _read(fd,p,(unsigned) length);
 	return p;
@@ -23,6 +23,7 @@ void *mmap(void *addr, size_t length, int prot, int flags,int fd, off_t offset)
 
 //On success, munmap() returns 0, on failure -1
 
+inline
 int munmap(void* addr, size_t length)
 {	(void) addr;
 	(void) length;

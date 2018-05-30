@@ -14,7 +14,8 @@
 
 extern "C" {
 #else
-#define inline __inline
+//#define inline __inline
+#define nullptr 0
 #endif
 
 struct itimerval 

@@ -68,10 +68,10 @@
 #define	volatile	__volatile
 
 #else	/* !__GNUC__ */
-#define	const				/* delete ANSI C keywords */
+//#define	const				/* delete ANSI C keywords */
 //#define	inline
-#define	signed
-#define	volatile
+//#define	signed
+//#define	volatile
 #endif	/* !__GNUC__ */
 #endif	/* !(__STDC__ || __cplusplus) */
 
