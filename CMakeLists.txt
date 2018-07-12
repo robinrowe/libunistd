@@ -27,6 +27,7 @@ if(WIN32)
 add_subdirectory(unistd)
 endif()
 
+add_subdirectory(libuuid)
 add_subdirectory(lmdb)
 add_subdirectory(portable)
 add_subdirectory(regex)

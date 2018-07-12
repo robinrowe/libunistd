@@ -84,6 +84,20 @@ int unsetenv(const char *name)
 char *optarg;
 int optind, opterr, optopt;
 
+int truncate(const char *path, off_t length)
+{	OFSTRUCT buffer;
+	HFILE h = OpenFile(path, &buffer, OF_WRITE);
+	const BOOL ok = SetEndOfFile((HANDLE)h);
+	CloseHandle((HANDLE)h);
+	return ok;
+}
+
+int ftruncate(int fd, off_t length)
+{	intptr_t h = _get_osfhandle(fd);
+	const BOOL ok = SetEndOfFile((HANDLE)h);
+	return ok;
+}
+
 #ifdef __cplusplus
 }
 #endif

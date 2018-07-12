@@ -180,7 +180,7 @@ int uni_sscanf(char* input,const char* format,...)
 	const size_t length = strlen(input);
 	va_list argList;
 	va_start(argList,format);
-#pragma warning(suppress:4996)
+#pragma warning(disable:4996)
 	const int retval = _snscanf(input,length-1,format,argList);
 	va_end(argList);
 	input[length-1]=0;
@@ -524,6 +524,9 @@ extern "C"
 
 int setenv(const char *name, const char *value, int overwrite);
 int unsetenv(const char *name);
+int truncate(const char *path, off_t length);
+int ftruncate(int fd, off_t length);
+
 #ifdef __cplusplus
 }
 #endif

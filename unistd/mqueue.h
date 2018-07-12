@@ -21,7 +21,7 @@ struct mq_attr
 	int mq_curmsgs;
 };
 
-typedef long long mqd_t;
+typedef HANDLE mqd_t;
 
 inline
 int MultiByteToWideChar(LPCSTR lpMultiByteStr,LPWSTR lpWideCharStr,int bufsize)
@@ -60,7 +60,7 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 	LPSECURITY_ATTRIBUTES lpSecurityAttributes=0;
 	switch(oflag)
 	{	default:
-			return -1;
+			return (mqd_t) -1;
 		case O_CREAT | O_RDONLY:
 		case O_CREAT | O_WRONLY:
 		case O_CREAT | O_RDWR:
@@ -73,9 +73,9 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 			if (hSlot == INVALID_HANDLE_VALUE) 
 			{	portable::MsgBuffer<80> msg;
 				puts(msg.GetLastError());
-				return -1;
+				return (mqd_t) -1;
 			}
-			return (mqd_t) hSlot;
+			return hSlot;
 		}
 		case O_RDONLY:
 			dwDesiredAccess|=GENERIC_READ;
@@ -101,9 +101,9 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 		dwFlagsAndAttributes,
 		lpSecurityAttributes);
 	if(hSlot == INVALID_HANDLE_VALUE)
-	{	return -1;
+	{	return (mqd_t) -1;
 	}
-	return (mqd_t) hSlot;
+	return hSlot;
 }
 
 inline
@@ -125,7 +125,7 @@ ssize_t mq_receive(mqd_t mqdes,char* msg,size_t msg_len,unsigned* msg_prio)
 {   if(msg_prio!=0)
 	{	return -1;
 	}
-	HANDLE handle = (HANDLE) mqdes;
+	HANDLE handle = mqdes;
 #if 0
 	DWORD msgSize;
     HANDLE hMailslot,
@@ -154,14 +154,14 @@ ssize_t mq_receive(mqd_t mqdes,char* msg,size_t msg_len,unsigned* msg_prio)
 
 inline
 int mq_close(mqd_t mqdes)
-{	HANDLE handle = (HANDLE) mqdes;
-	const BOOL ok=CloseHandle(handle);
+{	const BOOL ok=CloseHandle(mqdes);
 	return ok ? 0:-1;
 }
 
 inline
-int mq_unlink(const char* /*name*/)
-{	return 0;
+int mq_unlink(const char* name)
+{	(void) name;
+	return 0;
 }
 
 #endif
