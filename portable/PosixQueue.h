@@ -22,6 +22,7 @@ class PosixQueue
 	mqd_t mq;
 	mq_attr attr;
 	ssize_t bytesRead;
+	bool isVerbose;
 public:
 	~PosixQueue()
 	{	Close();
@@ -29,11 +30,15 @@ public:
 	PosixQueue()
 	:	mq(0)
 	,	bytesRead(0)
+	,	isVerbose(false)
 	{	memset(&attr,sizeof(attr),0);
 	}
 	void Drop()
 	{	mq_unlink(name.c_str());
 		name.clear();
+	}
+	void SetVerbose(bool isVerbose = true)
+	{	this->isVerbose = isVerbose;
 	}
 	void SetFlags(int flags)
 	{	attr.mq_flags = flags;
@@ -91,8 +96,8 @@ public:
 		}
 		return true;
 	}
-	bool Receive()
-	{	bytesRead = mq_receive(mq,&v[0],v.size()-1, NULL);
+	bool Receive(unsigned offset = 0)
+	{	bytesRead = mq_receive(mq,&v[0]+offset,v.size()-1-offset, NULL);
 		if(bytesRead < 0)
 		{	bytesRead = 0;
 			return false;
@@ -100,6 +105,7 @@ public:
 		if(0 != v[bytesRead-1])
 		{	v[bytesRead] = 0;
 		}
+		bytesRead += offset;
 		return true;
 	}
 	unsigned BytesRead() const
@@ -107,6 +113,13 @@ public:
 	}
 	operator const char*() const
 	{	return &v[0];
+	}
+	operator char*()
+	{	return &v[0];
+	}
+	bool IsCommand(const char* cmd) const
+	{	const int isDifferent = strcmp(&v[0],cmd);
+		return !isDifferent;
 	}
 };
 

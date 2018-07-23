@@ -20,6 +20,7 @@
 #include <condition_variable>
 #include <stdio.h>
 #include "SystemCall.h"
+#include "Text.h"
 
 namespace portable 
 {
@@ -29,34 +30,39 @@ class Pump
     typedef std::unique_lock<std::mutex> Lock;
     std::mutex mut;
     std::condition_variable cv;
+	std::thread worker;
     bool isGo;
 	bool isWake;
-	const char* object;
+	portable::Text<20> name;
     static void Main(Pump* self)
     {   self->Run();
     }
 	virtual void Wait(Lock& lock)
 	{	cv.wait(lock);
 	}
-    virtual void Action(){}
-    virtual void Init(){}
+    virtual bool Action()
+	{	return true;
+	}
+    virtual bool Init()
+	{	return true;
+	}
 public:
     Pump()
     :   isGo(false)
 	,	isWake(false)
-    {	object = "Pump";
-	}
+    {}
     virtual ~Pump()
 	{	Stop();
 		Stop();
 	}
-    bool Start(const char* description="")
+    bool Start(const char* name = "Pump")
     {   if(isGo)
         {   return false;
         }
+		this->name = name;
         isGo=true;
-        std::thread worker(Main,this);
-		PrintTask(object,description);
+        worker = std::thread(Main,this);
+		PrintTask(name,name);
         worker.detach();
         return true;
     }

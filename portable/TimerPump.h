@@ -28,11 +28,10 @@ class TimerPump
 public:
     TimerPump()
 	:	isTimeout(false)
-	{	object = "TimerPump";
-	}
-    bool Start(int millis=0,const char* description="")
+	{}
+    bool Start(int millis=0,const char* name="TimerPump")
     {   SetTimeout(millis);
-        return Pump::Start();
+        return Pump::Start(name);
     }
     void SetTimeout(int millis)
     {   wakeDelay = milliseconds(millis);

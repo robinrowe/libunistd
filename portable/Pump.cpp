@@ -10,7 +10,9 @@ namespace portable
 {
 
 void Pump::Run()
-{   Init();
+{   if(!Init())
+	{	return;
+	}
     while(isGo)
     {   Lock lock(mut);
 		Wait(lock);
@@ -20,7 +22,7 @@ void Pump::Run()
 		}
 		isWake=false;
         if(isGo)
-        {   Action();
+        {   isGo = Action();
     }   }
 }
 

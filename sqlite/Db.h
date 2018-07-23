@@ -17,7 +17,7 @@ namespace sqlite {
 class DbBase
 {
 public:
-	typedef int (*dbCallback)(void*,int,char**,char**);
+	typedef int (*DbCallback)(void*,int,char**,char**);
 	virtual ~DbBase()
 	{	Close();
 	}
@@ -26,7 +26,7 @@ public:
 	virtual bool Open(const char* dbName) = 0;
 	virtual void Close()
 	{}
-	virtual bool Exec(const char* ,dbCallback )
+	virtual bool Exec(const char* ,DbCallback )
 	{   return false;
 	}
 };
@@ -104,7 +104,7 @@ public:
 			isOpen=false;
 		}
 	}
-	bool Exec(const char* sql,dbCallback callback)
+	bool Exec(const char* sql,DbCallback callback = 0)
 	{	//qDebug()<<sql;
 		const int rc = sqlite3_exec(db, sql, callback, this,(char**) &errorMsg);
 		if(rc!=SQLITE_OK)
