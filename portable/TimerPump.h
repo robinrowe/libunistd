@@ -29,9 +29,9 @@ public:
     TimerPump()
 	:	isTimeout(false)
 	{}
-    bool Start(const char* name="TimerPump",int millis=0)
+    bool Start(const char* name="TimerPump",int millis=0,bool isJoin = false)
     {   SetTimeout(millis);
-        return Pump::Start(name);
+        return Pump::Start(name,isJoin);
     }
     void SetTimeout(int millis)
     {   wakeDelay = milliseconds(millis);

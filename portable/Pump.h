@@ -55,7 +55,7 @@ public:
 	{	Stop();
 		Stop();
 	}
-    bool Start(bool isWait = false,const char* name = "Pump")
+    bool Start(const char* name = "Pump",bool isJoin = false)
     {   if(isGo)
         {   return false;
         }
@@ -63,7 +63,7 @@ public:
         isGo=true;
         worker = std::thread(Main,this);
 		PrintTask(name,name);
-		if(isWait)
+		if(isJoin)
 		{	worker.join();
 		}
 		else
