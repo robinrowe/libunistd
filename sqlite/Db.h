@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include "source/sqlite3.h"
 #include <string>
+//#include <stdint.h>
 //#include <QDebug>
 
 namespace sqlite {
@@ -113,15 +114,18 @@ public:
 		}
 		return true;
 	}
-	std::string GetLastInsertRowId()
+	long long GetLastInsertRowId()
+	{	return sqlite3_last_insert_rowid(db);
+	}
+	bool GetLastInsertRowId(std::string& s)
 	{   //const char* sqlLastInsertRowId = "SELECT seq from sqlite_sequence WHERE name=?;";
 		const char* sqlLastInsertRowId = "SELECT last_insert_rowid();";
-		std::string lastRowId;
-		const int rc = sqlite3_exec(db, sqlLastInsertRowId, GetLastInsertRowIdCb, &lastRowId,(char**) &errorMsg);
+// bug...
+		const int rc = sqlite3_exec(db, sqlLastInsertRowId, GetLastInsertRowIdCb, &s,(char**) &errorMsg);
 		if(rc!=SQLITE_OK)
-		{   return "";
+		{   return false;
 		}
-		return lastRowId;
+		return true;
 	}
 	static int PrintCb(void*, int cols, char **value, char **colName)
 	{	for(int i=0; i<cols; i++)
