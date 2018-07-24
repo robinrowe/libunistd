@@ -22,7 +22,7 @@ void Pump::Run()
 		}
 		isWake=false;
         if(isGo)
-        {   isGo = Action();
+        {   Action();
     }   }
 }
 

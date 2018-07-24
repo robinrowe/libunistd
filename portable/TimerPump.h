@@ -29,7 +29,7 @@ public:
     TimerPump()
 	:	isTimeout(false)
 	{}
-    bool Start(int millis=0,const char* name="TimerPump")
+    bool Start(const char* name="TimerPump",int millis=0)
     {   SetTimeout(millis);
         return Pump::Start(name);
     }

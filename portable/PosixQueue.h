@@ -96,6 +96,14 @@ public:
 		}
 		return true;
 	}
+	bool SendReply(const char* msg)
+	{	char* p = strchr(&v[0],' ');
+		if(!p)
+		{	return false;
+		}
+		strncpy(p+1,msg,v.size()-1 - (p - &v[0]));
+		return Send(&v[0]);
+	}
 	bool Receive(unsigned offset = 0)
 	{	bytesRead = mq_receive(mq,&v[0]+offset,v.size()-1-offset, NULL);
 		if(bytesRead < 0)

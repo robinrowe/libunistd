@@ -40,12 +40,12 @@ class Pump
 	virtual void Wait(Lock& lock)
 	{	cv.wait(lock);
 	}
-    virtual bool Action()
-	{	return true;
-	}
+    virtual void Action()
+	{}
     virtual bool Init()
 	{	return true;
 	}
+    void Run();
 public:
     Pump()
     :   isGo(false)
@@ -55,7 +55,7 @@ public:
 	{	Stop();
 		Stop();
 	}
-    bool Start(const char* name = "Pump")
+    bool Start(bool isWait = false,const char* name = "Pump")
     {   if(isGo)
         {   return false;
         }
@@ -63,7 +63,12 @@ public:
         isGo=true;
         worker = std::thread(Main,this);
 		PrintTask(name,name);
-        worker.detach();
+		if(isWait)
+		{	worker.join();
+		}
+		else
+		{	worker.detach();
+		}
         return true;
     }
     bool Stop()
@@ -80,7 +85,6 @@ public:
 		}
 #endif
 	}
-    void Run();
 };
 
 }
