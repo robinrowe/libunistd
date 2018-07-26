@@ -22,6 +22,7 @@ class PosixQueue
 	mqd_t mq;
 	mq_attr attr;
 	ssize_t bytesRead;
+	char* msg;
 	bool isVerbose;
 public:
 	~PosixQueue()
@@ -31,6 +32,7 @@ public:
 	:	mq(0)
 	,	bytesRead(0)
 	,	isVerbose(false)
+	,	msg(0)
 	{	memset(&attr,sizeof(attr),0);
 	}
 	void Drop()
@@ -65,6 +67,7 @@ public:
 		v.resize(bufsize);
 		v[0] = 0;
 		v[bufsize-1] = 0;
+		msg = &v[0];
 		return true;
 	}
 	bool operator!() const
@@ -81,7 +84,7 @@ public:
 	{	if(len>name.length())
 		{	len = name.length();
 		}
-		return !strncmp(&v[0],s,len);
+		return !strncmp(msg,s,len);
 	}
 	bool operator==(const char* s) const
 	{	return IsEqual(s,strlen(s));
@@ -96,16 +99,21 @@ public:
 		}
 		return true;
 	}
-	bool SendReply(const char* msg)
-	{	char* p = strchr(&v[0],' ');
+	bool Send(const char* command,const char* data)
+	{	strncpy(msg,command,v.size()-1);
+		strncpy(msg+strlen(command),data,strlen(msg));
+		return Send(msg);
+	}
+	bool SendReply(const char* data)
+	{	char* p = strchr(msg,' ');
 		if(!p)
 		{	return false;
 		}
-		strncpy(p+1,msg,v.size()-1 - (p - &v[0]));
-		return Send(&v[0]);
+		strncpy(p+1,data,v.size()-1 - (p - msg));
+		return Send(msg);
 	}
 	bool Receive(unsigned offset = 0)
-	{	bytesRead = mq_receive(mq,&v[0]+offset,v.size()-1-offset, NULL);
+	{	bytesRead = mq_receive(mq,msg+offset,v.size()-1-offset, NULL);
 		if(bytesRead < 0)
 		{	bytesRead = 0;
 			return false;
@@ -120,13 +128,14 @@ public:
 	{	return bytesRead;
 	}
 	operator const char*() const
-	{	return &v[0];
+	{	return msg;
 	}
 	operator char*()
-	{	return &v[0];
+	{	return msg;
 	}
 	bool IsCommand(const char* cmd) const
-	{	const int isDifferent = strcmp(&v[0],cmd);
+	{	const size_t length = strlen(cmd);
+		const int isDifferent = memcmp(msg,cmd,length);
 		return !isDifferent;
 	}
 };
