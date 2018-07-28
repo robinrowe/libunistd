@@ -105,9 +105,9 @@ public:
 			isOpen=false;
 		}
 	}
-	bool Exec(const char* sql,DbCallback callback = 0)
+	bool Exec(const char* sql,DbCallback callback,void* object)
 	{	//qDebug()<<sql;
-		const int rc = sqlite3_exec(db, sql, callback, this,(char**) &errorMsg);
+		const int rc = sqlite3_exec(db, sql, callback, object,(char**) &errorMsg);
 		if(rc!=SQLITE_OK)
 		{   SetErrorMsg();
 			return false;
