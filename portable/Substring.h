@@ -18,8 +18,13 @@ class Substring
 	:	text(0)
 	,	length(0)
 	{}
-	void SetEnds(const char* ends)
+	void SetEnd(const char* ends,int offset = 0)
 	{	if(!ends)
+		{	length = 0;
+			return;
+		}
+		ends += offset;
+		if(ends < text)
 		{	length = 0;
 			return;
 		}
