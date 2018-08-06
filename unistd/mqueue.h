@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include "../portable/MsgBuffer.h"
+#include "../portable/SystemLog.h"
 
 #ifndef __cplusplus
 #error
@@ -36,6 +36,13 @@ int MultiByteToWideChar(LPCSTR lpMultiByteStr,LPWSTR lpWideCharStr,int bufsize)
 		bufsize);
 }
 
+/* man mq_open:
+Each message queue is identified by a name of the form '/somename'.
+That is, a null-terminated string of up to NAME_MAX (i.e., 255)
+characters consisting of an initial slash, followed by one or 
+more characters, none of which are slashes. 
+*/
+
 inline
 mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 {	const size_t bufsize=80;
@@ -43,7 +50,11 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 #pragma warning(disable:4996)
 	strcpy(namePath,"\\\\.\\mailslot\\");
 	strcpy(namePath+13,name+1);
-#if 0
+	if(strchr(namePath,'/'))
+	{	TRACE("Invalid mq_open");
+		return (mqd_t) -1;
+	}
+	#if 0
 #pragma warning(default:4996)
 	WCHAR wName[bufsize];
 	if(!MultiByteToWideChar(namePath,wName,bufsize))
@@ -71,8 +82,7 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 				lReadTimeout,
 				lpSecurityAttributes);
 			if (hSlot == INVALID_HANDLE_VALUE) 
-			{	portable::MsgBuffer<80> msg;
-				puts(msg.GetLastError());
+			{	TRACE(0);
 				return (mqd_t) -1;
 			}
 			return hSlot;
@@ -101,7 +111,8 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 		dwFlagsAndAttributes,
 		lpSecurityAttributes);
 	if(hSlot == INVALID_HANDLE_VALUE)
-	{	return (mqd_t) -1;
+	{	TRACE(0);
+		return (mqd_t) -1;
 	}
 	return hSlot;
 }
@@ -115,7 +126,8 @@ int mq_send(mqd_t mqdes, const char *msg,size_t msg_len, unsigned msg_prio)
 	DWORD cbWritten; 
 	const BOOL fResult = (0 != WriteFile(hSlot,msg,(DWORD)msg_len,&cbWritten,(LPOVERLAPPED) NULL)); 
 	if (!fResult) 
-	{	return -1;
+	{	TRACE(0);
+		return -1;
 	} 
 	return cbWritten;
 }
@@ -123,7 +135,8 @@ int mq_send(mqd_t mqdes, const char *msg,size_t msg_len, unsigned msg_prio)
 inline
 ssize_t mq_receive(mqd_t mqdes,char* msg,size_t msg_len,unsigned* msg_prio)
 {   if(msg_prio!=0)
-	{	return -1;
+	{	TRACE(0);
+		return -1;
 	}
 	HANDLE handle = mqdes;
 #if 0
@@ -145,8 +158,7 @@ ssize_t mq_receive(mqd_t mqdes,char* msg,size_t msg_len,unsigned* msg_prio)
     LPOVERLAPPED lpOverlapped = 0;
 	const BOOL ok = (0!=ReadFile(handle, msg, (DWORD) msg_len, &numRead, lpOverlapped));
 	if(!ok) // || msgSize != numRead)
-	{	portable::MsgBuffer<80> msg;
-		puts(msg.GetLastError());
+	{	TRACE(0);
 		return -1;
 	}
 	return numRead;

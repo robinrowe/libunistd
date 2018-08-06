@@ -12,7 +12,7 @@ class FieldMap
 	char* p;
 	const char* StripFieldname(const char* text) const
 	{	if(!text)
-		{	return "";
+		{	return &empty;
 		}
 		const char* sep = strstr(text,": ");
 		if(sep)

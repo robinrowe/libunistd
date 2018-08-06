@@ -13,6 +13,7 @@
 #include <string.h>
 #include <string>
 #include <vector>
+#include "SystemLog.h"
 
 namespace portable
 {
@@ -66,7 +67,11 @@ public:
 #pragma warning (disable : 4996)
 	bool Open(const char* filename,const char* flags)
 	{	fp = fopen(filename,flags);
-		return IsGood();
+		if(!IsGood())
+		{	TRACE(0);
+			return false;
+		}
+		return true;
 	}
 #pragma warning (default : 4996)
 	bool OpenReadOnly(const char* filename)
@@ -83,7 +88,11 @@ public:
 		{	return false;
 		}
 		bytes=fread(data,1,length,fp);
-		return bytes>0;
+		if(bytes < 0)
+		{	TRACE(0);
+			return false;
+		}		
+		return true;
 	}
 #define READ(T) bool Read(T x){ return Read((char*) &x,sizeof(x)); }
     READ(unsigned)
@@ -118,6 +127,9 @@ public:
 		{	return false;
 		}
 		bytes=fwrite(data,1,length,fp);
+		if(bytes != length)
+		{	TRACE(0);
+		}
 		return bytes==length;
 	}
 #define WRITE(T) bool Write(T x){ return Write((const char*) &x,sizeof(x)); }
@@ -142,7 +154,8 @@ public:
 		}
 		const int err=fseek(fp,offset,where);
 		if(err)
-		{	return false;
+		{	TRACE(0);
+			return false;
 		}
 		return true;
 	}

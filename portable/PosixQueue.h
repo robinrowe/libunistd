@@ -1,4 +1,4 @@
-// PosixQueue.h
+// portable/PosixQueue.h
 // Copyright 2018/06/29 Robin.Rowe@Cinepaint.org
 // License open source MIT
 
@@ -13,6 +13,12 @@
 #include <mqueue.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "SystemLog.h"
+#ifdef _WIN32
+#define TRACE_QUEUE(msg)
+#else
+#define TRACE_QUEUE(msg) SystemLog(__FILE__,__LINE__,msg)
+#endif
 
 namespace portable {
 
@@ -62,7 +68,8 @@ public:
 		}
 		mq = mq_open(name,oflag,mode,p);
 		if(mq<0)
-		{	return false;
+		{	TRACE_QUEUE(0);
+			return false;
 		}
 		v.resize(bufsize);
 		v[0] = 0;
@@ -95,7 +102,8 @@ public:
 	bool Send(const char* msg)
 	{	const int ok = mq_send(mq,msg,strlen(msg)+1,0);
 		if(ok<0)
-		{	return false;
+		{	TRACE_QUEUE(0);
+			return false;
 		}
 		return true;
 	}
@@ -116,6 +124,7 @@ public:
 	{	bytesRead = mq_receive(mq,msg+offset,v.size()-1-offset, NULL);
 		if(bytesRead < 0)
 		{	bytesRead = 0;
+			TRACE_QUEUE(0);
 			return false;
 		}
 		if(0 != v[bytesRead-1])
