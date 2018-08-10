@@ -21,7 +21,7 @@ struct mq_attr
 	int mq_curmsgs;
 };
 
-typedef HANDLE mqd_t;
+typedef intptr_t mqd_t;
 
 inline
 int MultiByteToWideChar(LPCSTR lpMultiByteStr,LPWSTR lpWideCharStr,int bufsize)
@@ -52,7 +52,7 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 	strcpy(namePath+13,name+1);
 	if(strchr(namePath,'/'))
 	{	TRACE("Invalid mq_open");
-		return (mqd_t) -1;
+		return -1;
 	}
 	#if 0
 #pragma warning(default:4996)
@@ -83,9 +83,9 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 				lpSecurityAttributes);
 			if (hSlot == INVALID_HANDLE_VALUE) 
 			{	TRACE(0);
-				return (mqd_t) -1;
+				return -1;
 			}
-			return hSlot;
+			return (mqd_t) hSlot;
 		}
 		case O_RDONLY:
 			dwDesiredAccess|=GENERIC_READ;
@@ -112,19 +112,19 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 		lpSecurityAttributes);
 	if(hSlot == INVALID_HANDLE_VALUE)
 	{	TRACE(0);
-		return (mqd_t) -1;
+		return -1;
 	}
-	return hSlot;
+	return (mqd_t) hSlot;
 }
 
 inline
-int mq_send(mqd_t mqdes, const char *msg,size_t msg_len, unsigned msg_prio)
+int mq_send(mqd_t mqdes, const char *buffer,size_t bufsize, unsigned msg_prio)
 {	if(msg_prio!=0)
 	{	return -1;
 	}
 	HANDLE hSlot = (HANDLE) mqdes;
 	DWORD cbWritten; 
-	const BOOL fResult = (0 != WriteFile(hSlot,msg,(DWORD)msg_len,&cbWritten,(LPOVERLAPPED) NULL)); 
+	const BOOL fResult = (0 != WriteFile(hSlot,buffer,(DWORD)bufsize,&cbWritten,(LPOVERLAPPED) NULL)); 
 	if (!fResult) 
 	{	TRACE(0);
 		return -1;
@@ -133,12 +133,12 @@ int mq_send(mqd_t mqdes, const char *msg,size_t msg_len, unsigned msg_prio)
 }
 
 inline
-ssize_t mq_receive(mqd_t mqdes,char* msg,size_t msg_len,unsigned* msg_prio)
+ssize_t mq_receive(mqd_t mqdes,char* buffer,size_t bufsize,unsigned* msg_prio)
 {   if(msg_prio!=0)
 	{	TRACE(0);
 		return -1;
 	}
-	HANDLE handle = mqdes;
+	HANDLE handle = (HANDLE) mqdes;
 #if 0
 	DWORD msgSize;
     HANDLE hMailslot,
@@ -156,7 +156,7 @@ ssize_t mq_receive(mqd_t mqdes,char* msg,size_t msg_len,unsigned* msg_prio)
 #endif	
 	DWORD numRead; 
     LPOVERLAPPED lpOverlapped = 0;
-	const BOOL ok = (0!=ReadFile(handle, msg, (DWORD) msg_len, &numRead, lpOverlapped));
+	const BOOL ok = ReadFile(handle, buffer, (DWORD) bufsize, &numRead, lpOverlapped);
 	if(!ok) // || msgSize != numRead)
 	{	TRACE(0);
 		return -1;
@@ -166,7 +166,10 @@ ssize_t mq_receive(mqd_t mqdes,char* msg,size_t msg_len,unsigned* msg_prio)
 
 inline
 int mq_close(mqd_t mqdes)
-{	const BOOL ok=CloseHandle(mqdes);
+{	if(mqdes < 0)
+	{	return -1;
+	}
+	const BOOL ok=CloseHandle((HANDLE)mqdes);
 	return ok ? 0:-1;
 }
 

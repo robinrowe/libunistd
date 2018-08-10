@@ -51,19 +51,20 @@ void SystemLog(const char* filename,int lineNo,const char* msg)
 	if(!msg || !*msg)
 	{	msg = strerror(errno);
 	}
+	printf("%s@%i: %s\n",filename,lineNo,msg);
 #ifdef _DEBUG
 #ifdef QT
 	qDebug() << filename << '@' << lineNo << ': " << msg;
 #else
 	_CrtDbgReport( _CRT_WARN,filename,lineNo,msg,NULL);
 #endif
+	DebugBreak();
 #endif
 #ifdef SYSTEM_LOGFILE
 	if(systemLogfile)
 	{	fprintf(systemLogfile,"%s@%s: %s\n",filename,lineNo,msg);
 	}
 #endif
-	printf("%s@%i: %s\n",filename,lineNo,msg);
 }
 
 inline

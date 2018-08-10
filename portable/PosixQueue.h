@@ -136,10 +136,10 @@ public:
 	unsigned BytesRead() const
 	{	return bytesRead;
 	}
-	operator const char*() const
+	const char* c_str() const
 	{	return msg;
 	}
-	operator char*()
+	char* c_str()
 	{	return msg;
 	}
 	bool IsCommand(const char* cmd) const
