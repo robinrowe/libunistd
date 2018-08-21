@@ -9,16 +9,16 @@
 #include <string>
 #include <stdio.h>
 #include "PacketSizer.h"
-#include "SoftLock.h"
-#include "StdFile.h"
+#include "../SoftLock.h"
+#include "../StdFile.h"
 #include "../xxHash/xxhash.h"
-
+/*
 #if 1
 #define TRACE(msg) puts("ERROR: " msg); Dump()
 #else
 #define TRACE(msg)
 #endif
-
+*/
 namespace portable 
 {
 

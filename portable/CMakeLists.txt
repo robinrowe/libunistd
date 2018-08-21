@@ -65,17 +65,17 @@ set(HEADERS
 )
 
 set(SOURCE
-	BsdPacketServer.cpp
-	BsdSocket.cpp
-	BsdSocketClient.cpp
-	BsdSocketPool.cpp
-	BsdSocketServer.cpp
+	ipc/BsdPacketServer.cpp
+	ipc/BsdSocket.cpp
+	ipc/BsdSocketClient.cpp
+	ipc/BsdSocketPool.cpp
+	ipc/BsdSocketServer.cpp
 	CommandLine.cpp
-	Http.cpp
+	http/Http.cpp
 	Network.cpp
-	PacketReader.cpp
-	Pump.cpp
-	VariableClock.cpp
+	ipc/PacketReader.cpp
+	pump/Pump.cpp
+	time/VariableClock.cpp
 	WormFile.cpp
 )
 

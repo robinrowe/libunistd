@@ -46,48 +46,57 @@ more characters, none of which are slashes.
 inline
 mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 {	const size_t bufsize=80;
-	char namePath[bufsize];
+	char pipeName[bufsize];
 #pragma warning(disable:4996)
-	strcpy(namePath,"\\\\.\\mailslot\\");
-	strcpy(namePath+13,name+1);
-	if(strchr(namePath,'/'))
+// This name must have the following form: 
+// LPTSTR lpszPipename = TEXT("\\\\.\\pipe\\mynamedpipe"); 
+	strcpy(pipeName,"\\\\.\\pipe\\");
+	strcat(pipeName,name+1);
+	if(strchr(pipeName,'/'))
 	{	TRACE("Invalid mq_open");
 		return -1;
 	}
-	#if 0
-#pragma warning(default:4996)
-	WCHAR wName[bufsize];
-	if(!MultiByteToWideChar(namePath,wName,bufsize))
-	{	portable::MsgBuffer<80> msg;
-		puts(msg.GetLastError());
-		return -1;
+	if(oflag & O_CREAT) 
+	{	DWORD openMode = 0;
+		switch(oflag)
+		{	default:
+				return (mqd_t) -1;
+			case O_CREAT | O_RDONLY:
+				openMode = PIPE_ACCESS_INBOUND;
+				break;
+			case O_CREAT | O_WRONLY:
+				openMode = PIPE_ACCESS_OUTBOUND;
+				break;
+			case O_CREAT | O_RDWR:
+				openMode = PIPE_ACCESS_DUPLEX;
+				break;	
+		}
+		DWORD pipeMode = PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS;
+		DWORD kernelBufsize = 512;
+		HANDLE hPipe = CreateNamedPipe( 
+			pipeName,
+			openMode,
+			pipeMode,
+			PIPE_UNLIMITED_INSTANCES,
+			kernelBufsize,
+			kernelBufsize,
+			NULL,
+			NULL);
+		if (hPipe == INVALID_HANDLE_VALUE) 
+		{	TRACE(0);
+			return -1;
+		}
+		BOOL ok = ConnectNamedPipe(hPipe,NULL);
+		if(!ok)
+		{	TRACE(0);
+			return -1;
+		}
+		return (mqd_t) hPipe;
 	}
-#endif
-// This name must have the following form: \\.\mailslot\[path]name
-// LPTSTR Slot = TEXT("\\\\.\\mailslot\\sample_mailslot");
-// sprintf(ServerName, "\\\\%s\\Mailslot\\Myslot", name);
 	DWORD dwDesiredAccess=0;
 	DWORD dwShareMode=0;
-	LPSECURITY_ATTRIBUTES lpSecurityAttributes=0;
 	switch(oflag)
-	{	default:
-			return (mqd_t) -1;
-		case O_CREAT | O_RDONLY:
-		case O_CREAT | O_WRONLY:
-		case O_CREAT | O_RDWR:
-		{	const DWORD nMaxMessageSize=0;
-			const DWORD lReadTimeout=MAILSLOT_WAIT_FOREVER;
-			HANDLE hSlot = CreateMailslotA(namePath,
-				nMaxMessageSize,
-				lReadTimeout,
-				lpSecurityAttributes);
-			if (hSlot == INVALID_HANDLE_VALUE) 
-			{	TRACE(0);
-				return -1;
-			}
-			return (mqd_t) hSlot;
-		}
-		case O_RDONLY:
+	{	case O_RDONLY:
 			dwDesiredAccess|=GENERIC_READ;
 			dwShareMode|=FILE_SHARE_READ;
 			break;
@@ -100,21 +109,18 @@ mqd_t mq_open(const char *name,int oflag,mode_t mode,mq_attr* attr=0)
 			dwShareMode=FILE_SHARE_READ | FILE_SHARE_WRITE;
 			break;
     }
-	DWORD dwCreationDisposition=OPEN_EXISTING;
-	DWORD dwFlagsAndAttributes=FILE_ATTRIBUTE_NORMAL;
-	HANDLE hTemplateFile=NULL;
-	HANDLE hSlot = CreateFileA(namePath,
+	HANDLE hPipe = CreateFileA(pipeName,
 		dwDesiredAccess,
 		dwShareMode,
-		lpSecurityAttributes,
-		dwCreationDisposition,
-		dwFlagsAndAttributes,
-		lpSecurityAttributes);
-	if(hSlot == INVALID_HANDLE_VALUE)
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+	if(hPipe == INVALID_HANDLE_VALUE)
 	{	TRACE(0);
 		return -1;
 	}
-	return (mqd_t) hSlot;
+	return (mqd_t) hPipe;
 }
 
 inline
@@ -122,10 +128,10 @@ int mq_send(mqd_t mqdes, const char *buffer,size_t bufsize, unsigned msg_prio)
 {	if(msg_prio!=0)
 	{	return -1;
 	}
-	HANDLE hSlot = (HANDLE) mqdes;
+	HANDLE h = (HANDLE) mqdes;
 	DWORD cbWritten; 
-	const BOOL fResult = (0 != WriteFile(hSlot,buffer,(DWORD)bufsize,&cbWritten,(LPOVERLAPPED) NULL)); 
-	if (!fResult) 
+	const BOOL ok = WriteFile(h,buffer,(DWORD)bufsize,&cbWritten,NULL); 
+	if (!ok) 
 	{	TRACE(0);
 		return -1;
 	} 
@@ -138,25 +144,9 @@ ssize_t mq_receive(mqd_t mqdes,char* buffer,size_t bufsize,unsigned* msg_prio)
 	{	TRACE(0);
 		return -1;
 	}
-	HANDLE handle = (HANDLE) mqdes;
-#if 0
-	DWORD msgSize;
-    HANDLE hMailslot,
-    LPDWORD lpMaxMessageSize,
-    LPDWORD lpNextSize,
-    LPDWORD lpMessageCount,
-    LPDWORD lpReadTimeout
-	BOOL ok = GetMailslotInfo(handle, 0, &msgSize, 0, 0);
-	if(!ok) // || msgSize == (DWORD)MAILSLOT_NO_MESSAGE)
-	{	return -1;
-	}
-	if(msgSize<msg_len)
-	{	return -1;
-	}
-#endif	
+	HANDLE h = (HANDLE) mqdes;
 	DWORD numRead; 
-    LPOVERLAPPED lpOverlapped = 0;
-	const BOOL ok = ReadFile(handle, buffer, (DWORD) bufsize, &numRead, lpOverlapped);
+	const BOOL ok = ReadFile(h,buffer,(DWORD) bufsize,&numRead,NULL);
 	if(!ok) // || msgSize != numRead)
 	{	TRACE(0);
 		return -1;
@@ -169,7 +159,7 @@ int mq_close(mqd_t mqdes)
 {	if(mqdes < 0)
 	{	return -1;
 	}
-	const BOOL ok=CloseHandle((HANDLE)mqdes);
+	const BOOL ok = CloseHandle((HANDLE)mqdes);
 	return ok ? 0:-1;
 }
 

@@ -82,7 +82,11 @@ void StatusMsg(const char* msg)
 
 }
 
+#ifdef _DEBUG
 #define TRACE(msg) portable::SystemLog(__FILE__,__LINE__,msg)
+#else
+#define TRACE(msg) 
+#endif
 #pragma warning(default:4996)
 
 #endif

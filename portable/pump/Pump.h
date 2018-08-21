@@ -19,8 +19,8 @@
 #include <mutex>
 #include <condition_variable>
 #include <stdio.h>
-#include "SystemCall.h"
-#include "Text.h"
+#include "../SystemCall.h"
+#include "../Text.h"
 
 namespace portable 
 {
