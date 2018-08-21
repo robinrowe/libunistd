@@ -1,16 +1,16 @@
-// BsdSocket.cpp
+// PacketSocket.cpp
 // Created by Robin Rowe on 11/27/2015
 // Copyright (c) 2015 Robin.Rowe@CinePaint.org
 // License open source MIT
 
 #pragma comment(lib, "libunistd.lib")
 
-#include "BsdSocket.h"
+#include "PacketSocket.h"
 
 namespace portable 
 {
 
-void BsdSocket::Close()
+void PacketSocket::Close()
 {	puts("Socket close");
 	isGo=false;
 	isConnected=false;
@@ -20,7 +20,7 @@ void BsdSocket::Close()
 		socketfd=0;
 }	}
 
-bool BsdSocket::GetIp(const char* hostname,std::string& ip)
+bool PacketSocket::GetIp(const char* hostname,std::string& ip)
 {	struct hostent *he;
 #pragma warning(disable:4996)
 	he = gethostbyname(hostname);
@@ -37,7 +37,7 @@ bool BsdSocket::GetIp(const char* hostname,std::string& ip)
 	return true;
 }
 
-void BsdSocket::GetPeerName(SOCKET sock,std::string& s)
+void PacketSocket::GetPeerName(SOCKET sock,std::string& s)
 {	struct sockaddr_storage addr;
 	char ipstr[INET6_ADDRSTRLEN];
 	socklen_t len = sizeof addr;
@@ -54,7 +54,7 @@ void BsdSocket::GetPeerName(SOCKET sock,std::string& s)
 	s=ipstr;
 }
 
-bool BsdSocket::SetAsyncMode(bool isAsync)
+bool PacketSocket::SetAsyncMode(bool isAsync)
 {	if (!IsGood())
 	{	return false;
 	}
@@ -71,7 +71,7 @@ bool BsdSocket::SetAsyncMode(bool isAsync)
 #endif
 }
 
-bool BsdSocket::Open(const char* serverName, int serverPort,bool isReuseSocket)
+bool PacketSocket::Open(const char* serverName, int serverPort,bool isReuseSocket)
 {	puts("libunistd 1.1 " __DATE__ " " __TIME__);
 	if (!serverName || !*serverName || !serverPort)
 	{	errorMsg.Set("No server to open specified");

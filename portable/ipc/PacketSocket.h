@@ -1,10 +1,10 @@
-// portable/BsdSocket.h
+// portable/PacketSocket.h
 // Created by Robin Rowe on 11/27/2015
 // Copyright (c) 2015 Robin.Rowe@CinePaint.org
 // License open source MIT
 
-#ifndef BsdSocket_h
-#define BsdSocket_h
+#ifndef PacketSocket_h
+#define PacketSocket_h
 #include <thread>
 #include <memory.h> 
 #include <string>
@@ -23,7 +23,7 @@
 namespace portable 
 {
 
-class BsdSocket
+class PacketSocket
 {protected:
 	SOCKET socketfd;
 	bool isGo;
@@ -48,20 +48,20 @@ protected:
 	}
 public:
 	MsgBuffer<120> errorMsg;
-	virtual ~BsdSocket()
+	virtual ~PacketSocket()
 	{	// Close(); Don't do this, might be a temp copy
 	}
-	BsdSocket()
+	PacketSocket()
 	:	socketfd(0)
 	,	isGo(false)
 	,	isConnected(false)
 	{}
-	BsdSocket(SOCKET socketfd)
+	PacketSocket(SOCKET socketfd)
 	:	socketfd(socketfd)
 	,	isGo(false)
 	,	isConnected(false)
 	{}
-	BsdSocket(const BsdSocket&) = default;
+	PacketSocket(const PacketSocket&) = default;
 	bool IsGood() const
 	{	return socketfd > 0;
 	}

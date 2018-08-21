@@ -4,8 +4,8 @@
 // License open source MIT
 
 #include "BsdSocketPool.h"
-#include "SoftLock.h"
-#include "VerboseCounter.h"
+#include "../SoftLock.h"
+#include "../VerboseCounter.h"
 
 namespace portable 
 {
@@ -23,7 +23,7 @@ bool BsdSocketPool::SetSlot(SOCKET sid)
 bool BsdSocketPool::SetZombieSlot(SOCKET sid)
 {	for(unsigned i =0;i<socketfd.size();i++)
 	{	if(IsGood(socketfd[i]))
-		{	BsdSocket bsdSocket(socketfd[i]);
+		{	PacketSocket bsdSocket(socketfd[i]);
 			if(!bsdSocket.SendEmptyPacket())
 			{	socketfd[i] = sid;
 				return true;
@@ -85,7 +85,7 @@ void BsdSocketPool::ReleaseSlot(SOCKET slot)
 	if (0 >= socketfd[slot])
 	{	return;
 	}
-	BsdSocket bsdSocket(socketfd[slot]);
+	PacketSocket bsdSocket(socketfd[slot]);
 	bsdSocket.Close();
 	socketfd[slot] = 0;
 	if(!counter)

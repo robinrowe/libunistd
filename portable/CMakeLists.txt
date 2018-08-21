@@ -4,19 +4,19 @@ set(NAME libportable)
 message("--- Building ${NAME} ---")
 
 set(HEADERS
-	Astring.h
+#	Astring.h
 	AtomicCounter.h
 	AtomicLock.h
 	AtomicLock0.h
 	AtomicMutex.h
 	Breakpoint.h
-	BsdMulticast.h
-	BSdPacketServer.h
-	BsdSocket.h
-	BsdSocketClient.h
-	BsdSocketPool.h
-	BsdSocketServer.h
-	BsdSocketStartup.h
+	ipc/BsdMulticast.h
+	ipc/BSdPacketServer.h
+	ipc/BsdSocket.h
+	ipc/BsdSocketClient.h
+	ipc/BsdSocketPool.h
+	ipc/BsdSocketServer.h
+	ipc/BsdSocketStartup.h
 	Buffer.h
 	Cfile.h
 	CommandLine.h
@@ -25,21 +25,21 @@ set(HEADERS
 	endian.h
 	Folder.h
 	homedir.h
-	HtmlPage.h
-	Http.h
-	HttpDecoder.h
+	http/HtmlPage.h
+	http/Http.h
+	http/HttpDecoder.h
 	Logger.h
 	MsgBuffer.h
 	Network.h
-	Packet.h
-	PacketBuffer.h
-	PacketMarker.h
-	PacketQueue.h
-	PacketReader.h
-	PacketSizer.h
-	PacketWriter.h
+	ipc/Packet.h
+	ipc/PacketBuffer.h
+	ipc/PacketMarker.h
+	ipc/PacketQueue.h
+	ipc/PacketReader.h
+	ipc/PacketSizer.h
+	ipc/PacketWriter.h
 	QtHelpers.h
-	Pump.h
+	pump/Pump.h
 	Random.h
 	SoftLock.h
 	StdBlob.h
@@ -51,16 +51,16 @@ set(HEADERS
 	stub.h
 	SystemCall.h
 	thread_semaphore.h
-	Timecode.h
-	TimerPump.h
-	TimeSpan.h
-	TimeStamp.h
+	time/Timecode.h
+	pump/TimerPump.h
+	time/TimeSpan.h
+	time/TimeStamp.h
 	UnrealLogger.h
-	VariableClock.h
+	time/VariableClock.h
 	Vec3d.h
 	VerboseCounter.h
-	WallClock.h
-	Watchdog.h
+	time/WallClock.h
+	time/Watchdog.h
 	WormFile.h
 )
 

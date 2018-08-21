@@ -20,7 +20,7 @@ class BsdPacketServer
 	static const unsigned bufSize = 64*1024;
 	std::vector<char> headerBuffer;
 	bool SendTo(PacketWriter& packet,SOCKET fd)
-	{	BsdSocket bsdSocket(fd);
+	{	PacketSocket bsdSocket(fd);
 		if(bsdSocket.SendTo(packet))
 		{	return true;
 		}
@@ -30,7 +30,7 @@ class BsdPacketServer
 	bool IsInvalid(SOCKET fd)
 	{	return fd<=0;
 	}
-	void LogSocketError(const BsdSocket& bsdSocket);
+	void LogSocketError(const PacketSocket& bsdSocket);
 	bool Login(SOCKET fd) override
 	{	return SendHeaderPacket(fd);
 	}
@@ -93,7 +93,7 @@ public:
 			return false;
 		}
 		std::string ip;
-		BsdSocket::GetPeerName(fd,ip);
+		PacketSocket::GetPeerName(fd,ip);
 		printf("Send header packet to %s size=%u\n",ip.c_str(), headerPacket.header.packetSize);
 		return SendFramePacket(fd);
 	}

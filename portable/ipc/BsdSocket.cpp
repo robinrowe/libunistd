@@ -12,8 +12,6 @@ namespace portable
 
 void BsdSocket::Close()
 {	puts("Socket close");
-	isGo=false;
-	isConnected=false;
 	if(socketfd)
 	{	SendEmptyPacket();
 		closesocket(socketfd);
@@ -55,7 +53,7 @@ void BsdSocket::GetPeerName(SOCKET sock,std::string& s)
 }
 
 bool BsdSocket::SetAsyncMode(bool isAsync)
-{	if (!IsGood())
+{	if (!IsOpen())
 	{	return false;
 	}
 #ifdef _WIN32
@@ -106,7 +104,6 @@ bool BsdSocket::Open(const char* serverName, int serverPort,bool isReuseSocket)
 	if (ok<0)
 	{	puts("connect failed");
 		errorMsg.GetLastError();
-		isGo = false;
 		return false;
 	}
 	SetReuse(socketfd);

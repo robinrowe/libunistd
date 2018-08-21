@@ -6,7 +6,7 @@
 #ifndef BsdSocketServer_h
 #define BsdSocketServer_h
 
-#include "BsdSocket.h"
+#include "PacketSocket.h"
 #include "BsdSocketStartup.h"
 #include "BsdSocketPool.h"
 
@@ -14,7 +14,7 @@ namespace portable
 {
 
 class BsdSocketServer
-:	public BsdSocket
+:	public PacketSocket
 {	BsdSocketStartup socketStartup;
 protected:
 	std::thread listenWorker;
@@ -42,7 +42,7 @@ public:
 	bool Open(int serverPort,int maxStreams,bool isPacketRun=true);
 	void Close() override
 	{	Stop();
-		BsdSocket::Close();
+		PacketSocket::Close();
 	}
 	virtual bool Login(SOCKET fd)
 	{	(void)fd;

@@ -4,7 +4,7 @@
 // License open source MIT
 
 #include "BsdSocketClient.h"
-#include "Logger.h"
+#include "../Logger.h"
 
 namespace portable 
 {
@@ -115,7 +115,7 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 void BsdSocketClient::SocketReset(const char* msg,portable::PacketReader& packet)
 {	(void)msg;
     packet.Dump();
-	BsdSocket bsdSocket(socketfd);
+	PacketSocket bsdSocket(socketfd);
 	bsdSocket.Close();
 	socketfd = 0;
 	Stop();

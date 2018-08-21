@@ -3,7 +3,7 @@
 // License MIT Open Source
 
 #include "BsdPacketServer.h"
-#include "Logger.h"
+#include "../Logger.h"
 
 namespace portable 
 {
@@ -19,7 +19,7 @@ bool BsdPacketServer::Start(int serverPort,unsigned maxStreams)
 	return true;
 }
 
-void BsdPacketServer::LogSocketError(const BsdSocket& bsdSocket)
+void BsdPacketServer::LogSocketError(const PacketSocket& bsdSocket)
 {	std::string msg;
 	bsdSocket.GetPeerName(msg);
 	msg+=" SendTo error: ";

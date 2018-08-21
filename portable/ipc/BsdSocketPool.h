@@ -6,7 +6,7 @@
 #ifndef BsdSocketPool_h
 #define BsdSocketPool_h
 
-#include "BsdSocket.h"
+#include "PacketSocket.h"
 #include "PacketWriter.h"
 #include "PacketStats.h"
 
@@ -48,7 +48,7 @@ public:
 	{	this->isStreaming = isStreaming;
 	}
 	bool SendPacket(Packet* packet,unsigned i)
-	{	BsdSocket bsdSocket(socketfd[i]);
+	{	PacketSocket bsdSocket(socketfd[i]);
 		if(bsdSocket.SendTo(*packet))
 		{	stats.Transmit(packet->GetPacketId()); 
 			return true;	

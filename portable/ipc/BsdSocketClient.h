@@ -6,14 +6,14 @@
 #ifndef BsdSocketClient_h
 #define BsdSocketClient_h
 
-#include "BsdSocket.h"
+#include "PacketSocket.h"
 #include "PacketStats.h"
 
 namespace portable 
 {
 
 class BsdSocketClient
-:	public BsdSocket
+:	public PacketSocket
 {	std::thread worker;
 	const unsigned bufsize;
 	static void Main(BsdSocketClient* self)
@@ -37,7 +37,7 @@ public:
 			socketfd=0;
 	}	}
 	bool Open(const char* serverName,int serverPort)
-	{	if(!BsdSocket::Open(serverName,serverPort))
+	{	if(!PacketSocket::Open(serverName,serverPort))
 		{	return false;
 		}
 		Start();
