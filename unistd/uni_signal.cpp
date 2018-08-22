@@ -84,12 +84,22 @@ int unsetenv(const char *name)
 char *optarg;
 int optind, opterr, optopt;
 
-int truncate(const char *path, off_t length)
-{	OFSTRUCT buffer;
-	HFILE h = OpenFile(path, &buffer, OF_WRITE);
-	const BOOL ok = SetEndOfFile((HANDLE)h);
+int truncate(const char *filename,off_t length)
+{	//OFSTRUCT buffer;
+	//HANDLE h = OpenFileA(path, &buffer, OF_WRITE);
+	if(length)
+	{	HANDLE h = CreateFileA(filename, GENERIC_WRITE, 0, 0, TRUNCATE_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		CloseHandle(h);
+	}
+	HANDLE h = CreateFileA(filename, GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	const DWORD p = SetFilePointer(h,length,0,FILE_BEGIN);
+	if(!p)
+	{	CloseHandle(h);
+		return -1;
+	}
+	const BOOL ok = SetEndOfFile(h);
 	CloseHandle((HANDLE)h);
-	return ok;
+	return ok ? 0:-1;
 }
 
 int ftruncate(int fd, off_t length)

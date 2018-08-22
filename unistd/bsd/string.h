@@ -15,11 +15,12 @@ size_t strlcpy(char *dst, const char *src, size_t size)
 	{	return 0;
 	}
 	const char* end = strncpy(dst,src,size);
-	if(end == dst + size - 1)
+	const size_t length = end - dst;
+	if(length>=size)
 	{	dst[size-1] = 0;
-		return size -1;
+		return size-1;
 	}
-	return end - dst;
+	return length;
 }
 
 inline

@@ -5,6 +5,7 @@
 #ifndef UdpPump_h
 #define UdpPump_h
 
+#include <unistd.h>
 #include <string>
 #include <string.h>
 #include <vector>
@@ -63,8 +64,8 @@ public:
 	}
 	bool Send(const char* command,const char* data)
 	{	char* msg = &udpServer.v[0];
-		strncpy(msg,command,udpServer.v.size()-1);
-		strncpy(msg+strlen(command),data,strlen(msg));
+		strlcpy(msg,command,udpServer.v.size()-1);
+		strlcpy(msg+strlen(command),data,strlen(msg));
 		return Send(msg);
 	}
 	bool SendReply(const char* data)
@@ -73,7 +74,7 @@ public:
 		if(!p)
 		{	return false;
 		}
-		strncpy(p+1,data,udpServer.v.size()-1 - (p - msg));
+		strlcpy(p+1,data,udpServer.v.size()-1 - (p - msg));
 		return Send(msg);
 	}
 	bool Receive()
