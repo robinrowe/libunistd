@@ -33,12 +33,21 @@ class Pump
 	std::thread worker;
     bool isGo;
 	bool isWake;
-	portable::Text<20> name;
+	Text<20> name;
     static void Main(Pump* self)
     {   self->Run();
     }
-	virtual void Wait(Lock& lock)
+	virtual void Wait(Lock& lock) 
 	{	cv.wait(lock);
+	}
+	virtual bool Wait()
+	{	Lock lock(mut);
+		Wait(lock);
+		if(!isWake)
+		{	// spurious thread wake
+			return false;
+		}
+		return true;
 	}
     virtual void Action()
 	{}

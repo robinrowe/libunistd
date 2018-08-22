@@ -14,11 +14,8 @@ void Pump::Run()
 	{	return;
 	}
     while(isGo)
-    {   Lock lock(mut);
-		Wait(lock);
-		if(!isWake)
-		{	// spurious thread wake
-			continue;
+    {   if(!Wait())
+		{	continue;
 		}
 		isWake=false;
         if(isGo)
