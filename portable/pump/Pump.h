@@ -20,7 +20,6 @@
 #include <condition_variable>
 #include <stdio.h>
 #include "../SystemCall.h"
-#include "../Text.h"
 
 namespace portable 
 {
@@ -33,14 +32,14 @@ class Pump
 	std::thread worker;
     bool isGo;
 	bool isWake;
-	Text<20> name;
+	const char* pumpName;// Expects static string, not copied!
     static void Main(Pump* self)
     {   self->Run();
     }
 	virtual void Wait(Lock& lock) 
 	{	cv.wait(lock);
 	}
-	virtual bool Wait()
+	virtual bool Receive()
 	{	Lock lock(mut);
 		Wait(lock);
 		if(!isWake)
@@ -56,22 +55,25 @@ class Pump
 	}
     void Run();
 public:
-    Pump()
-    :   isGo(false)
+    Pump(const char* pumpName)
+    :   pumpName(pumpName)
+	,	isGo(false)
 	,	isWake(false)
     {}
     virtual ~Pump()
 	{	Stop();
 		Stop();
 	}
-    bool Start(const char* name = "Pump",bool isJoin = false)
+	bool StartJoin()
+	{	return Start(true);
+	}
+    bool Start(bool isJoin = false)
     {   if(isGo)
         {   return false;
         }
-		this->name = name;
         isGo=true;
         worker = std::thread(Main,this);
-		PrintTask(name,name);
+		PrintTask(pumpName,pumpName);
 		if(isJoin)
 		{	worker.join();
 		}

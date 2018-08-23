@@ -69,7 +69,7 @@ bool BsdSocket::SetAsyncMode(bool isAsync)
 #endif
 }
 
-bool BsdSocket::Open(const char* serverName, int serverPort,bool isReuseSocket)
+bool BsdSocket::Open(const char* serverName, int serverPort)
 {	puts("libunistd 1.1 " __DATE__ " " __TIME__);
 	if (!serverName || !*serverName || !serverPort)
 	{	errorMsg.Set("No server to open specified");
@@ -94,19 +94,32 @@ bool BsdSocket::Open(const char* serverName, int serverPort,bool isReuseSocket)
 		errorMsg.GetLastError();
 		return false;
 	}
-	if (isReuseSocket)
-	{	const bool ok = SetReuse(socketfd);
-		if (!ok)
-		{	puts("Can't reuse socket");
-		}
-	}
-	const int ok = connect(socketfd, (struct sockaddr*)&server_sockaddr, sizeof(server_sockaddr));
+	return true;
+}
+
+bool BsdSocket::Connect(bool isReuseSocket)
+{	const int ok = connect(socketfd, (struct sockaddr*)&server_sockaddr, sizeof(server_sockaddr));
 	if (ok<0)
 	{	puts("connect failed");
 		errorMsg.GetLastError();
 		return false;
 	}
-	SetReuse(socketfd);
+	if(!SetReuse(socketfd,isReuseSocket))
+	{	puts("Can't reuse socket");
+	}
+	return true;
+}
+
+bool BsdSocket::Bind(bool isReuseSocket)
+{    const int ok = bind(socketfd, (const struct sockaddr *)&server_sockaddr, 
+        sizeof(server_sockaddr));
+	if(ok<0)
+	{	perror("bind failed");
+		return false;
+	}
+	if(!SetReuse(socketfd,isReuseSocket))
+	{	puts("Can't reuse socket");
+	}
 	return true;
 }
 

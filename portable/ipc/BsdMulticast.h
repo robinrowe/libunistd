@@ -29,7 +29,8 @@ protected:
 #endif
 public:
 	BsdMulticast(BsdSocketPool& socketPool)
-	:	headerPacket(nullptr)
+	:	TimerPump("BsdMultiPump")
+	,	headerPacket(nullptr)
 	,	framePacket(nullptr)
 	,	socketPool(socketPool)
 	{	TimerPump::Start();

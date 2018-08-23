@@ -14,7 +14,7 @@ void Pump::Run()
 	{	return;
 	}
     while(isGo)
-    {   if(!Wait())
+    {   if(!Receive())
 		{	continue;
 		}
 		isWake=false;

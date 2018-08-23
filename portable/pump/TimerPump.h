@@ -26,12 +26,13 @@ class TimerPump
 		cv.wait(lock);
 	}
 public:
-    TimerPump()
-	:	isTimeout(false)
+    TimerPump(const char* pumpName)
+	:	Pump(pumpName)
+	,	isTimeout(false)
 	{}
-    bool Start(const char* name="TimerPump",int millis=0,bool isJoin = false)
+    bool Start(int millis=0,bool isJoin = false)
     {   SetTimeout(millis);
-        return Pump::Start(name,isJoin);
+        return Pump::Start(isJoin);
     }
     void SetTimeout(int millis)
     {   wakeDelay = milliseconds(millis);

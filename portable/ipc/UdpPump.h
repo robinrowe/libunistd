@@ -24,8 +24,9 @@ public:
 	~UdpPump()
 	{	Close();
 	}
-	UdpPump(unsigned bufsize)
-	:	udpServer(bufsize)
+	UdpPump(const char* pumpName,unsigned bufsize)
+	:	Pump(pumpName)
+	,	udpServer(bufsize)
 	,	bytesRead(0)
 	,	isVerbose(false)
 	{}
@@ -33,8 +34,11 @@ public:
 	{	this->isVerbose = isVerbose;
 	}
 	bool Open(const char* serverName,unsigned port)
-	{	const bool ok = udpServer.Open(serverName,port);
-		if(!ok)
+	{	if(!udpServer.Open(serverName,port))
+		{	TRACE(0);
+			return false;
+		}
+		if(!udpServer.Bind())
 		{	TRACE(0);
 			return false;
 		}
@@ -45,19 +49,6 @@ public:
 	}
 	void Close()
 	{	udpServer.Close();
-	}
-	bool IsEqual(const char* s,size_t len) const
-	{	if(len>name.length())
-		{	len = name.length();
-		}
-		const char* msg = &udpServer.v[0];
-		return !strncmp(msg,s,len);
-	}
-	bool operator==(const char* s) const
-	{	return IsEqual(s,strlen(s));
-	}
-	bool operator!=(const char* s) const
-	{	return !IsEqual(s,strlen(s));
 	}
 	bool Send(const char* msg)
 	{	return udpServer.Send(msg);
@@ -77,7 +68,7 @@ public:
 		strlcpy(p+1,data,udpServer.v.size()-1 - (p - msg));
 		return Send(msg);
 	}
-	bool Receive()
+	bool Receive() override
 	{	bytesRead = udpServer.Receive();
 		if(bytesRead < 0)
 		{	bytesRead = 0;

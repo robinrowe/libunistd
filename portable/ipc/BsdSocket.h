@@ -118,7 +118,9 @@ public:
 	static bool GetIp(const char* hostname,std::string& ip);
 	static void GetPeerName(SOCKET sock, std::string& s);
 	bool SetAsyncMode(bool isAsync = true);
-	bool Open(const char* serverName, int serverPort,bool isReuseSocket = true);
+	bool Open(const char* serverName, int serverPort);
+	bool Connect(bool isReuseSocket = true);
+	bool Bind(bool isReuseSocket = true);
 	virtual void Close();
 };
 
