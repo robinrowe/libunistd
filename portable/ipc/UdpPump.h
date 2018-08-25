@@ -20,6 +20,16 @@ class UdpPump
 {	BsdSocketUdp udpServer;
 	ssize_t bytesRead;
 	bool isVerbose;
+protected:
+	bool Receive() override
+	{	bytesRead = udpServer.Receive();
+		if(bytesRead < 0)
+		{	bytesRead = 0;
+			TRACE(0);
+			return false;
+		}
+		return true;
+	}
 public:
 	~UdpPump()
 	{	Close();
@@ -67,15 +77,6 @@ public:
 		}
 		strlcpy(p+1,data,udpServer.v.size()-1 - (p - msg));
 		return Send(msg);
-	}
-	bool Receive() override
-	{	bytesRead = udpServer.Receive();
-		if(bytesRead < 0)
-		{	bytesRead = 0;
-			TRACE(0);
-			return false;
-		}
-		return true;
 	}
 	unsigned BytesRead() const
 	{	return bytesRead;

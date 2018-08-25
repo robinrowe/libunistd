@@ -46,6 +46,7 @@ class Pump
 		{	// spurious thread wake
 			return false;
 		}
+		isWake=false;
 		return true;
 	}
     virtual void Action()
