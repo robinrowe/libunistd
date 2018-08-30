@@ -55,6 +55,7 @@ class Pump
 	{	return true;
 	}
     void Run();
+	bool Start(bool isJoin = false);
 public:
     Pump(const char* pumpName)
     :   pumpName(pumpName)
@@ -68,21 +69,9 @@ public:
 	bool StartJoin()
 	{	return Start(true);
 	}
-    bool Start(bool isJoin = false)
-    {   if(isGo)
-        {   return false;
-        }
-        isGo=true;
-        worker = std::thread(Main,this);
-		PrintTask(pumpName,pumpName);
-		if(isJoin)
-		{	worker.join();
-		}
-		else
-		{	worker.detach();
-		}
-        return true;
-    }
+	bool StartDetach()
+	{	return Start(false);
+	}
     bool Stop()
     {   isGo=false;
 		Wake();

@@ -97,30 +97,39 @@ bool BsdSocket::Open(const char* serverName, int serverPort)
 	return true;
 }
 
-bool BsdSocket::Connect(bool isReuseSocket)
+bool BsdSocket::Connect()
 {	const int ok = connect(socketfd, (struct sockaddr*)&server_sockaddr, sizeof(server_sockaddr));
 	if (ok<0)
 	{	puts("connect failed");
 		errorMsg.GetLastError();
 		return false;
 	}
-	if(!SetReuse(socketfd,isReuseSocket))
-	{	puts("Can't reuse socket");
-	}
 	return true;
 }
 
-bool BsdSocket::Bind(bool isReuseSocket)
+bool BsdSocket::Bind()
 {    const int ok = bind(socketfd, (const struct sockaddr *)&server_sockaddr, 
         sizeof(server_sockaddr));
 	if(ok<0)
 	{	perror("bind failed");
 		return false;
 	}
-	if(!SetReuse(socketfd,isReuseSocket))
-	{	puts("Can't reuse socket");
-	}
 	return true;
+}
+
+bool BsdSocket::SetTimeout(unsigned timeout_in_seconds)
+{
+#ifdef _WIN32
+	const DWORD timeout = timeout_in_seconds * 1000;
+	const int ok = setsockopt(socketfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof timeout);
+	return ok!=-1;
+#else
+	struct timeval tv;
+	tv.tv_sec = timeout_in_seconds;
+	tv.tv_usec = 0;
+	const int ok = setsockopt(socketfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
+	return ok!=-1;
+#endif
 }
 
 }

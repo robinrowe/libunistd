@@ -17,12 +17,12 @@ namespace portable {
 
 class UdpPump
 :	public Pump
-{	BsdSocketUdp udpServer;
-	ssize_t bytesRead;
+{	ssize_t bytesRead;
 	bool isVerbose;
 protected:
 	bool Receive() override
-	{	bytesRead = udpServer.Receive();
+	{	bytesRead = udpSocket.Receive();
+		Wake();
 		if(bytesRead < 0)
 		{	bytesRead = 0;
 			TRACE(0);
@@ -31,12 +31,13 @@ protected:
 		return true;
 	}
 public:
+	BsdSocketUdp udpSocket;
 	~UdpPump()
 	{	Close();
 	}
-	UdpPump(const char* pumpName,unsigned bufsize)
+	UdpPump(const char* pumpName,size_t bufsize)
 	:	Pump(pumpName)
-	,	udpServer(bufsize)
+	,	udpSocket(bufsize)
 	,	bytesRead(0)
 	,	isVerbose(false)
 	{}
@@ -44,53 +45,62 @@ public:
 	{	this->isVerbose = isVerbose;
 	}
 	bool Open(const char* serverName,unsigned port)
-	{	if(!udpServer.Open(serverName,port))
-		{	TRACE(0);
-			return false;
-		}
-		if(!udpServer.Bind())
+	{	if(!udpSocket.Open(serverName,port))
 		{	TRACE(0);
 			return false;
 		}
 		return true;
 	}
+	bool Bind()
+	{	if(!udpSocket.Bind())
+		{	TRACE(0);
+			return false;
+	}	}
+	bool Connect()
+	{	if(!udpSocket.Connect())
+		{	TRACE(0);
+			return false;
+	}	}
 	bool operator!() const
 	{	return UdpPump::operator!();
 	}
 	void Close()
-	{	udpServer.Close();
+	{	udpSocket.Close();
 	}
 	bool Send(const char* msg)
-	{	return udpServer.Send(msg);
+	{	return udpSocket.Send(msg);
 	}
 	bool Send(const char* command,const char* data)
-	{	char* msg = &udpServer.v[0];
-		strlcpy(msg,command,udpServer.v.size()-1);
+	{	char* msg = &udpSocket.v[0];
+		strlcpy(msg,command,udpSocket.v.size()-1);
 		strlcpy(msg+strlen(command),data,strlen(msg));
 		return Send(msg);
 	}
 	bool SendReply(const char* data)
-	{	char* msg = &udpServer.v[0];
+	{	char* msg = &udpSocket.v[0];
 		char* p = strchr(msg,' ');
 		if(!p)
 		{	return false;
 		}
-		strlcpy(p+1,data,udpServer.v.size()-1 - (p - msg));
+		strlcpy(p+1,data,udpSocket.v.size()-1 - (p - msg));
 		return Send(msg);
 	}
 	unsigned BytesRead() const
 	{	return bytesRead;
 	}
 	const char* c_str() const
-	{	return &udpServer.v[0];
+	{	return &udpSocket.v[0];
 	}
 	char* c_str()
-	{	return &udpServer.v[0];
+	{	return &udpSocket.v[0];
+	}
+	bool IsCommand(const char* cmd,size_t length) const
+	{	const int isDifferent = memcmp(&udpSocket.v[0],cmd,length);
+		return !isDifferent;
 	}
 	bool IsCommand(const char* cmd) const
 	{	const size_t length = strlen(cmd);
-		const int isDifferent = memcmp(&udpServer.v[0],cmd,length);
-		return !isDifferent;
+		return IsCommand(cmd,length);
 	}
 };
 

@@ -19,4 +19,20 @@ void Pump::Run()
     }   }
 }
 
+bool Pump::Start(bool isJoin)
+{   if(isGo)
+    {   return false;
+    }
+    isGo=true;
+    worker = std::thread(Main,this);
+	PrintTask(pumpName,pumpName);
+	if(isJoin)
+	{	worker.join();
+	}
+	else
+	{	worker.detach();
+	}
+    return true;
+}
+
 }

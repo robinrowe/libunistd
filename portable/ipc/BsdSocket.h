@@ -119,8 +119,9 @@ public:
 	static void GetPeerName(SOCKET sock, std::string& s);
 	bool SetAsyncMode(bool isAsync = true);
 	bool Open(const char* serverName, int serverPort);
-	bool Connect(bool isReuseSocket = true);
-	bool Bind(bool isReuseSocket = true);
+	bool Connect();
+	bool Bind();
+	bool SetTimeout(unsigned secondsTimeout);// Call before Bind()
 	virtual void Close();
 };
 
