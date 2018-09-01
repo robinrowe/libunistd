@@ -36,19 +36,19 @@ public:
 	}
 	bool Receive()
 	{	const int bufsize = (int) v.size();
-		const int bytes = RecvFrom(&v[0],bufsize,0);
-		if(bytes<=0)
+		bytesRead = RecvFrom(&v[0],bufsize,0);
+		if(bytesRead<=0)
 		{	v[0] = 0;
 			return false;
 		}
-		if(bytes >= bufsize)
+		if(bytesRead >= bufsize)
 		{	v[bufsize-1] = 0;
-			return bufsize;
+			return true;
 		}
-		v[bytes] = 0;
-		return bytes;
+		v[bytesRead] = 0;
+		return true;
 	}
-	operator const char*() const
+	const char* c_str() const
 	{	return &v[0];
 	}
 };

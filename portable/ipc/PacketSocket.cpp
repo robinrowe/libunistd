@@ -72,7 +72,7 @@ bool PacketSocket::SetAsyncMode(bool isAsync)
 }
 
 bool PacketSocket::Open(const char* serverName, int serverPort,bool isReuseSocket)
-{	puts("libunistd 1.1 " __DATE__ " " __TIME__);
+{	puts("PacketSocket: libunistd 1.1 " __DATE__ " " __TIME__);
 	if (!serverName || !*serverName || !serverPort)
 	{	errorMsg.Set("No server to open specified");
 		return false;

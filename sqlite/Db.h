@@ -61,21 +61,33 @@ class Db
 :	public DbBase
 {	sqlite3* db;
 	bool isOpen;
+	bool isTrace;
 	const char* errorMsg;
 	void SetErrorMsg()
 	{	errorMsg=sqlite3_errmsg(db);
 		status=errorMsg;
 		//qDebug()<<"Error "<<errorMsg;
 	}
+	void Trace(const char* msg)
+	{	if(!isTrace)
+		{	return;
+		}
+		printf("TRACE SQL: %s\n",msg);
+		//qDebug()<<sql;
+	}
 public:
 	std::string status;
 	Db()
-	:	db(0),
-		errorMsg(0),
-		isOpen(false)
+	:	db(0)
+	,	errorMsg(0)
+	,	isOpen(false)
+	,	isTrace(false)
 	{}
 	~Db()
 	{   Close();
+	}
+	void SetTrace(bool isTrace = true)
+	{	this->isTrace = isTrace;
 	}
 	bool IsExist(const char* dbName) const
 	{	return IsFile(dbName);
@@ -106,7 +118,10 @@ public:
 		}
 	}
 	bool Exec(const char* sql,DbCallback callback,void* object)
-	{	//qDebug()<<sql;
+	{	if(!sql)
+		{	return false;
+		}
+		Trace(sql);
 		const int rc = sqlite3_exec(db, sql, callback, object,(char**) &errorMsg);
 		if(rc!=SQLITE_OK)
 		{   SetErrorMsg();

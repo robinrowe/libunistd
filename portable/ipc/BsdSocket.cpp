@@ -6,6 +6,7 @@
 #pragma comment(lib, "libunistd.lib")
 
 #include "BsdSocket.h"
+#define ON_SOCKET_ERROR(msg) OnSocketError(__FILE__,__LINE__,msg)
 
 namespace portable 
 {
@@ -70,15 +71,13 @@ bool BsdSocket::SetAsyncMode(bool isAsync)
 }
 
 bool BsdSocket::Open(const char* serverName, int serverPort)
-{	puts("libunistd 1.1 " __DATE__ " " __TIME__);
-	if (!serverName || !*serverName || !serverPort)
-	{	errorMsg.Set("No server to open specified");
+{	if (!serverName || !*serverName || !serverPort)
+	{	ON_SOCKET_ERROR("No server to open specified");
 		return false;
 	}
 	socketfd = OpenSocket();
 	if (socketfd == -1)
-	{	puts("OpenSocket failed");
-		errorMsg.GetLastError();
+	{	ON_SOCKET_ERROR("OpenSocket failed");
 		return false;
 	}
 	memset((char *)&server_sockaddr, 0, sizeof(server_sockaddr));
@@ -90,8 +89,7 @@ bool BsdSocket::Open(const char* serverName, int serverPort)
 	{	hostname = serverName;
 	}
 	if (1 != inet_pton(AF_INET, hostname.c_str(), &server_sockaddr.sin_addr))
-	{	puts("inet_pton failed");
-		errorMsg.GetLastError();
+	{	ON_SOCKET_ERROR("inet_pton failed");
 		return false;
 	}
 	return true;
@@ -100,8 +98,7 @@ bool BsdSocket::Open(const char* serverName, int serverPort)
 bool BsdSocket::Connect()
 {	const int ok = connect(socketfd, (struct sockaddr*)&server_sockaddr, sizeof(server_sockaddr));
 	if (ok<0)
-	{	puts("connect failed");
-		errorMsg.GetLastError();
+	{	ON_SOCKET_ERROR("connect failed");
 		return false;
 	}
 	return true;
@@ -111,12 +108,12 @@ bool BsdSocket::Bind()
 {    const int ok = bind(socketfd, (const struct sockaddr *)&server_sockaddr, 
         sizeof(server_sockaddr));
 	if(ok<0)
-	{	perror("bind failed");
+	{	ON_SOCKET_ERROR("bind failed");
 		return false;
 	}
 	return true;
 }
-
+/*
 bool BsdSocket::SetTimeout(unsigned timeout_in_seconds)
 {
 #ifdef _WIN32
@@ -130,6 +127,30 @@ bool BsdSocket::SetTimeout(unsigned timeout_in_seconds)
 	const int ok = setsockopt(socketfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
 	return ok!=-1;
 #endif
+}
+*/
+bool BsdSocket::SendTo(const char* msg,unsigned len)
+{	if(!IsOpen())
+	{	return false;
+	}
+	int slen = sizeof(sockaddr_in);
+	Trace("SendTo",msg,len);
+	if(sendto(socketfd,msg,len,0,(struct sockaddr *)&server_sockaddr,slen)==-1)
+	{	ON_SOCKET_ERROR("sendto");
+		return false;
+	}
+	return true;
+}
+
+int BsdSocket::RecvFrom(char* buffer,unsigned bufsize,unsigned offset)
+{	int slen = sizeof(sockaddr_in);
+	if(socketfd<=0)
+	{	ON_SOCKET_ERROR("Socket not open");
+		return -1;
+	}	
+	bytesRead = recvfrom(socketfd,buffer+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
+	Trace("RecvFrom",buffer+offset,bytesRead);
+	return bytesRead;
 }
 
 }

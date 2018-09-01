@@ -224,7 +224,7 @@ FILE *popen(const char *command, const char *type)
 
 inline
 int pclose(FILE *stream)
-{	return _pclose(stream);
+{	return stream ? _pclose(stream):-1;
 }
 
 //#define send send2

@@ -16,6 +16,7 @@
 #include "../MsgBuffer.h"
 #include "../AtomicCounter.h"
 #include "../VerboseCounter.h"
+#include "../SystemLog.h"
 
 #pragma warning(disable:4265)
 
@@ -25,22 +26,47 @@ namespace portable
 class BsdSocket
 {protected:
 	SOCKET socketfd;
+	int bytesRead;
 	bool isVerbose;
+	bool isTrace;
 	sockaddr_in server_sockaddr;
 	virtual int OpenSocket()
-	{	puts("OpenSocket");
+	{	TRACE("OpenSocket not implemented");
 		return 0;
 	}
+	virtual void OnSocketError(const char* filename,int lineno,const char* msg)
+	{	if(!isVerbose)
+		{	return;
+		}
+		portable::SystemLog(filename,lineno,msg);
+	}
+	void Trace(const char* msg)
+	{	if(!isTrace)
+		{	return;
+		}
+		printf("TRACE SOCKET: %s\n",msg);
+	}
+	void Trace(const char* function,const char* msg,int length)
+	{	if(!isTrace)
+		{	return;
+		}
+		printf("TRACE SOCKET %s(%i): %.*s\n",function,length,length,msg);
+	}
 public:
-	MsgBuffer<120> errorMsg;
+//	MsgBuffer<120> errorMsg;
 	virtual ~BsdSocket()
 	{	// Close(); Don't do this, might be a temp copy
 	}
 	BsdSocket()
 	:	socketfd(0)
+	,	bytesRead(0)
+	,	isTrace(false)
+	,	isVerbose(false)
 	{}
 	BsdSocket(SOCKET socketfd)
 	:	socketfd(socketfd)
+	,	isTrace(false)
+	,	isVerbose(false)
 	{}
 	BsdSocket(const BsdSocket&) = default;
 	void SetVerbose(bool isVerbose = true)
@@ -49,23 +75,14 @@ public:
 	bool IsVerbose() const
 	{	return isVerbose;
 	}
+	void SetTrace(bool isTrace = true)
+	{	this->isTrace = isTrace;
+	}
+	bool IsTrace() const
+	{	return isTrace;
+	}
 	bool IsOpen() const
 	{	return socketfd > 0;
-	}
-	bool SendTo(const char* msg,unsigned len)
-	{	if(!IsOpen())
-		{	return false;
-		}
-		int slen = sizeof(sockaddr_in);
-		if(isVerbose)
-		{	printf("SendTo: %.*s", len, msg);
-			//fwrite(msg,len,1,stdout);
-		}
-		if(sendto(socketfd,msg,len,0,(struct sockaddr *)&server_sockaddr,slen)==-1)
-		{	OnSocketError(msg,len);
-			return false;
-		}
-		return true;
 	}
 	bool Send(const char* s)
 	{	if(!s)
@@ -73,19 +90,6 @@ public:
 		}
 		const unsigned len = (unsigned) strlen(s);
 		return SendTo(s,len);
-	}
-	int RecvFrom(char* buffer,unsigned bufsize,unsigned offset=0)
-	{	int slen = sizeof(sockaddr_in);
-		if(socketfd<=0)
-		{	errorMsg.Set("Socket not open");
-			return -1;
-		}	
-		const int bytes = recvfrom(socketfd,buffer+offset,bufsize-offset,0,(struct sockaddr *)&server_sockaddr,&slen);
-		if(isVerbose && bytes >= 0)
-		{	printf("RecvFrom: %.*s", bytes, buffer+offset);
-			//fwrite(msg,len,1,stdout);
-		}
-		return bytes;
 	}
 	void SocketReset(const char* msg = nullptr)
 	{	socketfd=0;
@@ -104,16 +108,14 @@ public:
 		const int status = setsockopt(socketfd,SOL_SOCKET,SO_REUSEADDR,p,size);
 		return status > 0;
 	}
-	virtual void OnSocketError(const char* msg,unsigned len)
-	{	(void)msg;
-		(void)len;
-		puts(errorMsg.GetLastError());
-	}
 	bool SendEmptyPacket()
-	{	if(isVerbose)
-		{	puts("Send Empty Packet");
+	{	if(isTrace)
+		{	Trace("Send Empty Packet");
 		}
 		return SendTo("", 0);
+	}
+	int BytesRead() const
+	{	return bytesRead;
 	}
 	static bool GetIp(const char* hostname,std::string& ip);
 	static void GetPeerName(SOCKET sock, std::string& s);
@@ -121,8 +123,10 @@ public:
 	bool Open(const char* serverName, int serverPort);
 	bool Connect();
 	bool Bind();
-	bool SetTimeout(unsigned secondsTimeout);// Call before Bind()
+//	bool SetTimeout(unsigned secondsTimeout);// Call before Bind()
 	virtual void Close();
+	bool SendTo(const char* msg,unsigned len);
+	int RecvFrom(char* buffer,unsigned bufsize,unsigned offset=0);
 };
 
 }

@@ -17,15 +17,11 @@ namespace portable {
 
 class UdpPump
 :	public Pump
-{	ssize_t bytesRead;
-	bool isVerbose;
+{	bool isVerbose;
 protected:
 	bool Receive() override
-	{	bytesRead = udpSocket.Receive();
-		Wake();
-		if(bytesRead < 0)
-		{	bytesRead = 0;
-			TRACE(0);
+	{	if(!udpSocket.Receive())
+		{	TRACE(0);
 			return false;
 		}
 		return true;
@@ -38,11 +34,13 @@ public:
 	UdpPump(const char* pumpName,size_t bufsize)
 	:	Pump(pumpName)
 	,	udpSocket(bufsize)
-	,	bytesRead(0)
 	,	isVerbose(false)
 	{}
 	void SetVerbose(bool isVerbose = true)
 	{	this->isVerbose = isVerbose;
+	}
+	void SetTrace(bool isTrace = true)
+	{	udpSocket.SetTrace(isTrace);
 	}
 	bool Open(const char* serverName,unsigned port)
 	{	if(!udpSocket.Open(serverName,port))
@@ -55,12 +53,16 @@ public:
 	{	if(!udpSocket.Bind())
 		{	TRACE(0);
 			return false;
-	}	}
+		}
+		return true;
+	}
 	bool Connect()
 	{	if(!udpSocket.Connect())
 		{	TRACE(0);
 			return false;
-	}	}
+		}
+		return true;
+	}
 	bool operator!() const
 	{	return UdpPump::operator!();
 	}
@@ -86,7 +88,7 @@ public:
 		return Send(msg);
 	}
 	unsigned BytesRead() const
-	{	return bytesRead;
+	{	return udpSocket.BytesRead();
 	}
 	const char* c_str() const
 	{	return &udpSocket.v[0];

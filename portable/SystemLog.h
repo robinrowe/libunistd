@@ -77,7 +77,7 @@ void StatusMsg(const char* msg)
 	OutputDebugStringA(msg);
 #endif
 #endif
-	puts(msg);
+	printf("Status: %s\n",msg);
 }
 
 }
