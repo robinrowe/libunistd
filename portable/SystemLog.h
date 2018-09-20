@@ -9,6 +9,7 @@ namespace portable
 {
 
 #ifdef _WIN32
+#include "../unistd/unistd.h"
 #ifdef _DEBUG
 #include <crtdbg.h>
 #endif
@@ -58,7 +59,9 @@ void SystemLog(const char* filename,int lineNo,const char* msg)
 #else
 	_CrtDbgReport( _CRT_WARN,filename,lineNo,msg,NULL);
 #endif
+#ifdef DEBUG_BREAK
 	DebugBreak();
+#endif
 #endif
 #ifdef SYSTEM_LOGFILE
 	if(systemLogfile)

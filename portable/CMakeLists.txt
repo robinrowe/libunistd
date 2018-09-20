@@ -53,8 +53,8 @@ set(HEADERS
 	thread_semaphore.h
 	time/Timecode.h
 	pump/TimerPump.h
-	time/TimeSpan.h
-	time/TimeStamp.h
+	time/Timespan.h
+	time/Timestamp.h
 	UnrealLogger.h
 	time/VariableClock.h
 	Vec3d.h
@@ -75,6 +75,7 @@ set(SOURCE
 	Network.cpp
 	ipc/PacketReader.cpp
 	pump/Pump.cpp
+	time/Timestamp.cpp
 	time/VariableClock.cpp
 	WormFile.cpp
 )

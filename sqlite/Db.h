@@ -1,4 +1,4 @@
-// libsqlite/Sqlite.h
+// sqlite/SqliteDb.h
 // Robin.Rowe@Cinepaint.org
 // 2015/8/3
 
@@ -8,57 +8,14 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "source/sqlite3.h"
 #include <string>
-//#include <stdint.h>
-//#include <QDebug>
+#include <portable/Db.h>
+#include "source/sqlite3.h"
 
 namespace sqlite {
 
-class DbBase
-{
-public:
-	typedef int (*DbCallback)(void*,int,char**,char**);
-	virtual ~DbBase()
-	{	Close();
-	}
-	virtual bool IsExist(const char* dbName) const = 0;
-	virtual bool IsOpen() const = 0;
-	virtual bool Open(const char* dbName) = 0;
-	virtual void Close()
-	{}
-	virtual bool Exec(const char* ,DbCallback )
-	{   return false;
-	}
-};
-
-inline
-bool IsFile(const char* filename)
-{
-#ifdef WIN32
-	struct __stat64 st;
-	const int err = _stat64(filename, &st);
-	if(err!=0)
-	{	return false;
-	}
-	return true;
-#else
-	struct stat st;
-	const int err = stat(filename, &st);
-	if(err!=0)
-	{	return false;
-	}
-	return true;
-#endif
-}
-
-inline
-void DropFile(const char* filename)
-{   remove(filename);
-}
-
 class Db
-:	public DbBase
+:	public portable::Db
 {	sqlite3* db;
 	bool isOpen;
 	bool isTrace;
@@ -85,6 +42,9 @@ public:
 	{}
 	~Db()
 	{   Close();
+	}
+	operator sqlite3*()
+	{	return db;
 	}
 	void SetTrace(bool isTrace = true)
 	{	this->isTrace = isTrace;
@@ -163,55 +123,6 @@ public:
 		return 0;
 	}
 };
-
-#if 0
-int main(int argc, char* argv[])
-{	Sqlite db;
-	if(!db.Open("test.db"))
-	{	fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-		return 1;
-	}
-	fprintf(stderr, "Opened database successfully\n");
-	const char* sql = "CREATE TABLE COMPANY("
-		 "ID INT PRIMARY KEY     NOT NULL,"
-		 "NAME           TEXT    NOT NULL,"
-		 "AGE            INT     NOT NULL,"
-		 "ADDRESS        CHAR(50),"
-		 "SALARY         REAL );";
-	if(db.Exec(sql,Sqlite::Print))
-	{	fprintf(stderr, "SQL error: %s\n", db.GetErrorMsg());
-		return 2;
-	}
-	else
-	{	fprintf(stdout, "Table created successfully\n");
-	}
-	sql = "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY) "
-		 "VALUES (1, 'Paul', 32, 'California', 20000.00 ); "
-		 "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY) "
-		 "VALUES (2, 'Allen', 25, 'Texas', 15000.00 ); "
-		 "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)"
-		 "VALUES (3, 'Teddy', 23, 'Norway', 20000.00 );"
-		 "INSERT INTO COMPANY (ID,NAME,AGE,ADDRESS,SALARY)"
-		 "VALUES (4, 'Mark', 25, 'Rich-Mond ', 65000.00 );";
-	if(db.Exec(sql,Sqlite::Print))
-	{	fprintf(stderr, "SQL error: %s\n", db.GetErrorMsg());
-		return 3;
-	}
-	else
-	{	fprintf(stdout, "Table inserted successfully\n");
-	}
-	sql = "SELECT * from COMPANY";
-	if(db.Exec(sql,Sqlite::Print))
-	{	fprintf(stderr, "SQL error: %s\n", db.GetErrorMsg());
-		return 4;
-	}
-	else
-	{	fprintf(stdout, "Table queried successfully\n");
-	}
-	return 0;
-}
-#endif
-//$g++ test.c -l sqlite3
 
 }
 

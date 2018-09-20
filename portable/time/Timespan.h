@@ -1,9 +1,9 @@
-// TimeSpan.h
+// Timespan.h
 // Libunistd Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT
 
-#ifndef TimeSpan_h
-#define TimeSpan_h
+#ifndef Timespan_h
+#define Timespan_h
 
 #include <chrono>
 #include <stdio.h>
@@ -11,13 +11,13 @@
 namespace portable
 {
 
-class TimeSpan
+class Timespan
 {   double longestDuration;
 	double shortestDuration;
 	unsigned tickCount;
 	std::chrono::steady_clock::time_point start; 
 public:
-    TimeSpan()
+    Timespan()
 	{	Reset();
 	}
 	void Reset(const char* msg = nullptr)
@@ -60,12 +60,12 @@ public:
 /* Use like this...
 
 int main()
-{	TimeSpan timeSpan;// starts time here
+{	Timespan Timespan;// starts time here
 	for(unsigned i=0;i<5;i++)
 	{	sleep(5);
-		timeSpan.Snap();// checks interval here
+		Timespan.Snap();// checks interval here
 	}
-	printf("TimeSpan intervals: shortest = %f, longest = %f, tickCount = %u",timeSpan.GetShortest(),timeSpan.GetLongest(), timeSpan.GetTickCount());
+	printf("Timespan intervals: shortest = %f, longest = %f, tickCount = %u",Timespan.GetShortest(),Timespan.GetLongest(), Timespan.GetTickCount());
 	return 1;
 }
 

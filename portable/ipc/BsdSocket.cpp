@@ -12,7 +12,7 @@ namespace portable
 {
 
 void BsdSocket::Close()
-{	puts("Socket close");
+{	Trace("Socket close");
 	if(socketfd)
 	{	SendEmptyPacket();
 		closesocket(socketfd);
@@ -75,6 +75,7 @@ bool BsdSocket::Open(const char* serverName, int serverPort)
 	{	ON_SOCKET_ERROR("No server to open specified");
 		return false;
 	}
+	TraceOpen(serverName,serverPort);
 	socketfd = OpenSocket();
 	if (socketfd == -1)
 	{	ON_SOCKET_ERROR("OpenSocket failed");

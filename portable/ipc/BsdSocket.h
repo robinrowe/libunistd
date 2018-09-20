@@ -17,6 +17,7 @@
 #include "../AtomicCounter.h"
 #include "../VerboseCounter.h"
 #include "../SystemLog.h"
+#include "../time/Timestamp.h"
 
 #pragma warning(disable:4265)
 
@@ -29,6 +30,7 @@ class BsdSocket
 	int bytesRead;
 	bool isVerbose;
 	bool isTrace;
+	bool isAutoClose;
 	sockaddr_in server_sockaddr;
 	virtual int OpenSocket()
 	{	TRACE("OpenSocket not implemented");
@@ -44,31 +46,46 @@ class BsdSocket
 	{	if(!isTrace)
 		{	return;
 		}
-		printf("TRACE SOCKET: %s\n",msg);
+		portable::Timestamp now;
+		const char* t = now.toString();
+		printf("TRACE SOCKET(%s): %s\n",t,msg);
 	}
 	void Trace(const char* function,const char* msg,int length)
 	{	if(!isTrace)
 		{	return;
 		}
-		printf("TRACE SOCKET %s(%i): %.*s\n",function,length,length,msg);
+		portable::Timestamp now;
+		const char* t = now.toString();
+		printf("TRACE SOCKET %s(%s): %.*s[%i]\n", function,t,length,msg,length);
+	}
+	void TraceOpen(const char* serverName,int port)
+	{	if(!isTrace)
+		{	return;
+		}
+		portable::Timestamp now;
+		const char* t = now.toString();
+		printf("TRACE SOCKET OPEN %s:%i @ %s\n",serverName,port,t);
 	}
 public:
-//	MsgBuffer<120> errorMsg;
+    BsdSocket(BsdSocket const&) = delete;
+    BsdSocket& operator=(BsdSocket const&) = delete;
 	virtual ~BsdSocket()
-	{	// Close(); Don't do this, might be a temp copy
-	}
+	{	if(isAutoClose) // ok, not a temp copy
+		{	Close(); 
+	}	}
 	BsdSocket()
 	:	socketfd(0)
 	,	bytesRead(0)
 	,	isTrace(false)
 	,	isVerbose(false)
+	,	isAutoClose(true)
 	{}
 	BsdSocket(SOCKET socketfd)
 	:	socketfd(socketfd)
 	,	isTrace(false)
 	,	isVerbose(false)
+	,	isAutoClose(false)
 	{}
-	BsdSocket(const BsdSocket&) = default;
 	void SetVerbose(bool isVerbose = true)
 	{	this->isVerbose = isVerbose;
 	}
