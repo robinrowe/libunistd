@@ -41,35 +41,66 @@
 #define PROT_WRITE PAGE_READWRITE
 #define PROT_NONE PAGE_NOACCESS
 
-static std::vector<HANDLE> mapHandle;
+struct ShmHandle
+{	HANDLE h;
+	void* p;
+	ShmHandle(HANDLE h,void* p)
+	:	h(h)
+	,	p(p)
+	{}
+	void Clear()
+	{	h=0;
+		p=0;
+	}
+	bool operator!() const
+	{	return !h;
+	}
+};
+
+static std::vector<ShmHandle> shmMap;
 
 inline
 int shm_open(const char *name, int oflag, mode_t mode)
 {	std::string s("Global\\");
 	s += name+1;
-	HANDLE hMapFile = CreateFileMappingA(
+	DWORD flag = 0;
+	if(oflag|O_RDWR)
+	{	flag = PAGE_READWRITE;
+	}
+	HANDLE hMapFile = 0;
+	if(oflag|O_CREAT)
+	{	hMapFile = CreateFileMappingA(
 		INVALID_HANDLE_VALUE, // use paging file
 		NULL, // default security
-		oflag, // read/write access
+		flag, // read/write access
 		0,  // maximum object size (high-order DWORD)
-		0,  // maximum object size (low-order DWORD)
-		&s[0]); // name of mapping object
-	if(!hMapFile)
-	{	return -1;
+		100,  // maximum object size (low-order DWORD)
+		s.c_str()); // name of mapping object
 	}
-	mapHandle.push_back(hMapFile);
-	return int(mapHandle.size());
+	else
+	{   hMapFile = OpenFileMapping(
+                   FILE_MAP_ALL_ACCESS,   // read/write access
+                   FALSE,                 // do not inherit the name
+                   name);               // name of mapping object
+	}	
+	if(!hMapFile)
+	{	int err = GetLastError();
+		return -1;
+	}
+	shmMap.push_back(ShmHandle(hMapFile,0));
+	return int(shmMap.size());
 }
 
 inline
 void* mmap(void *addr, size_t len, int prot, int flags,int fd, off_t off)
-{	if(0>=fd || mapHandle.size() <= fd-1)
+{	if(0>=fd || shmMap.size() <= fd-1)
 	{	return MAP_FAILED;
 	}
-	HANDLE hMapFile = mapHandle[fd-1];
-	void* p = MapViewOfFile(hMapFile,FILE_MAP_ALL_ACCESS,0,0,len);
+	ShmHandle mh = shmMap[fd-1];
+	void* p = MapViewOfFile(mh.h,FILE_MAP_ALL_ACCESS,0,0,len);
 	if(!p)
-	{	//CloseHandle(hMapFile);
+	{	CloseHandle(mh.h);
+		shmMap[fd-1].Clear();
 		return MAP_FAILED;
 	}
 	return p;
@@ -77,11 +108,15 @@ void* mmap(void *addr, size_t len, int prot, int flags,int fd, off_t off)
 
 inline
 int shm_close(int fd)
-{	if(0>=fd || mapHandle.size() <= fd-1)
+{	if(0>=fd || shmMap.size() <= fd-1)
 	{	return -1;
 	}
-	HANDLE hMapFile = mapHandle[fd-1];
-	BOOL ok = CloseHandle(hMapFile);
+	ShmHandle mh = shmMap[fd-1];
+	if(mh.p)
+	{	UnmapViewOfFile(mh.p);
+	}	
+	BOOL ok = CloseHandle(mh.h);
+	shmMap[fd-1].Clear();
 	if(!ok)
 	{	return -1;
 	}	
@@ -99,11 +134,11 @@ int shm_unlink(const char *name)
 
 inline
 int shm_ftruncate(int fd, off_t length)
-{	if(0>=fd || mapHandle.size() <= fd-1)
+{	if(0>=fd || shmMap.size() <= fd-1)
 	{	return -1;
 	}
-	HANDLE hMapFile = mapHandle[fd-1];
-	const BOOL ok = SetEndOfFile(hMapFile);
+	ShmHandle mh = shmMap[fd-1];
+	const BOOL ok = SetEndOfFile(mh.h);
 	if(!ok)
 	{	return -1;
 	}	

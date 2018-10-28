@@ -16,7 +16,7 @@
 int main(int argc, char **argv) 
 {	int oflags=O_RDWR;
 	int i;
-	char   *name   = "/junk.01";
+	char   *name   = "/mmanjunk";
 	int     fd     = shm_open(name, oflags, 0644 );
 	fprintf(stderr,"Shared Mem Descriptor: fd=%d\n", fd);
 	assert (fd>0);

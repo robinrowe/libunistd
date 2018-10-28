@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 {	int oflags=O_RDWR;
 	oflags = O_RDWR | O_CREAT;
 	off_t   length = 2 * 1024;
-	char *name   = "/junk.01";
+	char *name   = "/mmanjunk";
 	int fd = shm_open(name, oflags, 0644 );
 	shm_ftruncate(fd, length);
 	fprintf(stderr,"Shared Mem Descriptor: fd=%d\n", fd);
