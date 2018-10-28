@@ -1,0 +1,6 @@
+# libunistd/test/shm/CMakeList.txt
+
+add_executable(shm_server shm_server.cpp)
+target_link_libraries(shm_server libunistd)
+add_executable(shm_client shm_server.cpp)
+target_link_libraries(shm_client libunistd)

@@ -1,0 +1,6 @@
+# libunistd/test/mman/CMakeList.txt
+
+add_executable(mman_server mman_server.cpp)
+target_link_libraries(mman_server libunistd)
+add_executable(mman_client mman_client.cpp)
+target_link_libraries(mman_client libunistd)
