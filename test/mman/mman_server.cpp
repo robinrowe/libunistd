@@ -10,11 +10,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
-
-#ifndef _WIN32
-#define shm_close close
-#define shm_ftruncate ftruncate
-#endif
+#include <more/shm_more.h>
 
 int main(int argc, char **argv) 
 {	int oflags=O_RDWR;

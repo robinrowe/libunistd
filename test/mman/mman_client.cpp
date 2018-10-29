@@ -10,25 +10,13 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
-
-#ifndef _WIN32
-#define shm_close close
-#define shm_flush(fd) 
-
-int shm_size(int fd)
-{	struct stat sb;
-	fstat(fd, &sb);
-	off_t length = sb.st_size;
-	return int(length);
-}
-#endif
+#include <more/shm_more.h>
 
 int main(int argc, char **argv) 
 {	int oflags=O_RDWR;
-	int i;
 	char *name = "/mmanjunk";
 	int fd = shm_open(name, oflags, 0644 );
-	fprintf(stderr,"Shared Mem Descriptor: fd=%d\n", fd);
+	printf("Shared Mem Descriptor: fd=%d\n", fd);
 	assert (fd>0);
 	size_t length = shm_size(fd);
 	char* p = (char *) mmap(NULL, length, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);

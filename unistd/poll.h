@@ -26,21 +26,21 @@ int poll(struct pollfd *fds, nfds_t nfds, int mille_timeout)
 	if(!fd)
 	{	return -1;
 	}
-	u_int* readerCount=&fd[0].fd_count;
+	u_int* const readerCount=&fd[0].fd_count;
 	*readerCount=0;
 	SOCKET* fdReader=fd[0].fd_array;
 	int writer=nfds;
-	u_int* writerCount=&fd[nfds].fd_count;
+	u_int* const writerCount=&fd[nfds].fd_count;
 	*writerCount=0;
 	SOCKET* fdWriter=fd[nfds].fd_array;
 	for(int i=0;i<nfds;i++)
 	{	if(fds[i].events & POLLIN)
 		{	fdReader[*readerCount]=fds[i].fd;
-			*readerCount++;
+			(*readerCount)++;
 		}
 		if(fds[i].events & POLLOUT)
 		{	fdWriter[*writerCount]=fds[i].fd;
-			*writerCount++;
+			(*writerCount)++;
 	}	}
 	fd_set fdExcept;
 	fdExcept.fd_count=0;
