@@ -156,7 +156,7 @@ prog_inv_sh_nm_from_file(char *f, char stripext)
 		t++;
 	else
 		t = f;
-
+#pragma warning(disable : 4996)
 	strncpy(prog_inv_sh_nm_buf, t, sizeof(prog_inv_sh_nm_buf) - 1);
 	prog_inv_sh_nm_buf[sizeof(prog_inv_sh_nm_buf) - 1] = '\0';
 
@@ -184,6 +184,7 @@ errmsg(char doexit, int excode, char adderr, const char *fmt, ...)
 	}
 	if (adderr)
 		fprintf(stderr, "%s",strerror (errno));
+#pragma warning(default : 4996)
 	fprintf(stderr, "\n");
 	if (doexit)
 		exit(excode);

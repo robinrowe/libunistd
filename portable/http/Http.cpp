@@ -80,6 +80,7 @@ bool Http::http_query(const char *command, const char *url,const char *additiona
 	if (pfd) 
 	{	*pfd=-1;
 	}
+#pragma warning(disable : 4996)
 	hostent* hp = gethostbyname( http_proxy_server.size() ? http_proxy_server.c_str() : http_server.c_str() );
 	if(!hp)
 	{	ret = ERRHOST;
@@ -183,7 +184,7 @@ bool Http::http_put(char *data,int length,int overwrite,char *type)
 	    );
   return http_query("PUT",filename.c_str(),header,CLOSE, data, length, NULL);
 }
-
+#pragma warning(default : 4996)
 /*
  * Get data from the server
  *

@@ -278,6 +278,7 @@ static int get_clock(uint32_t *clock_high, uint32_t *clock_low,
 	int				ret = 0;
 
 	if (state_fd == -2) {
+#pragma warning(disable : 4996)
 		save_umask = umask(0);
 		state_fd = open(LIBUUID_CLOCK_FILE, O_RDWR|O_CREAT|O_CLOEXEC, 0660);
 		(void) umask(save_umask);
@@ -317,7 +318,7 @@ static int get_clock(uint32_t *clock_high, uint32_t *clock_low,
 			adjustment = a;
 		}
 	}
-
+#pragma warning(default : 4996)
 	if ((last.tv_sec == 0) && (last.tv_usec == 0)) {
 		random_get_bytes(&clock_seq, sizeof(clock_seq));
 		clock_seq &= 0x3FFF;

@@ -197,11 +197,13 @@ int main(int argc, char *argv[])
 			alldbs++;
 			break;
 		case 'f':
+#pragma warning(disable : 4996)
 			if (freopen(optarg, "w", stdout) == NULL) {
 				fprintf(stderr, "%s: %s: reopen: %s\n",
 					prog, optarg, strerror(errno));
 				exit(EXIT_FAILURE);
 			}
+#pragma warning(default : 4996)
 			break;
 		case 'n':
 			envflags |= MDB_NOSUBDIR;

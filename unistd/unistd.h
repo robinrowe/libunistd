@@ -533,6 +533,7 @@ int ftruncate(int fd, off_t length);
 
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 
+#pragma warning(default : 4996)
 #define   __attribute__(x)
 //__attribute__((format (printf, 1, 2)));
 #endif

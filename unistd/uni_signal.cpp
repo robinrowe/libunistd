@@ -51,6 +51,7 @@ int setenv(const char *name, const char *value, int overwrite)
 {	if(!name || !value)
 	{	return -1;
 	}
+#pragma warning(disable : 4996)
 	if(!overwrite)
 	{	char* p = getenv(name);
 		if(p)
@@ -80,7 +81,7 @@ int unsetenv(const char *name)
 	strcat(buf,"=");
 	return _putenv(buf);
 }
-
+#pragma warning(default : 4996)
 char *optarg;
 int optind, opterr, optopt;
 

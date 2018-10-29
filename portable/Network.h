@@ -114,7 +114,9 @@ public:
 		{	ipType = 6;
 			return;
 		}
+#pragma warning(disable : 4996)
 		strncpy(address,strerror(errno),INET6_ADDRSTRLEN);
+#pragma warning(default : 4996)
 		address[INET6_ADDRSTRLEN] = 0;
     }
 	operator const char*() const

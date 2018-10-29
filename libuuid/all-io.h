@@ -21,6 +21,7 @@ static inline int write_all(int fd, const void *buf, size_t count)
 		ssize_t tmp;
 
 		errno = 0;
+#pragma warning(disable : 4996)
 		tmp = write(fd, buf,(unsigned int) count);
 		if (tmp > 0) {
 			count -= tmp;
@@ -63,6 +64,7 @@ static inline ssize_t read_all(int fd, char *buf, size_t count)
 	memset(buf, 0, count);
 	while (count > 0) {
 		ret = read(fd, buf, (unsigned int) count);
+#pragma warning(default : 4996)
 		if (ret <= 0) {
 			if ((errno == EAGAIN || errno == EINTR || ret == 0) &&
 			    (tries++ < 5))

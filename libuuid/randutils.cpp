@@ -34,6 +34,7 @@ int random_get_fd(void)
 	struct timeval	tv;
 
 	gettimeofday(&tv, 0);
+#pragma warning(disable : 4996)
 	fd = open("/dev/urandom", O_RDONLY);
 	if (fd == -1)
 		fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
@@ -84,7 +85,7 @@ void random_get_bytes(void *buf, size_t nbytes)
 
 		close(fd);
 	}
-
+#pragma warning(default : 4996)
 	/*
 	 * We do this all the time, but this is the only source of
 	 * randomness if /dev/random/urandom is out to lunch.

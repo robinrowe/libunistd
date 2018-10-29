@@ -226,12 +226,14 @@ int scandir(const char* dirname, dirent*** namesList, scandir_f selector, scandi
 		{	return -1;
 		}
 		*entry = *temp;
+#pragma warning(disable : 4996)
 		if(temp->d_name)
 		{	strcpy(entry->buffer,temp->d_name);
 		}
 		else
 		{	entry->buffer[0] = 0;
 		}
+#pragma warning(default : 4996)
 		entry->d_name = entry->buffer;
 		names[matches] = entry;
 		matches++;
