@@ -5,11 +5,11 @@
 #ifndef uni_signal_h
 #define uni_signal_h
 
-#include "unistd.h"
 #include <signal.h>
 #include <time.h>
 #include <memory.h>
 #include "../portable/stub.h"
+#include "sys/sys_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,12 +42,6 @@ SIGTERM Termination request
 */
 
 #define WNOHANG 0
-
-typedef intptr_t pid_t;
-typedef int gid_t;
-typedef int uid_t;
-typedef int sigval_t;
-typedef int sigset_t;
 
 struct siginfo_t {
     int      si_signo;     /* Signal number */

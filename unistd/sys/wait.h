@@ -5,6 +5,7 @@
 #ifndef sys_wait_h
 #define sys_wait_h
 
+#include "sys/sys_types.h"
 #include "../portable/stub.h"
 
 #define WIFEXITED(wstatus) 1

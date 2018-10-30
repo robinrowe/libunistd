@@ -48,6 +48,7 @@
 #include <sys/stat.h>
 #include <assert.h>
 #include <inttypes.h>
+#include "sys/sys_types.h"
 #include "bsd/string.h"
 #include "uni_signal.h"
 #include "../portable/stub.h"
@@ -118,18 +119,6 @@ int fcntl(int handle, int mode)
 	STUB0(fcntl);
 }
 
-enum
-{	F_DUPFD, 
-	F_GETFD,
-	F_SETFD, 
-	F_GETFL, 
-	F_SETFL, 
-	F_GETLK, 
-	F_SETLK,
-	F_SETLKW,
-	FD_CLOEXEC
-};
-
 #endif
 
 inline
@@ -137,7 +126,6 @@ int mkdir(const char* path)
 {
 	return _mkdir(path);
 }
-
 
 inline
 int fcntl(int handle,int mode,int mode2)
@@ -228,10 +216,7 @@ int pclose(FILE *stream)
 }
 
 //#define send send2
-typedef int ssize_t;
-
 #define lstat stat
-typedef unsigned short mode_t;
 
 inline
 int kill(pid_t p, int x)
@@ -239,71 +224,6 @@ int kill(pid_t p, int x)
 	(void)x;
 	return -1;
 }
-
-#define R_OK 4
-#define W_OK 2
-#define X_OK 0
-#define F_OK 0
-
-#ifndef S_ISREG
-#define S_ISREG(x) (_S_IFREG & x)
-#endif
-
-#define S_ISLNK(x) 0
-
-#ifndef S_ISDIR
-#define S_ISDIR(x) (_S_IFDIR & x)
-#endif
-
-#define S_IXUSR _S_IEXEC
-#define S_IRUSR _S_IREAD
-#define S_IWUSR _S_IWRITE
-#define S_IXOTH S_IEXEC
-#define S_IXGRP S_IEXEC
-#define S_IRWXU S_IRUSR|S_IWUSR|S_IXUSR
-#define S_IRWXG S_IRGRP|S_IWGRP|S_IXGRP
-#define S_IRWXO S_IROTH|S_IWOTH|S_IXOTH
-//#define S_IRWXU _S_IEXEC|_S_IREAD|_S_IWRITE
-//#define S_IRWXO _S_IEXEC|_S_IREAD|_S_IWRITE
-//#define S_IRWXG _S_IEXEC|_S_IREAD|_S_IWRITE
-#define S_IROTH S_IREAD
-#define S_IRGRP S_IREAD
-#define S_IWGRP S_IWRITE
-#define S_IWOTH S_IWRITE
-#define O_CLOEXEC 0
-#define O_DIRECTORY _O_OBTAIN_DIR
-
-/*
-
-From WIN32 sys/stat.h:
-
-#define _S_IFMT   0xF000 // File type mask
-#define _S_IFDIR  0x4000 // Directory
-#define _S_IFCHR  0x2000 // Character special
-#define _S_IFIFO  0x1000 // Pipe
-#define _S_IFREG  0x8000 // Regular
-#define _S_IREAD  0x0100 // Read permission, owner
-#define _S_IWRITE 0x0080 // Write permission, owner
-#define _S_IEXEC  0x0040 // Execute/search permission, owner
-
-#define S_IFMT   _S_IFMT
-#define S_IFDIR  _S_IFDIR
-#define S_IFCHR  _S_IFCHR
-#define S_IFREG  _S_IFREG
-#define S_IREAD  _S_IREAD
-#define S_IWRITE _S_IWRITE
-#define S_IEXEC  _S_IEXEC
-
-*/
-enum {
-	S_IFSOCK = 1,
-	S_IFLNK,
-	S_IFBLK,
-	S_IFIFO,
-	S_ISUID,
-	S_ISGID,
-	S_ISVTX
-};
 
 inline
 int S_ISCHR(int v) 
@@ -339,9 +259,11 @@ int S_ISSOCK(int v)
 
 #define getpid _getpid
 
-typedef int gid_t;
-typedef int uid_t;
-#define PATH_MAX 255
+inline
+pid_t gettid()
+{	HANDLE h = GetCurrentThread();
+	return (intptr_t) h;
+}
 
 inline 
 int setgid(gid_t g)
@@ -426,26 +348,6 @@ int syncfs(int fd)
 {	fsync(fd);
 }
 
-#define EBADFD 200
-#define ESHUTDOWN 201
-#define SHUT_RD SD_RECEIVE
-#define SHUT_WR SD_SEND
-#define SHUT_RDWR SD_BOTH
-
-#define MSG_NOSIGNAL 0
-#ifndef TCP_KEEPCNT
-#define TCP_KEEPCNT 0
-#endif
-#define access _access
-
-#define F_GETFL 0
-#define F_SETFL 0
-#define O_NONBLOCK 0
-#define O_SYNC 0
-#define O_NOCTTY 0
-
-typedef int Atom;
-
 #if _MSC_VER <= 1900
 
 inline
@@ -463,35 +365,6 @@ int getlogin_r(char *buf, size_t len)
     BOOL ok = GetUserNameA(buf,&bufsize);
     return ok? 0:-1;
 }
-
-#if 0
-#define open uni_open
-#define close _close
-#define read uni_read
-#define write uni_write
-#define lseek _lseek
-#define creat _creat
-#define chdir _chdir
-
-inline
-int open(const char* filename, int oflag)
-{
-	return _open(filename, oflag, 0);
-}
-
-inline
-int read(int fd, void *buffer, unsigned int count)
-{
-	return _read(fd, buffer, count);
-}
-
-inline
-int write(int fd, const void *buffer, unsigned int count)
-{
-	return _write(fd, buffer, count);
-}
-
-#endif
 
 inline
 int getopt(int argc, char * const argv[],const char *optstring)

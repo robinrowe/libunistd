@@ -72,7 +72,7 @@ void random_get_bytes(void *buf, size_t nbytes)
 
 	if (fd >= 0) {
 		while (n > 0) {
-			ssize_t x = read(fd, cp, n);
+			ssize_t x = read(fd, cp,(unsigned) n);
 			if (x <= 0) {
 				if (lose_counter++ > 16)
 					break;
