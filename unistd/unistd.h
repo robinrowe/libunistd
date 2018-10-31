@@ -79,7 +79,7 @@ int snprintb(char *buf, size_t buflen, const char *fmt, uint64_t val)
 	(void)buflen;
 	(void)fmt;
 	(void)val;
-	STUB0(snprintb);
+	STUB_0(snprintb);
 }
 
 inline
@@ -89,7 +89,7 @@ int snprintb_m(char *buf, size_t buflen, const char *fmt, uint64_t val,size_t ma
 	(void)fmt;
 	(void)val;
 	(void)max;
-	STUB0(snprintb_m);
+	STUB_0(snprintb_m);
 }
 
 inline
@@ -116,7 +116,7 @@ int fcntl(int handle, int mode)
 {
 	(void)handle;
 	(void)mode;
-	STUB0(fcntl);
+	STUB_0(fcntl);
 }
 
 #endif
@@ -132,7 +132,7 @@ int fcntl(int handle,int mode,int mode2)
 {	(void)handle;
 	(void)mode;
 	(void)mode2;
-	STUB0(fcntl);
+	STUB_0(fcntl);
 }
 
 //#define _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -279,7 +279,7 @@ int setuid(uid_t g)
 
 inline
 const char* getsysconfdir()
-{	STUB0(getsysconfdir);
+{	STUB_0(getsysconfdir);
 }
 
 inline 
@@ -293,17 +293,17 @@ inline
 int fchmod(int a, mode_t b)
 {	(void)a;
 	(void)b;
-	STUB0(fchmod);
+	STUB_0(fchmod);
 }
 
 inline
 uid_t getuid()
-{	STUB0(getuid);
+{	STUB_0(getuid);
 }
 
 inline
 uid_t geteuid()
-{	STUB0(geteuid);
+{	STUB_0(geteuid);
 }
 
 inline
@@ -323,7 +323,7 @@ ssize_t readlink(const char *path, char *buf, size_t bufsize)
 {	(void)path;
 	(void)buf;
 	(void)bufsize;
-	STUB0(readlink);
+	STUB_0(readlink);
 }
 
 inline
@@ -371,7 +371,7 @@ int getopt(int argc, char * const argv[],const char *optstring)
 {	(void)argc;
 	(void)argv;
 	(void)optstring;
-	STUB0(getopt);
+	STUB_0(getopt);
 }
 
 inline
@@ -387,7 +387,7 @@ void PrintDirectory()
 
 inline
 unsigned int alarm(unsigned int seconds)
-{	STUB0(alarm);
+{	STUB_0(alarm);
 }
 
 #ifdef __cplusplus

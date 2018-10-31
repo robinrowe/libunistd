@@ -35,7 +35,7 @@ inline
 int getitimer(int which, struct itimerval *curr_value)
 {   (void)which;
     (void)curr_value;
-    STUB0(getitimer);
+    STUB_NEG(getitimer);
 }
 
 inline
@@ -43,7 +43,7 @@ int setitimer(int which, const struct itimerval *new_value,struct itimerval *old
 {   (void)which;
     (void)new_value;
     (void)old_value;
-    STUB0(setitimer);
+    STUB_NEG(setitimer);
 }
 
 enum

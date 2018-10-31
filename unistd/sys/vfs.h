@@ -10,12 +10,12 @@
 
 inline
 int statfs(const char *path, struct statfs *buf)
-{   STUB0(statfs);
+{   STUB_NEG(statfs);
 }
 
 inline
 int fstatfs(int fd, struct statfs *buf)
-{   STUB0(fstatfs);
+{   STUB_NEG(fstatfs);
 }
 
 typedef short __fsword_t;

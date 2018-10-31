@@ -51,7 +51,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int mille_timeout)
 
 inline
 int ppoll(struct pollfd *fds, nfds_t nfds,const struct timespec *tmo_p, const sigset_t *sigmask)
-{   STUB0(ppoll);
+{   STUB_NEG(ppoll);
 }
 
 #ifdef __cplusplus

@@ -32,7 +32,8 @@ void StubBug(const char* msg)
 #define MSG_TODO(x)	StubBug("TO-DO: " x)
 
 #define STUB(functionName) StubBug("STUB:" #functionName)
-#define STUB0(functionName) StubBug("STUB:" #functionName); return 0
+#define STUB_0(functionName) StubBug("STUB:" #functionName); return 0
+#define STUB_NEG(functionName) StubBug("STUB:" #functionName); return -1
 #define STUB_MSG(functionName) StubBug("STUB:" #functionName)
 
 #ifdef __cplusplus

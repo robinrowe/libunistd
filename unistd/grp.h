@@ -15,13 +15,13 @@ struct group {
 inline
 struct group *getgrnam(const char *name)
 {	(void) name;
-	STUB0(getgrnam);
+	STUB_0(getgrnam);
 }
 
 inline
 struct group *getgrgid(gid_t gid)
 {	(void) gid;
-	STUB0(getgrgid);
+	STUB_0(getgrgid);
 }
 
 inline
@@ -31,7 +31,7 @@ int getgrnam_r(const char *name, struct group *grp,char *buf, size_t buflen, str
 	(void)buf;
 	(void)buflen;
 	(void)result;
-	STUB0(getgrnam_r);
+	STUB_NEG(getgrnam_r);
 }
 
 inline
@@ -41,14 +41,14 @@ int getgrgid_r(gid_t gid, struct group *grp,char *buf, size_t buflen, struct gro
 	(void)buf;
 	(void)buflen;
 	(void)result;
-	STUB0(getgrgid_r);
+	STUB_NEG(getgrgid_r);
 }
 
 inline
 int initgroups(const char *user, gid_t group)
 {	(void)user;
 	(void)group;
-	STUB0(initgroups);
+	STUB_NEG(initgroups);
 }
 
 #endif

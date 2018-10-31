@@ -25,7 +25,7 @@ int usleep(useconds_t delay)
 #if 0
 inline
 int usleep(useconds_t delay)
-STUB0(usleep)
+STUB_NEG(usleep)
 
 inline
 std::string Now()
@@ -57,7 +57,7 @@ inline
 int clock_getres(clockid_t clk_id, struct timespec *res)
 {	(void)clk_id;
 	(void)res;
-	STUB0(clock_getres);
+	STUB_NEG(clock_getres);
 }
 
 // seconds and nanosecond count of the time since the Epoch (00:00 1 January, 1970 UTC).
@@ -106,7 +106,7 @@ inline
 int clock_settime(clockid_t clk_id, const struct timespec *tp)
 {	(void)clk_id;
 	(void)tp;
-	STUB0(clock_settime);
+	STUB_NEG(clock_settime);
 }
 
 inline

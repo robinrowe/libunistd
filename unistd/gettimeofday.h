@@ -13,7 +13,7 @@ inline
 int settimeofday(const struct timeval *tv, const struct timezone *tz)
 {	(void)tv;
 	(void)tz;
-	STUB0(0);
+	STUB_NEG(0);
 }
 
 #endif

@@ -109,28 +109,28 @@ int sigemptyset(sigset_t *set)
 inline
 int sigfillset(sigset_t *set)
 {	(void)set;
-	STUB0(sigfillset);
+	STUB_0(sigfillset);
 }
 
 inline
 int sigaddset(sigset_t *set, int signum)
 {	(void)set;
 	(void)signum;
-	STUB0(sigaddset);
+	STUB_0(sigaddset);
 }
 
 inline
 int sigdelset(sigset_t *set, int signum)
 {	(void)set;
 	(void)signum;
-	STUB0(sigdelset);
+	STUB_0(sigdelset);
 }
 
 inline
 int sigismember(const sigset_t *set, int signum)
 {	(void)set;
 	(void)signum;
-	STUB0(sigismember);
+	STUB_0(sigismember);
 }
 
 extern void (*CtrlCHandler)(int, struct siginfo_t *, void *);
@@ -142,19 +142,19 @@ int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 {	(void)how;
 	(void)set;
 	(void)oldset;
-	STUB0(sigprocmask);
+	STUB_0(sigprocmask);
 }
 
 inline
 int sigpending(sigset_t *set)
 {	(void)set;
-	STUB0(sigpending);
+	STUB_0(sigpending);
 }
 
 inline
 int sigsuspend(const sigset_t *mask)
 {	(void)mask;
-	STUB0(sigsuspend);
+	STUB_0(sigsuspend);
 }
 
 #ifdef __cplusplus

@@ -15,7 +15,7 @@ extern "C" {
 
 inline
 int prctl(int option, unsigned long arg2, unsigned long arg3,unsigned long arg4, unsigned long arg5)
-{   STUB0(prctl);
+{   STUB_NEG(prctl);
 }
 
 enum

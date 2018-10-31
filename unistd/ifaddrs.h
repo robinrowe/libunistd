@@ -32,7 +32,7 @@ struct ifaddrs
 
 inline
 int getifaddrs(struct ifaddrs **ifap)
-{   STUB0(getifaddrs);
+{   STUB_NEG(getifaddrs);
 }
 
 inline

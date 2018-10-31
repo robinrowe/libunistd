@@ -11,33 +11,22 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
-#include <stdlib.h>
-
-union semun
-{	int val;
-	struct semid_ds *buf;
-	ushort *array;
-};
 
 int main()
-{	int i,j;
-	int pid;
-	int semid; /* semid of semaphore set */
+{	int semid; /* semid of semaphore set */
 	key_t key = 1234; /* key to pass to semget() */
 	int semflg = IPC_CREAT | 0666; /* semflg to pass to semget() */
 	int nsems = 1; /* nsems to pass to semget() */
 	int nsops; /* number of operations to do */
-	struct sembuf *sops = (struct sembuf *) malloc(2*sizeof(struct sembuf));
+	sembuf sops[2];
 	/* ptr to operations to perform */
 	/* set up semaphore */
-	printf("\nsemget: Setting up seamaphore: semget(%#lx, %%#o)\n",key, nsems, semflg);
+	printf("\nsemget: Setting up seamaphore %d: semget(%#lx, %#o)\n",key, nsems, semflg);
 	if((semid = semget(key, nsems, semflg)) == -1)
 	{	perror("semget: semget failed");
-		exit(1);
+		return 1;
 	}
-	else
-	{	printf("semget: semget succeeded: semid =%d\n", semid);
-	}
+	printf("semget: semget succeeded: semid =%d\n", semid);
 	/* allow for 3 semaphore sets */
 	for(int i = 0;i < 3;i++)
 	{	nsops = 2;
@@ -50,7 +39,8 @@ int main()
 		sops[1].sem_flg = SEM_UNDO | IPC_NOWAIT; /* take off semaphore */
 		/* Recap the call to be made. */
 		printf("\nsemop:Parent Calling semop(%d, &sops, %d) with:", semid, nsops);
-		for(j = 0; j < nsops; j++)
+		int j = 0;
+		for(; j < nsops; j++)
 		{	printf("\n\tsops[%d].sem_num = %d, ", j, sops[j].sem_num);
 			printf("sem_op = %d, ", sops[j].sem_op);
 			printf("sem_flg = %#o\n", sops[j].sem_flg);
@@ -70,10 +60,9 @@ int main()
 		sops[0].sem_flg = SEM_UNDO | IPC_NOWAIT; /* take off semaphore, asynchronous  */
 		if((j = semop(semid, sops, nsops)) == -1)
 		{	perror("semop: semop failed");
+			continue;
 		}
-		else
-		{	printf("Parent Process Giving up Control of Track: %d/3 times\n", i+1);
-		}
+		printf("Parent Process Giving up Control of Track: %d/3 times\n", i+1);
 		sleep(5); /* halt process to allow child to catch semaphor change first */
 	}
 }

@@ -38,7 +38,7 @@ int getrlimit(int resource, struct rlimit *rlim)
 
 inline
 int setrlimit(int resource, const struct rlimit *rlim)
-{   STUB0(setrlimit);
+{   STUB_NEG(setrlimit);
 }
 
 #ifdef __cplusplus

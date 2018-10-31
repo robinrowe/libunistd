@@ -5,15 +5,19 @@
 
 #include <sys/sys_types.h>
 #include <sys/stat.h>
-#if 0
+#include "../../portable/stub.h"
+
 struct ipc_perm 
 {	uid_t uid;
 	gid_t gid;
 	uid_t cuid;
 	gid_t cgid;
 	mode_t mode;
+	ipc_perm()
+	{	memset(this,0,sizeof(*this));
+	}
 };
-#endif
+
 enum
 {	IPC_CREAT,
 	IPC_EXCL,
@@ -24,7 +28,9 @@ enum
 	IPC_STAT
 };
 
-key_t ftok(const char*, int);
+key_t ftok(const char*, int)
+{	STUB_NEG(ftok);
+}
 
 #endif
 

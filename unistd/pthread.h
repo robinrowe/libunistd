@@ -144,32 +144,32 @@ int pthread_attr_destroy(pthread_attr_t *attr)
 
 inline
 int pthread_attr_setinheritsched(pthread_attr_t *attr,int inheritsched)
-{   STUB0(pthread_attr_setinheritsched);
+{   STUB_NEG(pthread_attr_setinheritsched);
 }
 
 inline
 int pthread_attr_getinheritsched(const pthread_attr_t *attr,int *inheritsched)
-{   STUB0(pthread_attr_getinheritsched);
+{   STUB_NEG(pthread_attr_getinheritsched);
 }
 
 inline
 int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy)
-{   STUB0(pthread_attr_setschedpolicy);
+{   STUB_NEG(pthread_attr_setschedpolicy);
 }
 
 inline
 int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy)
-{   STUB0(pthread_attr_getschedpolicy);
+{   STUB_NEG(pthread_attr_getschedpolicy);
 }
 
 inline
 int pthread_attr_setschedparam(pthread_attr_t *attr,const struct sched_param *param)
-{   STUB0(pthread_attr_setschedparam);
+{   STUB_NEG(pthread_attr_setschedparam);
 }
 
 inline
 int pthread_attr_getschedparam(const pthread_attr_t *attr,struct sched_param *param)
-{   STUB0(pthread_attr_getschedparam);
+{   STUB_NEG(pthread_attr_getschedparam);
 }
 
 #ifdef VERBOSE_PTHREAD
@@ -247,17 +247,17 @@ int pthread_join(pthread_t thread, void **retval)
 
 inline
 int pthread_mutex_lock(pthread_mutex_t *mutex)
-{   STUB0(pthread_mutex_lock);
+{   STUB_NEG(pthread_mutex_lock);
 }
 
 inline
 int pthread_mutex_trylock(pthread_mutex_t *mutex)
-{   STUB0(pthread_mutex_trylock);
+{   STUB_NEG(pthread_mutex_trylock);
 }
 
 inline
 int pthread_mutex_unlock(pthread_mutex_t *mutex)
-{   STUB0(pthread_mutex_unlock);
+{   STUB_NEG(pthread_mutex_unlock);
 }
 
 inline
@@ -267,12 +267,12 @@ void pthread_exit(void *retval)
 
 inline
 int pthread_cancel(pthread_t thread)
-{   STUB0(pthread_cancel);
+{   STUB_NEG(pthread_cancel);
 }
 
 inline
 pthread_t pthread_self()
-{	STUB0(pthread_self);
+{	STUB_0(pthread_self);
 }
 
 inline
@@ -283,42 +283,42 @@ int pthread_detach(pthread_t thread)
 
 inline
 int pthread_cond_destroy(pthread_cond_t *cond)
-{	STUB0(pthread_cond_destroy);
+{	STUB_NEG(pthread_cond_destroy);
 }
 
 inline
 int pthread_cond_init(pthread_cond_t* restrict_cond,const pthread_condattr_t* restrict_attr)
-{	STUB0(pthread_cond_destroy);
+{	STUB_NEG(pthread_cond_destroy);
 }
 
 inline
 int pthread_cond_broadcast(pthread_cond_t *cond)
-{	STUB0(pthread_cond_broadcast);
+{	STUB_NEG(pthread_cond_broadcast);
 }
 
 inline
 int pthread_cond_signal(pthread_cond_t *cond)
-{	STUB0(pthread_cond_signal);
+{	STUB_NEG(pthread_cond_signal);
 }
 
 inline
 int pthread_cond_timedwait(pthread_cond_t* restrict_cond,pthread_mutex_t* restrict_mutex,const struct timespec * restrict_abstime)
-{	STUB0(pthread_cond_timedwait);
+{	STUB_NEG(pthread_cond_timedwait);
 }
 
 inline
 int pthread_cond_wait(pthread_cond_t* restrict_cond,pthread_mutex_t * restrict_mutex)
-{	STUB0(pthread_cond_wait);
+{	STUB_NEG(pthread_cond_wait);
 }
 
 inline
 int pthread_mutex_destroy(pthread_mutex_t *mutex)
-{	STUB0(pthread_mutex_destroy);
+{	STUB_NEG(pthread_mutex_destroy);
 }
 
 inline
 int pthread_mutex_init(pthread_mutex_t* restrict_mutex,const pthread_mutexattr_t * restrict_attr)
-{	STUB0(pthread_mutex_init);
+{	STUB_NEG(pthread_mutex_init);
 }
 
 #ifdef __cplusplus

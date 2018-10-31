@@ -14,15 +14,15 @@ extern "C" {
 #endif
 
 int ffs(int i)
-{   STUB0(ffs);
+{   STUB_NEG(ffs);
 }
 
 int ffsl(long int i)
-{   STUB0(ffsl);
+{   STUB_NEG(ffsl);
 }
 
 int ffsll(long long int i)
-{   STUB0(ffsll);
+{   STUB_NEG(ffsll);
 }
 
 #ifdef __cplusplus
