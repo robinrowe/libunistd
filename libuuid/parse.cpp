@@ -64,7 +64,7 @@ int uuid_parse(const char *in, uuid_t uu)
 	}
 	uuid.time_low = strtoul(in, NULL, 16);
 	uuid.time_mid = (uint16_t) strtoul(in+9, NULL, 16);
-	uuid.time_hi_and_version = strtoul(in+14, NULL, 16);
+	uuid.time_hi_and_version = (uint16_t) strtoul(in+14, NULL, 16);
 	uuid.clock_seq = (uint16_t) strtoul(in+19, NULL, 16);
 	cp = in+24;
 	buf[2] = 0;

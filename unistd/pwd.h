@@ -3,6 +3,8 @@
 #ifndef PWD_H
 #define PWD_H
 
+#include "../portable/stub.h"
+
 struct passwd {
 	char   *pw_name;       /* username */
 	char   *pw_passwd;     /* user password */
@@ -16,13 +18,13 @@ struct passwd {
 inline
 struct passwd *getpwnam(const char *name)
 {	(void) name;
-	return 0;
+	STUB_0(getpwnam);
 }
 
 inline
 struct passwd *getpwuid(uid_t uid)
 {	(void) uid;
-	return 0;
+	STUB_0(getpwuid);
 }
 
 inline
@@ -32,7 +34,7 @@ int getpwnam_r(const char *name, struct passwd *pwd,char *buf, size_t buflen, st
 	(void) buf;
 	(void) buflen;
 	(void) result;
-	return 0;
+	STUB_0(getpwnam_r);
 }
 
 inline
@@ -42,7 +44,20 @@ int getpwuid_r(uid_t uid, struct passwd *pwd,char *buf, size_t buflen, struct pa
 	(void) buf;
 	(void) buflen;
 	(void) result;
-	return 0;
+	STUB_0(getpwuid_r);
+}
+
+inline
+passwd *getpwent()
+{	STUB_0(getpwent);
+}
+
+void setpwent()
+{	STUB(setpwent);
+}
+
+void endpwent()
+{	STUB(endpwent);
 }
 
 #endif

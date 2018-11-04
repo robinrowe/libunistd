@@ -5,6 +5,7 @@
 
 #include <sys/sys_types.h>
 #include <sys/stat.h>
+#include <memory.h>
 #include "../../portable/stub.h"
 
 struct ipc_perm 

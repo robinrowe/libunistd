@@ -293,18 +293,29 @@ inline
 int fchmod(int a, mode_t b)
 {	(void)a;
 	(void)b;
-	STUB_0(fchmod);
+	STUB_NEG(fchmod);
 }
 
 inline
 uid_t getuid()
-{	STUB_0(getuid);
+{	STUB_NEG(getuid);
 }
 
 inline
 uid_t geteuid()
-{	STUB_0(geteuid);
+{	STUB_NEG(geteuid);
 }
+
+inline
+gid_t getgid()
+{	STUB_NEG(getgid);
+}
+
+inline
+gid_t getegid()
+{	STUB_NEG(getegid);
+}
+
 
 inline
 char* realpath(const char *path, char *resolved_path)

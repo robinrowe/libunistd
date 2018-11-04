@@ -48,6 +48,14 @@ int alphasort(const struct dirent** a,const struct dirent** b)
 	return strcmp((*a)->d_name,(*b)->d_name);
 }
 
+inline
+int versionsort(const struct dirent** a,const struct dirent** b)
+{	if(!a || !b)
+	{	return 0;
+	}
+	return strcmp((*a)->d_name,(*b)->d_name);
+}
+
 struct DIR* opendir (const char*);
 struct dirent*	readdir (struct DIR*);
 int readdir_r(struct DIR *dirp, struct dirent *entry, struct dirent **result);

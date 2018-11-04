@@ -106,7 +106,7 @@ enum {
 #define SHUT_RDWR SD_BOTH
 
 #define MSG_NOSIGNAL 0
-#ifndef TCP_KEEPCNT
+#if 0
 #define TCP_KEEPCNT 0
 #endif
 #define access _access

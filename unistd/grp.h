@@ -51,4 +51,17 @@ int initgroups(const char *user, gid_t group)
 	STUB_NEG(initgroups);
 }
 
+inline
+group *getgrent()
+{	STUB_0(getgrent);
+}
+
+void setgrent()
+{	STUB(setgrent);
+}
+
+void endgrent()
+{	STUB(endgrent);
+}
+
 #endif

@@ -34,7 +34,10 @@ struct Dir_t
 	{	return hFind == INVALID_HANDLE_VALUE;
 	}
 	void Set()
-	{	entry.d_namlen = (int) strlen(entry.d_name);
+	{	entry.d_namlen = 0;
+		if(entry.d_name)
+		{	entry.d_namlen = (int) strlen(entry.d_name);
+		}
 		if(findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{	entry.d_type = DT_DIR;
 		}
