@@ -1,0 +1,5 @@
+# libunistd/test/test_unit/CMakeList.txt
+
+add_executable(test_unit main.cpp)
+target_link_libraries (test_unit LINK_PUBLIC libunistd)
+

@@ -12,62 +12,12 @@
 #include <list>
 #include <string>
 #include "dirent.h"
+#include "../portable/Finder.h"
 
 #define SUFFIX	'*'
 #define	SLASH	'\\'
 
-struct Dir_t
-:	public DIR
-{public:
-	Dir_t()
-	{	hFind = INVALID_HANDLE_VALUE;
-		memset(&findFileData,0,sizeof(findFileData));
-		entry.d_name = findFileData.cFileName;
-		isFirst = true;
-		entry.d_ino=0;
-		entry.d_reclen=0;
-		entry.d_namlen=0;
-		entry.d_type=DT_UNKNOWN;
-		entry.d_name=0;
-	}
-	bool operator!() const
-	{	return hFind == INVALID_HANDLE_VALUE;
-	}
-	void Set()
-	{	entry.d_namlen = 0;
-		if(entry.d_name)
-		{	entry.d_namlen = (int) strlen(entry.d_name);
-		}
-		if(findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-		{	entry.d_type = DT_DIR;
-		}
-		else
-		{	entry.d_type = DT_REG;
-	}	}
-	bool FindFirst(const char* path)
-	{	hFind = FindFirstFile(path, &findFileData);
-		if (!*this)
-		{	return false;
-		}
-		Set();
-		return true;
-	}
-	dirent* Find()
-	{	if(isFirst)
-		{	isFirst = false;
-			return &entry;
-		}
-		if(!FindNextFile(hFind,&findFileData))
-		{	return 0;
-		}
-		Set();
-		return &entry;
-	}
-	int Close()
-	{	const BOOL ok = FindClose(hFind);
-		return ok ? 0 : -1;
-	}
-};
+typedef portable::Finder Finder;
 
 DIR* opendir(const char *path)
 {	errno = 0;
@@ -79,75 +29,71 @@ DIR* opendir(const char *path)
 	{	errno = ENOTDIR;
 		return 0;
 	}
-	Dir_t* dir = new Dir_t;
-	if (!dir)
+	Finder* finder = (Finder*) malloc(sizeof(Finder));
+	if (!finder)
 	{	errno = ENOMEM;
 		return 0;
 	}
-	if(!dir->FindFirst(path))
+	finder->Reset();
+	if(!finder->Open(path))
 	{	errno = ENOENT;
-		//		errno = ENOTDIR;
-		delete dir;
+		//	errno = ENOTDIR;
+		free(finder);
 		return 0;
 	}
-	return dir;
+	return (DIR*) finder;
 }
 
-struct dirent* readdir(DIR* d)
+int readdir_r(DIR *dir, struct dirent*, struct dirent** entry)
 {	errno = 0;
-	Dir_t* dir = (Dir_t*) d;
-	if(!dir || !*dir)
+	if(!dir)
 	{	errno = EFAULT;
-		return nullptr;
+		return 0;
+	}	
+	Finder* finder = (Finder*) dir;
+	if(!finder->Read())
+	{	if(finder->IsEof())
+		{	*entry = 0;
+			return 0;
+		}
+		errno = EBADF;
+		return EBADF;
 	}
-	return dir->Find();
-}
-
-int readdir_r(DIR *dir, struct dirent *entry, struct dirent** result)
-{	entry = readdir(dir);
-	if(!entry)
-	{	return -1;
-	}
-	*result = entry;
+	finder->Set(*entry);
 	return 0;
 }
 
-int closedir(DIR* d)
-{	errno = 0;
-	Dir_t* dir = (Dir_t*) d;
-	if (!dir)
-	{	errno = EFAULT;
-		return -1;
+struct dirent* readdir(DIR* dir)
+{	static dirent entry;
+	dirent* p = &entry;
+	const int error = readdir_r(dir,0,&p);
+	if(0!=error)
+	{	return 0;
 	}
-	int retval = dir->Close();
-	delete dir;
-	return retval;
+	return p;
 }
 
-#if 0
-void rewinddir(DIR * dir)
+void rewinddir(DIR* dir)
 {	errno = 0;
 	if (!dir)
 	{	errno = EFAULT;
 		return;
 	}
-	if(dir->dd_handle != -1)
-	{	_findclose (dir->dd_handle);
-	}
-	dir->dd_handle = -1;
-	dir->dd_stat = 0;
+	Finder* finder = (Finder*) dir;
+	finder->Rewind();
 }
 
-long telldir(DIR * dir)
+long telldir(DIR* dir)
 {	errno = 0;
 	if (!dir)
 	{	errno = EFAULT;
 		return -1;
 	}
-	return dir->dd_stat;
+	Finder* finder = (Finder*) dir;
+	return finder->Tell();
 }
 
-void seekdir(DIR * dir, long lPos)
+void seekdir(DIR* dir,long lPos)
 {	errno = 0;
 	if (!dir)
 	{	errno = EFAULT;
@@ -157,20 +103,24 @@ void seekdir(DIR * dir, long lPos)
 	{	errno = EINVAL;
 		return;
 	}
-	if(lPos == -1)
-	{	if(dir->dd_handle != -1)
-		{	_findclose (dir->dd_handle);
-		}
-		dir->dd_handle = -1;
-		dir->dd_stat = -1;
+	Finder* finder = (Finder*) dir;
+	if(finder->Tell() > lPos)
+	{	finder->Rewind();
 	}
-	else
-	{	rewinddir (dir);
-		while ((dir->dd_stat < lPos) && readdir (dir))
-		;	
-	}
+	finder->Seek(lPos);
 }
-#endif
+
+int closedir(DIR* dir)
+{	errno = 0;
+	if(!dir)
+	{	errno = EFAULT;
+		return -1;
+	}
+	Finder* finder = (Finder*) dir;
+	finder->Close();
+	free(dir);
+	return 0;
+}
 
 int alphaqsort(const void* v1, const void* v2)
 {	dirent** d1 = (dirent**)v1;
@@ -180,14 +130,29 @@ int alphaqsort(const void* v1, const void* v2)
 	return strcmp(name1,name2);
 }
 
+int alphasort(const struct dirent** a,const struct dirent** b)
+{	if(!a || !b)
+	{	return 0;
+	}
+	return strcmp((*a)->d_name,(*b)->d_name);
+}
+
+int versionsort(const struct dirent** a,const struct dirent** b)
+{	if(!a || !b)
+	{	return 0;
+	}
+	return strcmp((*a)->d_name,(*b)->d_name);
+}
+
 unsigned GetFileCount(DIR* dir,scandir_f selector)
 {	unsigned count = 0;
+	dirent entry;
+	dirent* p = &entry;
 	for(;;)
-	{	dirent* entry = readdir(dir);
-		if(!entry)
+	{	if(!readdir_r(dir,0,&p) || !p)
 		{	break;
 		}
-		if(selector != NULL && !(*selector)(entry))
+		if(selector != NULL && !(*selector)(p))
 		{	continue;
 		}
 		count++;
@@ -195,8 +160,8 @@ unsigned GetFileCount(DIR* dir,scandir_f selector)
 	return count;
 }
 
-int scandir(const char* dirname, dirent*** namesList, scandir_f selector, scandir_alphasort sorter)
-{	Dir_t* dir = (Dir_t*) opendir(dirname);
+int scandir(const char* path, dirent*** namesList, scandir_f selector, scandir_alphasort sorter)
+{	DIR* dir = opendir(path);
 	if(!dir)
 	{	return -1;
 	}
@@ -209,35 +174,22 @@ int scandir(const char* dirname, dirent*** namesList, scandir_f selector, scandi
 	if(!names)
 	{	return -1;
 	}
-	dir = (Dir_t*) opendir(dirname);
+	dir = opendir(path);
 	if (!dir)
 	{	return -1;
 	}
 	*namesList = names;
 	int matches = 0;
 	for(unsigned i = 0; i < count; i++)
-	{	dirent* temp = readdir(dir);
-		if(!temp)
+	{	dirent* entry = (dirent*) malloc(sizeof dirent);
+		dirent** p = &entry;
+		readdir_r(dir,0,p);
+		if(!entry)
 		{	break;
 		}
-		if(selector != NULL && !(*selector)(temp))
+		if(selector != NULL && !(*selector)(entry))
 		{	continue;
 		}
-		const size_t size = sizeof(dirent) + strlen(temp->d_name);
-		dirent* entry = (dirent*) malloc(size);
-		if(!entry)
-		{	return -1;
-		}
-		*entry = *temp;
-#pragma warning(disable : 4996)
-		if(temp->d_name)
-		{	strcpy(entry->buffer,temp->d_name);
-		}
-		else
-		{	entry->buffer[0] = 0;
-		}
-#pragma warning(default : 4996)
-		entry->d_name = entry->buffer;
 		names[matches] = entry;
 		matches++;
 	}
@@ -247,4 +199,3 @@ int scandir(const char* dirname, dirent*** namesList, scandir_f selector, scandi
 	}
 	return matches;
 }
-

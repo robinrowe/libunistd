@@ -1,4 +1,0 @@
-# libunistd/test/PosixQueue/CMakeList.txt
-
-add_executable(WormFile main.cpp)
-target_link_libraries(WormFile LINK_PUBLIC libportable libunistd)

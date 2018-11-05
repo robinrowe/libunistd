@@ -1,5 +1,0 @@
-# libunistd/test/sqlite/CMakeList.txt
-
-include_directories("..")
-add_executable(SqliteTest main.cpp)
-target_link_libraries(SqliteTest LINK_PUBLIC libportable libunistd libsqlite)

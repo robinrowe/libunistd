@@ -23,48 +23,28 @@ enum
 
 struct dirent
 {	long d_ino;
-	unsigned short	d_reclen;
-	unsigned short	d_namlen;
-	unsigned char  d_type;
-	char* d_name; // points to the name in the _finddata_t structure in the DIR
-	char buffer[1];
+	unsigned short d_reclen;
+	unsigned short d_namlen;
+	unsigned char d_type;
+	char* d_name;
 };
 
 struct DIR
-{	WIN32_FIND_DATA findFileData;
-	HANDLE hFind;
-	struct dirent entry;
-	int isFirst;
+{	void* p;
 };
 
 typedef int scandir_f(const struct dirent* d);
 typedef int scandir_alphasort(const struct dirent** a,const struct dirent** b);
+int alphasort(const struct dirent** a,const struct dirent** b);
+int versionsort(const struct dirent** a,const struct dirent** b);
 
-inline
-int alphasort(const struct dirent** a,const struct dirent** b)
-{	if(!a || !b)
-	{	return 0;
-	}
-	return strcmp((*a)->d_name,(*b)->d_name);
-}
-
-inline
-int versionsort(const struct dirent** a,const struct dirent** b)
-{	if(!a || !b)
-	{	return 0;
-	}
-	return strcmp((*a)->d_name,(*b)->d_name);
-}
-
-struct DIR* opendir (const char*);
-struct dirent*	readdir (struct DIR*);
-int readdir_r(struct DIR *dirp, struct dirent *entry, struct dirent **result);
-int	closedir (struct DIR*);
-#if 0
-void rewinddir (DIR*);
-long telldir (DIR*);
-void seekdir (DIR*, long);
-#endif
-int scandir(const char* buf,struct dirent*** namelist, scandir_f sf, scandir_alphasort af);
+struct DIR* opendir(const char* path);
+struct dirent* readdir(struct DIR* dir);
+int readdir_r(struct DIR* dir,struct dirent* entry, struct dirent** result);
+int	closedir(struct DIR* dir);
+void rewinddir(struct DIR* dir);
+long telldir(struct DIR* dir);
+void seekdir(struct DIR* dir,long tell);
+int scandir(const char* buf,struct dirent*** namelist,scandir_f sf,scandir_alphasort af);
 
 #endif

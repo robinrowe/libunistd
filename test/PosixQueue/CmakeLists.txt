@@ -1,7 +1,0 @@
-# libunistd/test/PosixQueue/CMakeList.txt
-
-add_executable(mq_receive mq_receive/main.cpp)
-target_link_libraries(mq_receive LINK_PUBLIC libportable libunistd)
-
-add_executable(mq_send mq_send/main.cpp)
-target_link_libraries(mq_send LINK_PUBLIC libportable libunistd)

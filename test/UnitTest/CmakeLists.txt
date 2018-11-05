@@ -1,5 +1,0 @@
-# libunistd/test/PosixQueue/CMakeList.txt
-
-add_executable(UnitTest main.cpp)
-target_link_libraries (UnitTest LINK_PUBLIC libunistd)
-
