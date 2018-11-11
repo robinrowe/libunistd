@@ -314,3 +314,25 @@ This procedure allows us to create globally accessible shared memory on Vista wi
 TrackBack URL for this entry: http://www.celceo.com/company/mt/mt-tb.cgi/4
 
 */
+/*
+
+GCC and Vista Incompatibility
+Since ReactOS is still being built with GCC (unfortunately), some of our devs have started to report a problem when using the MinGW build under Windows Vista. The call to MapViewOfFileEx that the compiler users for precompiled header support fails, so the compilation fails for any project that uses a PCH.
+
+This type of error might creep up in other system software as well, and it’s not really GCC’s fault for succumbing to it. If you look at the documentation for CreateFileMapping, you’ll notice this blurb in the Remarks section:
+
+Creating a file mapping object from a session other than session zero requires the SeCreateGlobalPrivilege privilege. Note that this privilege check is limited to the creation of file mapping objects and does not apply to opening existing ones. For example, if a service or the system creates a file mapping object, any process running in any session can access that file mapping object provided that the caller has the required access rights.
+
+Windows XP/2000: The requirement described in the previous paragraph was introduced with Windows Server 2003, Windows XP SP2 and Windows 2000 Server SP4.
+
+Although this feature was added in SP2, the reason it doesn’t happen in Windows XP has to do with two changes in Vista. First, UAC means that programs don’t get the SeCreateGlobalPrivilege anymore, because they’re not running in administrator accounts anymore. Secondly, in Vista, Session 0 is now the SYSTEM account session, where the login screen and services are running. Therefore, any user processes will run in Session 1, even in a normal single-user system. These two factors combined mean that CreateFileMapping is now significantly reduced in functionality and that only services are allowed to create global shared memory.
+
+There are three workarounds if you really need the functionality:
+
+Use the Microsoft Management Console (MMC) and the Local Security Policy Snap-In to give SeCreateGlobalPrivilege to the limited account.
+Write a wrapper program that executes with elevated rights and and uses RtlAcquire/AdjustPrivilege to get the privilege before running your target program (Such as gcc).
+Use the HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Kernel\ObUnsecureGlobalNames string array to add the name of the section to the list. Hopefully your program isn’t randomizing the name. Adding this name will disable the kernel protection check.
+
+http://www.alex-ionescu.com/?p=16
+
+*/
