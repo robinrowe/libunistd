@@ -4,6 +4,9 @@
 // OpenLDAP Public License
 
 #include <lmdb/Db.h>
+#include <lmdb/Datum.h>
+#include <lmdb/Transaction.h>
+#include <lmdb/Cursor.h>
 #include <stdio.h>
 
 int main(int argc,char * argv[])
@@ -13,31 +16,23 @@ int main(int argc,char * argv[])
 	if(!db.Open(dbPath,0))//dbName))
 	{	return 1;
 	}
-	{	lmdb::Transaction tr(db);
-		lmdb::Datum<int> key(41);
-		lmdb::Datum<int> value(14000);
-		if (!db.Put(tr,key,value))
-		{	return 2;
-	}	}
-	{	lmdb::Transaction tr(db);
-		lmdb::Datum<int> key(41);
-		lmdb::Datum<int> value(14000);
-		if (!db.Put(tr, key, value))
+	{	lmdb::Datum<int,int> data(41,14000);
+		lmdb::Transaction tr(db);
+		if(!data.Put(tr))
 		{	return 2;
 	}	}
 	lmdb::Cursor cursor(db);
 	if(!cursor)
 	{	return 4;
 	}
-	lmdb::Datum<int> key;
-	lmdb::Datum<int> value;
-	bool ok = cursor.GetFirst(key,value);
+	lmdb::Datum<int,int> data;
+	bool ok = data.GetFirst(cursor);
 	while(ok)
-	{	printf("key: '%d', data: '%d'\n",(int)key,(int)value);
-		if(32==key)
+	{	printf("key: '%d', data: '%d'\n",(int)data.key,(int)data.value);
+		if(32==data.key)
 		{	cursor.DropDatum();
 		}
-		ok = cursor.GetNext(key,value);
+		ok = data.GetNext(cursor);
 	}
 	puts("Done");
 	return 0;

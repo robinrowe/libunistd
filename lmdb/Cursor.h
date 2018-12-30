@@ -55,5 +55,10 @@ public:
 	}
 };
 
+inline
+Cursor::Cursor(Db& db)
+:	tr(db)
+{	rc = mdb_cursor_open(tr, db, &cursor);
+}
 }
 #endif

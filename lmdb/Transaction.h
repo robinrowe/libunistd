@@ -11,7 +11,8 @@
 namespace lmdb {
 
 class Transaction
-{	MDB_txn* txn;
+{	Db& db;
+	MDB_txn* txn;
 	int rc;
 public:
 	~Transaction()
@@ -24,10 +25,11 @@ public:
 		mdb_txn_abort(txn);
 		txn = 0;
 	}
-	Transaction(MDB_env* env,int flags = 0) //MDB_RDONLY
+	Transaction(Db& db,int flags = 0) //MDB_RDONLY
 	:	rc(0)
 	,	txn(0)
-	{	rc = mdb_txn_begin(env,0,flags,&txn);
+	,	db(db)
+	{	rc = mdb_txn_begin(db.GetEnv(),0,flags,&txn);
 		if(rc)
 		{	txn = 0;
 	}	}
@@ -43,6 +45,9 @@ public:
 	}
 	const char* toString() const
 	{	return mdb_strerror(rc);
+	}
+	bool Put(MDB_val* key,MDB_val* value)
+	{	return db.Put(txn,key,value);
 	}
 };
 

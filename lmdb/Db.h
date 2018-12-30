@@ -7,9 +7,6 @@
 #define LMDB_Db_h
 
 #include "source/lmdb.h"
-#include "Transaction.h"
-#include "Datum.h"
-#include "Cursor.h"
 #include <memory.h>
 
 namespace lmdb {
@@ -33,30 +30,11 @@ public:
 	{	Reset();
 		rc = mdb_env_create(&env);
 	}
-	bool Open(const char* path,const char* dbname,size_t size = 1024 * 1024)
-	{	if(rc)
-		{	return false;
-		}
-		rc = mdb_env_set_mapsize(env,size);
-		if(rc)
-		{	return false;
-		}
-		rc = mdb_env_set_maxdbs(env, 4);
-		if(rc)
-		{	return false;
-		}
-		rc = mdb_env_open(env,path,0,0664);
-		if(rc)
-		{	return false;
-		}
-		Transaction tr(env);
-		rc = mdb_open(tr,dbname,0,&dbi);
-		return 0==rc;
-	}
+	bool Open(const char* path,const char* dbname,size_t size = 1024 * 1024);
 	bool operator!() const
 	{	return 0!=rc;
 	}
-	operator MDB_env*()
+	MDB_env* GetEnv()
 	{	return env;
 	}
 	operator MDB_dbi()
@@ -91,12 +69,6 @@ public:
 #endif
 
 };
-
-inline
-Cursor::Cursor(Db& db)
-:	tr(db)
-{	rc = mdb_cursor_open(tr, db, &cursor);
-}
 
 }
 #endif

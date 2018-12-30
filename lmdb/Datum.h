@@ -8,29 +8,58 @@
 
 #include <memory.h>
 #include "source/lmdb.h"
+#include "Db.h"
+#include "Transaction.h"
+#include "Cursor.h"
 
 namespace lmdb {
 
 template <typename T>
+void SetDatum(const T& v,MDB_val* val)
+{	val->mv_size = sizeof(T);
+	val->mv_data = val;
+}
+
+template <typename T>
+void ZeroDatum(T& t)
+{	memset(&t,0,sizeof(T));
+}
+
+template <typename K,typename V>
 class Datum
-{	MDB_val val;
-	T v;
+{	MDB_val k;
+	MDB_val v;
 public:
-	Datum(const T& v)
-	:	v(v)
-	{	val.mv_size = sizeof(v);
-		val.mv_data = &this->v;
+	K key;
+	V value;
+	void Set()
+	{	SetDatum(key,&k);
+		SetDatum(value,&v);
+	}
+	void Set(const K& key,const V& value)
+	{	this->key = key;
+		this->value = value;
+		Set();
+	}
+	Datum(const K& key,const V& value)
+	{	Set(key,value);
 	}
 	Datum()
-	{	val.mv_size = sizeof(v);
-		val.mv_data = &this->v;
-		memset(&v,0,sizeof(v));
+	{	ZeroDatum(key);
+		ZeroDatum(value);
+		Set();
 	}
-	operator const T&() const
-	{	return v;
+	bool Put(Transaction t)
+	{	return t.Put(&k,&v);
 	}
-	operator MDB_val*()
-	{	return &val;
+	bool GetFirst(Cursor& cursor)
+	{	return cursor.GetFirst(&k,&v);
+	}
+	bool GetNext(Cursor& cursor,MDB_cursor_op op = MDB_NEXT)
+	{	return cursor.GetNext(&k,&v,op);
+	}
+	bool GetLast(Cursor& cursor)
+	{	return cursor.GetLast(&k,&v);
 	}
 };
 
