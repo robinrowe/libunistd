@@ -8,33 +8,51 @@
 #include <lmdb/Transaction.h>
 #include <lmdb/Cursor.h>
 #include <stdio.h>
+#include <string>
+#include <iostream>
+using namespace std;
+
+enum STATUS
+{	ok,
+	open_failed,
+	lock_failed,
+	write_failed,
+	cursor_failed
+};
 
 int main(int argc,char * argv[])
 {	lmdb::Db db;
-	const char* dbPath = "/Code/github/libunistd/test/lmdb";
-	const char* dbName = "test-lmdb.lmdb";
-	if(!db.Open(dbPath,0))//dbName))
-	{	return 1;
+	const char* filename = "/Code/github/libunistd/build/test/lmdb/data.mdb";
+//	db.Drop(filename);
+	if(!db.Open(filename))//,MDB_CREATE))
+	{	return open_failed;
 	}
-	{	lmdb::Datum<int,int> data(41,14000);
+	{	
+		lmdb::Datum<int,std::string> data(41,"Hello World");
 		lmdb::Transaction tr(db);
+		if(!tr)
+		{	return lock_failed;
+		}		
+		cout << "Put: " << data << endl;
 		if(!data.Put(tr))
-		{	return 2;
-	}	}
-	lmdb::Cursor cursor(db);
-	if(!cursor)
-	{	return 4;
-	}
-	lmdb::Datum<int,int> data;
-	bool ok = data.GetFirst(cursor);
-	while(ok)
-	{	printf("key: '%d', data: '%d'\n",(int)data.key,(int)data.value);
-		if(32==data.key)
-		{	cursor.DropDatum();
+		{	return write_failed;
 		}
-		ok = data.GetNext(cursor);
 	}
+	{	lmdb::Cursor cursor(db);
+		if(!cursor)
+		{	return cursor_failed;
+		}
+		lmdb::Datum<int,std::string> data;
+		bool ok = data.GetFirst(cursor);
+		while(ok)
+		{	cout << "Cursor: " << data << endl;
+			if(32==data.key.v)
+			{	cursor.DropDatum();
+			}
+			ok = data.GetNext(cursor);
+	}	}
 	puts("Done");
+	db.Close();
 	return 0;
 }
 

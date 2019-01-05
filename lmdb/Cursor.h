@@ -10,41 +10,50 @@
 #include "Db.h"
 #include "Cursor.h"
 #include "Transaction.h"
+#include "../portable/no_copy.h"
 
 namespace lmdb {
 
 class Db;
 
 class Cursor
-{	MDB_cursor* cursor;
+{	no_copy(Cursor);
 	Transaction tr;
+	MDB_cursor* mCursor;
 	int rc;
 public:
+	Cursor(Db& db)
+	:	tr(db,MDB_RDONLY)
+	,	mCursor(0)
+	,	rc(-1)
+	{	if(!tr)
+		{	return;
+		}		
+		rc = mdb_cursor_open(tr,tr.db,&mCursor);
+	}
 	~Cursor()
 	{	Close();
 	}
-	void Close()
-	{	if(!cursor)
-		{	return;
-		}
-		mdb_cursor_close(cursor);
-		tr.Close();
-		cursor = 0;
-	}
-	Cursor(Db& db);
 	bool operator!() const
 	{	return 0 != rc;
 	}
 	operator MDB_cursor*()
-	{	return cursor;
+	{	return mCursor;
+	}
+	void Close()
+	{	if(mCursor)
+		{	mdb_cursor_close(mCursor);
+		}
+		tr.Abort();
+		mCursor = 0;
 	}
 	bool DropDatum(bool isDelAllKeys=false)
 	{	const unsigned flags = isDelAllKeys ? 0:MDB_NODUPDATA;
-		rc = mdb_cursor_del(cursor,flags);
+		rc = mdb_cursor_del(mCursor,flags);
 		return 0 == rc;
 	}
 	bool GetNext(MDB_val* key,MDB_val* value,MDB_cursor_op op = MDB_NEXT)
-	{	rc = mdb_cursor_get(cursor,key,value,op);
+	{	rc = mdb_cursor_get(mCursor,key,value,op);
 		return 0 == rc;
 	}
 	bool GetFirst(MDB_val* key, MDB_val* value)
@@ -55,10 +64,5 @@ public:
 	}
 };
 
-inline
-Cursor::Cursor(Db& db)
-:	tr(db)
-{	rc = mdb_cursor_open(tr, db, &cursor);
-}
 }
 #endif

@@ -28,10 +28,13 @@ int main(int argc,char * argv[])
 	char sval[32];
 
 	rc = mdb_env_create(&env);
-	rc = mdb_env_open(env, "/Code/trasec/test", 0, 0664);
+	rc = mdb_env_open(env, "/Code/github/libunistd/build/test", 0, 0664);
 	rc = mdb_txn_begin(env, NULL, 0, &txn);
 	rc = mdb_open(txn, NULL, 0, &dbi);
-
+#if 0
+	mdb_txn_abort(txn);
+	rc = mdb_txn_begin(env, NULL, 0, &txn);
+#endif
 	key.mv_size = sizeof(int);
 	int k=32;
 	key.mv_data = &k;//sval;

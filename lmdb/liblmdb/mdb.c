@@ -283,10 +283,6 @@ typedef SSIZE_T	ssize_t;
 #endif
 
 #ifdef _WIN32
-#pragma warning(disable : 4996) // rsr
-#pragma warning(disable : 4267) // rsr
-#pragma warning(disable : 4244) // rsr
-
 #define MDB_USE_HASH	1
 #define MDB_PIDLOCK	0
 #define THREAD_RET	DWORD
@@ -1483,8 +1479,7 @@ mdb_strerror(int err)
 	 */
 #define MSGSIZE	1024
 #define PADSIZE	4096
-	static char buf[MSGSIZE+PADSIZE];//rsr
-	char* ptr = buf;
+	char buf[MSGSIZE+PADSIZE], *ptr = buf;
 #endif
 	int i;
 	if (!err)
@@ -1687,12 +1682,6 @@ mdb_cursor_chk(MDB_cursor *mc)
 		}
 	}
 }
-#else
-
-char *mdb_dkey(MDB_val *key, char *buf)
-{	return 0;
-}
-	
 #endif
 
 #if (MDB_DEBUG) > 2
@@ -3105,10 +3094,41 @@ mdb_freelist_save(MDB_txn *txn)
 		 * we may be unable to return them to me_pghead.
 		 */
 		MDB_page *mp = txn->mt_loose_pgs;
+		MDB_ID2 *dl = txn->mt_u.dirty_list;
+		unsigned x;
 		if ((rc = mdb_midl_need(&txn->mt_free_pgs, txn->mt_loose_count)) != 0)
 			return rc;
-		for (; mp; mp = NEXT_LOOSE_PAGE(mp))
+		for (; mp; mp = NEXT_LOOSE_PAGE(mp)) {
 			mdb_midl_xappend(txn->mt_free_pgs, mp->mp_pgno);
+			/* must also remove from dirty list */
+			if (txn->mt_flags & MDB_TXN_WRITEMAP) {
+				for (x=1; x<=dl[0].mid; x++)
+					if (dl[x].mid == mp->mp_pgno)
+						break;
+				mdb_tassert(txn, x <= dl[0].mid);
+			} else {
+				x = mdb_mid2l_search(dl, mp->mp_pgno);
+				mdb_tassert(txn, dl[x].mid == mp->mp_pgno);
+			}
+			dl[x].mptr = NULL;
+			mdb_dpage_free(env, mp);
+		}
+		{
+			/* squash freed slots out of the dirty list */
+			unsigned y;
+			for (y=1; dl[y].mptr && y <= dl[0].mid; y++);
+			if (y <= dl[0].mid) {
+				for(x=y, y++;;) {
+					while (!dl[y].mptr && y <= dl[0].mid) y++;
+					if (y > dl[0].mid) break;
+					dl[x++] = dl[y++];
+				}
+				dl[0].mid = x-1;
+			} else {
+				/* all slots freed */
+				dl[0].mid = 0;
+			}
+		}
 		txn->mt_loose_pgs = NULL;
 		txn->mt_loose_count = 0;
 	}
@@ -3929,7 +3949,10 @@ mdb_env_create(MDB_env **env)
 	e = calloc(1, sizeof(MDB_env));
 	if (!e)
 		return ENOMEM;
-
+#ifndef RSR
+	memset(e,0,sizeof(MDB_env));
+	e->me_txn0 = 0;
+#endif
 	e->me_maxreaders = DEFAULT_READERS;
 	e->me_maxdbs = e->me_numdbs = CORE_DBS;
 	e->me_fd = INVALID_HANDLE_VALUE;
@@ -4747,7 +4770,8 @@ mdb_env_setup_locks(MDB_env *env, MDB_name *fname, int mode, int *excl)
 	/* Try to get exclusive lock. If we succeed, then
 	 * nobody is using the lock region and we should initialize it.
 	 */
-	if ((rc = mdb_env_excl_lock(env, excl))) goto fail;
+	if ((rc = mdb_env_excl_lock(env, excl))) 
+		goto fail;
 
 #ifdef _WIN32
 	size = GetFileSize(env->me_lfd, NULL);
@@ -5074,7 +5098,7 @@ mdb_env_close0(MDB_env *env, int excl)
 	if (env->me_fd != INVALID_HANDLE_VALUE)
 		(void) close(env->me_fd);
 	if (env->me_txns) {
-		MDB_PID_T pid = env->me_pid;
+		MDB_PID_T pid = getpid();
 		/* Clearing readers is done in this function because
 		 * me_txkey with its destructor must be disabled first.
 		 *
@@ -6875,7 +6899,7 @@ current:
 						 * Copy end of page, adjusting alignment so
 						 * compiler may copy words instead of bytes.
 						 */
-						off = (PAGEHDRSZ + data->mv_size) & -(int) sizeof(size_t);//rsr
+						off = (PAGEHDRSZ + data->mv_size) & -sizeof(size_t);
 						memcpy((size_t *)((char *)np + off),
 							(size_t *)((char *)omp + off), sz - off);
 						sz = PAGEHDRSZ;

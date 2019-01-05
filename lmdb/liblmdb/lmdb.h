@@ -166,6 +166,9 @@
 #define _LMDB_H_
 
 #include <sys/types.h>
+#ifndef RSR
+#include "../../portable/print_malloc.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -200,7 +203,7 @@ typedef int mdb_filehandle_t;
 /** Library minor version */
 #define MDB_VERSION_MINOR	9
 /** Library patch version */
-#define MDB_VERSION_PATCH	22
+#define MDB_VERSION_PATCH	23
 
 /** Combine args a,b,c into a single integer for easy version comparisons */
 #define MDB_VERINT(a,b,c)	(((a) << 24) | ((b) << 16) | (c))
@@ -210,7 +213,7 @@ typedef int mdb_filehandle_t;
 	MDB_VERINT(MDB_VERSION_MAJOR,MDB_VERSION_MINOR,MDB_VERSION_PATCH)
 
 /** The release date of this library version */
-#define MDB_VERSION_DATE	"March 21, 2018"
+#define MDB_VERSION_DATE	"December 19, 2018"
 
 /** A stringifier for the version info */
 #define MDB_VERSTR(a,b,c,d)	"LMDB " #a "." #b "." #c ": (" d ")"
@@ -258,8 +261,6 @@ typedef struct MDB_val {
 	size_t		 mv_size;	/**< size of the data item */
 	void		*mv_data;	/**< address of the data item */
 } MDB_val;
-
-char *mdb_dkey(MDB_val *key, char *buf);
 
 /** @brief A callback function used to compare two keys in a database */
 typedef int  (MDB_cmp_func)(const MDB_val *a, const MDB_val *b);
@@ -372,7 +373,7 @@ typedef enum MDB_cursor_op {
 	MDB_GET_BOTH,			/**< Position at key/data pair. Only for #MDB_DUPSORT */
 	MDB_GET_BOTH_RANGE,		/**< position at key, nearest data. Only for #MDB_DUPSORT */
 	MDB_GET_CURRENT,		/**< Return key/data at current cursor position */
-	MDB_GET_MULTIPLE,		/**< Return key and up to a page of duplicate data items
+	MDB_GET_MULTIPLE,		/**< Return up to a page of duplicate data items
 								from current cursor position. Move cursor to prepare
 								for #MDB_NEXT_MULTIPLE. Only for #MDB_DUPFIXED */
 	MDB_LAST,				/**< Position at last key/data item */
@@ -381,7 +382,7 @@ typedef enum MDB_cursor_op {
 	MDB_NEXT,				/**< Position at next data item */
 	MDB_NEXT_DUP,			/**< Position at next data item of current key.
 								Only for #MDB_DUPSORT */
-	MDB_NEXT_MULTIPLE,		/**< Return key and up to a page of duplicate data items
+	MDB_NEXT_MULTIPLE,		/**< Return up to a page of duplicate data items
 								from next cursor position. Move cursor to prepare
 								for #MDB_NEXT_MULTIPLE. Only for #MDB_DUPFIXED */
 	MDB_NEXT_NODUP,			/**< Position at first data item of next key */
@@ -392,7 +393,7 @@ typedef enum MDB_cursor_op {
 	MDB_SET,				/**< Position at specified key */
 	MDB_SET_KEY,			/**< Position at specified key, return key + data */
 	MDB_SET_RANGE,			/**< Position at first key greater than or equal to specified key. */
-	MDB_PREV_MULTIPLE		/**< Position at previous page and return key and up to
+	MDB_PREV_MULTIPLE		/**< Position at previous page and return up to
 								a page of duplicate data items. Only for #MDB_DUPFIXED */
 } MDB_cursor_op;
 
@@ -578,7 +579,7 @@ int  mdb_env_create(MDB_env **env);
 	 *	<li>#MDB_NOTLS
 	 *		Don't use Thread-Local Storage. Tie reader locktable slots to
 	 *		#MDB_txn objects instead of to threads. I.e. #mdb_txn_reset() keeps
-	 *		the slot reserved for the #MDB_txn object. A thread may use parallel
+	 *		the slot reseved for the #MDB_txn object. A thread may use parallel
 	 *		read-only transactions. A read-only transaction may span threads if
 	 *		the user synchronizes its use. Applications that multiplex many
 	 *		user threads over individual OS threads need this option. Such an
@@ -1512,6 +1513,10 @@ int  mdb_cursor_put(MDB_cursor *cursor, MDB_val *key, MDB_val *data,
 	/** @brief Delete current key/data pair
 	 *
 	 * This function deletes the key/data pair to which the cursor refers.
+	 * This does not invalidate the cursor, so operations such as MDB_NEXT
+	 * can still be used on it.
+	 * Both MDB_NEXT and MDB_GET_CURRENT will return the same record after
+	 * this operation.
 	 * @param[in] cursor A cursor handle returned by #mdb_cursor_open()
 	 * @param[in] flags Options for this operation. This parameter
 	 * must be set to 0 or one of the values described here.

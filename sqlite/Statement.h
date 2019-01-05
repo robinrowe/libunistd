@@ -20,7 +20,7 @@ public:
 	,	stmt(0)
 	{	const int rc = sqlite3_prepare_v2(db,query,-1,&stmt,NULL);
 		if(SQLITE_OK != rc)
-		{	stmt = 0;
+	{	stmt = 0;
 	}	}
 	~Statement()
 	{	if(!stmt)

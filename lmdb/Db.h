@@ -1,36 +1,42 @@
 // Db.h
 // Created by Robin Rowe on 12/21/2015
 // Copyright (c) 2015 Robin.Rowe@CinePaint.org
-// OpenLDAP Public License
+// License MIT open source
 
 #ifndef LMDB_Db_h
 #define LMDB_Db_h
 
-#include "source/lmdb.h"
 #include <memory.h>
+#include "source/lmdb.h"
+#include "../portable/no_copy.h"
 
 namespace lmdb {
 
 class Db
-{	MDB_env *env;
+{	no_copy(Db);
+	MDB_env* env;
 	MDB_dbi dbi;
 	int rc;
 	void Reset()
 	{	env = 0;
 		dbi = 0;
 		rc = 0;
+		status = "ok";
 	}
+	const char* status;
 public:
 	~Db()
-	{	mdb_close(env, dbi);
-		mdb_env_close(env);
-		Reset();
+	{	Close();
 	}
 	Db()
 	{	Reset();
 		rc = mdb_env_create(&env);
+		if(0!=rc)
+		{	status = "env_create failed";
+	}	}
+	const char* Status() const
+	{	return status;
 	}
-	bool Open(const char* path,const char* dbname,size_t size = 1024 * 1024);
 	bool operator!() const
 	{	return 0!=rc;
 	}
@@ -43,31 +49,9 @@ public:
 	const char* toString() const
 	{	return mdb_strerror(rc);
 	}
-	bool Put(MDB_txn* txn,MDB_val* key,MDB_val* value)
-	{	rc = mdb_put(txn,dbi,key,value, 0);
-		return 0 == rc;
-	}
-#if 0
-	bool Get(const K& key)
-	{
-		this->key = key;
-		mdbKey.mv_size = sizeof(K);
-		memcpy(mdbKey.mv_data, &k, sizeof(K));
-		rc = mdb_get(lmdb.GetTxn(), lmdb.GetDbi(), &data);
-		// If the database supports duplicate keys (MDB_DUPSORT) then the first data item for 
-		// the key will be returned. Retrieval of other items requires the use of mdb_cursor_get().
-		// 0 on success. Some possible errors are:
-		// MDB_NOTFOUND - the key was not in the database.
-		// EINVAL - an invalid parameter was specified.
-		if (0 != rc)
-		{
-			return false;
-		}
-		memcpy(&v, data.mv_data, sizeof(V));
-		return true;
-	}
-#endif
-
+	bool Drop(const char* filename);
+	bool Open(const char* filename,int flags = 0,size_t size = 1024 * 1024);
+	void Close();	bool Put(MDB_txn* txn,MDB_val* key,MDB_val* value,int flags = 0);
 };
 
 }
