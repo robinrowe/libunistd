@@ -158,3 +158,32 @@ address of local variable or temporary: buf
 C:\Code\github\libunistd\build\lmdb\Debug\liblmdb.lib
 2>Done building project "liblmdb.vcxproj".
 ========== Rebuild All: 2 succeeded, 0 failed, 0 skipped =========
+
+
+Subject: Re: (ITS#8953) Windows lmdb warnings and a memory error
+Date: Fri, 4 Jan 2019 20:45:06 +0000
+From: Howard Chu
+To: openldap-its@OpenLDAP.org
+
+robin.rowe@cinepaint.org wrote:
+> Full_Name: Robin Rowe
+> Version: --branch OPENLDAP_REL_ENG_2_4
+> OS: Windows 10
+> URL: ftp://ftp.openldap.org/incoming/
+> Submission from: (NULL) (23.242.20.216)
+> 
+> 
+> Thanks for lmdb!
+> 
+> Building lmdb in Visual Studio 2017 produces warnings a memory error due to
+> returning address of local variable from function mdb_strerror. Many warnings
+> for integer truncation without using a cast. None of these seem severe. Will
+> anyone clean this up?
+
+None of these are meaningful, so no.
+
+-- 
+  -- Howard Chu
+  CTO, Symas Corp.           http://www.symas.com
+  Director, Highland Sun     http://highlandsun.com/hyc/
+  Chief Architect, OpenLDAP  http://www.openldap.org/project/

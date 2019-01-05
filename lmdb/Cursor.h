@@ -6,11 +6,10 @@
 #ifndef LMDB_Cursor_h
 #define LMDB_Cursor_h
 
-#include "source/lmdb.h"
+#include <portable/no_copy.h>
 #include "Db.h"
 #include "Cursor.h"
 #include "Transaction.h"
-#include "../portable/no_copy.h"
 
 namespace lmdb {
 

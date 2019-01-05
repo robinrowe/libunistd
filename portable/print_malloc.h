@@ -4,6 +4,8 @@
 #define print_malloc_h
 
 #include <stdio.h>
+#include <stdlib.h> 
+#include <malloc.h>
 
 inline
 void debug_print(const char* op,void* p,const char* filename,int lineno,size_t size)

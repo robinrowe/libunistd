@@ -2,6 +2,7 @@
 
 #include <string>
 #include <stdio.h>
+#include <lmdb.h>
 #include "Db.h"
 #include "Transaction.h"
 

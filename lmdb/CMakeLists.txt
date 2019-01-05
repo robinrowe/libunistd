@@ -28,5 +28,14 @@ add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
 #necessary for building mdb_dkey for mtest6:
 add_definitions(-DMDB_DEBUG)
 
+#For detecting double-free():
+#add_definitions(-DPRINT_MALLOC)
+
+set(INCDIR 
+	${CMAKE_CURRENT_SOURCE_DIR}/../lmdb/liblmdb
+	${CMAKE_CURRENT_SOURCE_DIR}/..
+)
+
 add_library(${NAME} ${SOURCES})
+target_include_directories(${NAME} PUBLIC ${INCDIR})
 add_subdirectory(test)

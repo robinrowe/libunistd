@@ -15,7 +15,7 @@
  * <http://www.OpenLDAP.org/license.html>.
  */
 #include <stdio.h>
-#include "lmdb.h"
+#include <lmdb.h>
 
 int main(int argc,char * argv[])
 {
@@ -45,6 +45,17 @@ int main(int argc,char * argv[])
 	sprintf(sval, "%03x %d foo bar", 32, 3141592);
 	rc = mdb_put(txn, dbi, &key, &data, 0);
 	rc = mdb_txn_commit(txn);
+#define HIDE_DOUBLE_FREE_BUG
+#ifndef HIDE_DOUBLE_FREE_BUG
+	rc = mdb_txn_commit(txn);
+/*
+mdb.c:3470 		rc = MDB_BAD_TXN;
+mdb.c:3471		goto fail; // Jumps away here due to double-commit...
+...
+mdb.c:5076	free(env->me_dirty_list);
+mdb.c:5076	free(env->me_txn0); // Double-free crashes here...
+*/
+#endif
 	if (rc) {
 		fprintf(stderr, "mdb_txn_commit: (%d) %s\n", rc, mdb_strerror(rc));
 		goto leave;

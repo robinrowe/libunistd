@@ -166,7 +166,7 @@
 #define _LMDB_H_
 
 #include <sys/types.h>
-#ifndef RSR
+#ifdef PRINT_MALLOC
 #include "../../portable/print_malloc.h"
 #endif
 

@@ -7,8 +7,8 @@
 #define LMDB_Db_h
 
 #include <memory.h>
-#include "source/lmdb.h"
-#include "../portable/no_copy.h"
+#include <lmdb.h>
+#include <portable/no_copy.h>
 
 namespace lmdb {
 

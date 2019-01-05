@@ -9,7 +9,7 @@
 #include <memory.h>
 #include <string>
 #include <ostream>
-#include "source/lmdb.h"
+#include <lmdb.h>
 #include "Db.h"
 #include "Transaction.h"
 #include "Cursor.h"

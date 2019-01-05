@@ -6,8 +6,8 @@
 #ifndef LMDB_Transaction_h
 #define LMDB_Transaction_h
 
-#include "source/lmdb.h"
-#include "../portable/no_copy.h"
+#include <lmdb.h>
+#include <portable/no_copy.h>
 
 namespace lmdb {
 
