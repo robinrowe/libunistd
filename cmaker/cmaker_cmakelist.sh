@@ -1,5 +1,5 @@
 #!/bin/bash 
-# make_cmake.sh
+# cmaker_cmakelist.sh
 # Created by Robin Rowe 2019/1/11
 # License MIT open source
 

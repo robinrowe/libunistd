@@ -1,5 +1,5 @@
 #!/bin/bash 
-# make_class.sh
+# cmaker_class.sh
 # Created by Robin Rowe 2019/1/10
 # License MIT open source
 

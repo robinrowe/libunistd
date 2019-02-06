@@ -1,5 +1,5 @@
 #!/bin/bash 
-# make_main.sh
+# cmaker_program.sh
 # Created by Robin Rowe 2019/1/11
 # License MIT open source
 
