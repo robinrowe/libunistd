@@ -18,6 +18,15 @@ if [ -z "$AUTHOR" ]; then
 	exit 1
 fi
 
+LowerCase()
+{	local c=${lower:0:1}
+	local body=${lower:1}
+	local octal=$(printf '%o' "'${c}")
+	octal=$((octal + 40))
+	c=$(printf '%b' '\'${octal})
+	lower="${c}${body}"
+}
+
 Sed()
 {	local arg=$1
 	local file=$2
@@ -29,9 +38,11 @@ CreateFile()
 {	local src=$1
 	local dst=$2
 	local arg=$3
+	lower=$3
 	echo Creating ${dst} ...
+	LowerCase
 	cp ${src} ${dst}
-	Sed "s|aCLASS|${arg,,}|g" ${dst}
+	Sed "s|aCLASS|${lower}|g" ${dst}
 	Sed "s|CLASS|${arg}|g" ${dst}
 	Sed "s|DATE|${date}|g" ${dst}
 	Sed "s|AUTHOR|${AUTHOR}|g" ${dst}
