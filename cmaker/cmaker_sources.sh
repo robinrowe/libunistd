@@ -11,18 +11,34 @@ if [ -z "$AUTHOR" ]; then
 	exit 1
 fi
 
+AddPath()
+{	shopt -s nullglob
+	local files=($1)
+	local target=$2
+	echo "files = ${files}"
+	for file in "${files[@]}"
+	do 
+		if [ -f "$file" ]; 
+		then 
+			echo ${file} >> ${target}
+	    fi 
+	done
+}
+
 AddSources() 
 {	if [[ -e ${sources} ]]; then
 		echo "Skipping... ${sources} already exists!"
 		return
 	fi
 	echo Creating ${sources}...
-	echo ls -1 *.h > ${sources}
-	echo ls -1 *.cpp >> ${sources}
-	echo ls -1 *.c >> ${sources}
+	AddPath "*.h" ${sources}
+	AddPath "*.H" ${sources}
+	AddPath "*.cpp" ${sources}
+	AddPath "*.cxx" ${sources}
+	AddPath "*.c" ${sources}
 }
 
 AddSources
-cat ${sources}
+#cat ${sources}
 
 
