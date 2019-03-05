@@ -6,11 +6,15 @@ Cmaker is a set of programs that create a framework of cmake files. This saves t
 
 ## Usage
 
-Add cmaker directory to your path or use with full path to call. Cmaker expects a LICENSE file from which it will read the license text to paste into the cmake files it creates.
+Add cmaker directory to your path or use with full path to call. 
 
+Cmaker expects to find a LICENSE file in your project directory from which it will read the first line as the license text to paste into the project files it creates. If you don't have a LICENSE file, you can create one like this:
+
+	echo "MIT Open Source" > LICENSE
+
+Creating a complete frameworks, including project, program, class files, and unit tests:
 
 	cd YourProjectDirectory
-	echo "MIT Open Source" > LICENSE
 	export AUTHOR="Your Name"
 	cmaker_project.sh YourProjectName
 	cmaker_program.sh YourExecutableName
@@ -21,6 +25,8 @@ Add cmaker directory to your path or use with full path to call. Cmaker expects 
 	make
 	ctest
 
-To add another program or class to your project later, simply call the relevant script again. The purpose of cmaker_sources.sh is to import existing legacy files. Is not needed by new projects.
+To add another program or class to your project later, simply call the relevant script again. You only need to call cmaker_project.sh once. 
+
+The purpose of cmaker_sources.sh is to import existing legacy files. Is not needed by new projects.
 	
 --0--
