@@ -8,11 +8,11 @@ using namespace std;
 
 int main(int argc,char* argv[])
 {	cout << "Testing CLASS" << endl;
-	CLASS aCLASS;
-	if(!aCLASS)
+	CLASS OBJECT;
+	if(!OBJECT)
 	{	cout << "CLASS failed, operator! == true" << endl;
 		return 1;
 	}
-	cout << aCLASS << endl << "Done!" << endl;
+	cout << OBJECT << endl << "Done!" << endl;
 	return 0;
 }

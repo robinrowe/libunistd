@@ -46,7 +46,7 @@ CreateFile()
 	echo Creating ${dst}...
 	LowerCase
 	cp ${src} ${dst}
-	Sed "s|aCLASS|${lower}|g" ${dst}
+	Sed "s|OBJECT|${lower}|g" ${dst}
 	Sed "s|CLASS|${arg}|g" ${dst}
 	Sed "s|DATE|${date}|g" ${dst}
 	Sed "s|AUTHOR|${AUTHOR}|g" ${dst}

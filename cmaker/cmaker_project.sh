@@ -6,6 +6,7 @@
 cmakelist=CMakeLists.txt
 date=$(date +%Y-%m-%d)
 project=$1
+project_file="$0.txt"
 
 ReadLicenseFile()
 {	if [[ ! -e LICENSE ]]; then
@@ -16,31 +17,28 @@ ReadLicenseFile()
 	echo "License: ${license}"
 }
 
+Sed()
+{	local arg=$1
+	local file=$2
+	sed "${arg}" ${file} > ${file}.tmp
+	mv -f ${file}.tmp ${file}
+}
+
 CreateCmakeList() 
 {	if [[ -e ${cmakelist} ]]; then
 		echo "Skipping... ${cmakelist} already exists!"
 		return
 	fi
+	if [[ -e ${cmakelist} ]]; then
+		echo "Skipping... ${cmakelist} already exists!"
+		return
+	fi
 	echo Creating ${cmakelist} for project ${project}...
-	echo "# ${project}/CMakeLists.txt" > ${cmakelist}
-	echo "# Created by ${AUTHOR} ${date}" >> ${cmakelist}
-	echo "# License ${license}" >> ${cmakelist}
-	echo '' >> ${cmakelist}
-	echo 'cmake_minimum_required(VERSION 3.8)' >> ${cmakelist}
-	echo 'set(CMAKE_CXX_STANDARD 17)' >> ${cmakelist}
-	echo 'set(CMAKE_CXX_STANDARD_REQUIRED ON)' >> ${cmakelist}
-	echo 'set(CMAKE_CXX_EXTENSIONS OFF)' >> ${cmakelist}
-	echo '' >> ${cmakelist}
-	echo "set(Project ${project})" >> ${cmakelist}
-	echo "project(${project})" >> ${cmakelist}
-	echo 'enable_testing()' >> ${cmakelist}
-	echo 'file(STRINGS sources.cmake SOURCES)' >> ${cmakelist}
-	echo "add_library(${project}_lib \${SOURCES})" >> ${cmakelist}
-	echo "link_libraries(${project}_lib)" >> ${cmakelist}
-	echo 'if(NOT WIN32 AND NOT APPLE)' >> ${cmakelist}
-	echo '	link_libraries(rt pthread)' >> ${cmakelist}
-	echo 'endif(NOT WIN32 AND NOT APPLE)' >> ${cmakelist}
-	echo '' >> ${cmakelist}
+	cp ${project_file} ${cmakelist}
+	Sed "s/PROJECT/${project}/g" ${cmakelist}
+	Sed "s/DATE/${date}/g" ${cmakelist}
+	Sed "s/AUTHOR/${AUTHOR}/g" ${cmakelist}
+	Sed "s/LICENSE/${license}/g" ${cmakelist}
 }
 
 main()

@@ -23,8 +23,8 @@ public:
 };
 
 inline
-std::ostream& operator<<(std::ostream& os,const CLASS& aCLASS)
-{	return aCLASS.Print(os);
+std::ostream& operator<<(std::ostream& os,const CLASS& OBJECT)
+{	return OBJECT.Print(os);
 }
 
 #endif
