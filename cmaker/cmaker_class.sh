@@ -4,7 +4,6 @@
 # License MIT open source
 
 #set -x
-license='MIT open source'
 h_file=$0.h
 cpp_file=$0.cpp
 test_file=$0.test.cpp
@@ -12,11 +11,16 @@ outstream=$0.OutStream.h
 cmakelist=CMakeLists.txt
 sources=sources.cmake
 date=$(date +%Y-%m-%d)
+args=("$@")
 
-if [ -z "$AUTHOR" ]; then 
-	echo "In bash set your name: % export AUTHOR=\"Your Name\""
-	exit 1
-fi
+ReadLicenseFile()
+{	if [[ ! -e LICENSE ]]; then
+		echo "Missing LICENSE file"
+		exit 1
+	fi
+	read -r license < LICENSE
+	echo "License: ${license}"
+}
 
 LowerCase()
 {	local c=${lower:0:1}
@@ -39,7 +43,7 @@ CreateFile()
 	local dst=$2
 	local arg=$3
 	lower=$3
-	echo Creating ${dst} ...
+	echo Creating ${dst}...
 	LowerCase
 	cp ${src} ${dst}
 	Sed "s|aCLASS|${lower}|g" ${dst}
@@ -65,19 +69,27 @@ UpdateCmakeSources()
 	echo "${arg}.cpp" >> ${sources}
 }
 
-if [[ ! -e test ]]; then
-    mkdir test
-fi
-
-for arg; do 
-	if [[ -e ${arg}.h ]]; then
-		echo "Skipping... ${arg}.h already exists!"
-		continue
+main()
+{	if [ -z "$AUTHOR" ]; then 
+		echo "In bash set your name: % export AUTHOR=\"Your Name\""
+		exit 1
 	fi
-	CreateFile ${h_file} "./${arg}.h" ${arg}
-	CreateFile ${cpp_file} "./${arg}.cpp" ${arg}
-	CreateFile ${test_file} "./test/test_${arg}.cpp" ${arg}
-	UpdateCmakeList $arg
-	UpdateCmakeSources $arg
-done
+	ReadLicenseFile
+	if [[ ! -e test ]]; then
+		mkdir test
+	fi
+	for arg in "${args[@]}"; do
+		if [[ -e ${arg}.h ]]; then
+			echo "Skipping... ${arg}.h already exists!"
+			continue
+		fi
+		CreateFile ${h_file} "./${arg}.h" ${arg}
+		CreateFile ${cpp_file} "./${arg}.cpp" ${arg}
+		CreateFile ${test_file} "./test/test_${arg}.cpp" ${arg}
+		UpdateCmakeList $arg
+		UpdateCmakeSources $arg
+	done
+}
+
+main
 

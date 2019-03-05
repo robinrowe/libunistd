@@ -1,6 +1,6 @@
 // EXECUTABLE.cpp 
 // Created by AUTHOR DATE
-// License MIT LICENSE
+// License LICENSE
 
 #include <iostream>
 using namespace std;

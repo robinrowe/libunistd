@@ -3,19 +3,18 @@
 # Created by Robin Rowe 2019/1/11
 # License MIT open source
 
-license="MIT open source"
 cmakelist=CMakeLists.txt
 date=$(date +%Y-%m-%d)
 project=$1
 
-if [ -z "${project}" ]; then 
-	echo 'Usage: % make_cmake Project_Name'
-	exit 1
-fi
-if [ -z "$AUTHOR" ]; then 
-	echo "In bash set your name: % export AUTHOR=\"Your Name\""
-	exit 1
-fi
+ReadLicenseFile()
+{	if [[ ! -e LICENSE ]]; then
+		echo "Missing LICENSE file"
+		exit 1
+	fi
+	read -r license < LICENSE
+	echo "License: ${license}"
+}
 
 CreateCmakeList() 
 {	if [[ -e ${cmakelist} ]]; then
@@ -44,7 +43,18 @@ CreateCmakeList()
 	echo '' >> ${cmakelist}
 }
 
-CreateCmakeList
-cat ${cmakelist}
+main()
+{	if [ -z "${project}" ]; then 
+		echo 'Usage: % make_cmake Project_Name'
+		exit 1
+	fi
+	if [ -z "$AUTHOR" ]; then 
+		echo "In bash set your name: % export AUTHOR=\"Your Name\""
+		exit 1
+	fi
+	ReadLicenseFile
+	CreateCmakeList
+#	cat ${cmakelist}
+}
 
-
+main

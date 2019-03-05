@@ -3,15 +3,19 @@
 # Created by Robin Rowe 2019/1/11
 # License MIT open source
 
-license="MIT open source"
 cmakelist=CMakeLists.txt
 date=$(date +%Y-%m-%d)
 main_file="$0.main.cpp"
+args=("$@") 
 
-if [ -z "$AUTHOR" ]; then 
-	echo "In bash set your name: % export AUTHOR=\"Your Name\""
-	exit 1
-fi
+ReadLicenseFile()
+{	if [[ ! -e LICENSE ]]; then
+		echo "Missing LICENSE file"
+		exit 1
+	fi
+	read -r license < LICENSE
+	echo "License: ${license}"
+}
 
 Sed()
 {	local arg=$1
@@ -42,8 +46,18 @@ UpdateCmakeList()
 	echo "add_executable(${exe} ${exe}.cpp)" >> ${cmakelist}
 	echo '' >> ${cmakelist}
 }
-	
-for arg; do 
-	CreateMainCpp ${main_file} ${arg}
-	UpdateCmakeList $arg
-done
+
+main()
+{	if [ -z "$AUTHOR" ]; then 
+		echo "In bash set your name: % export AUTHOR=\"Your Name\""
+		exit 1
+	fi
+	ReadLicenseFile
+	for arg in "${args[@]}"; do
+		CreateMainCpp ${main_file} ${arg}
+		UpdateCmakeList $arg
+	done
+}
+
+main
+

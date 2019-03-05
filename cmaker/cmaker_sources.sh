@@ -3,13 +3,16 @@
 # Created by Robin Rowe 2019/2/6
 # License MIT open source
 
-license="MIT open source"
 sources=sources.cmake
 
-if [ -z "$AUTHOR" ]; then 
-	echo "In bash set your name: % export AUTHOR=\"Your Name\""
-	exit 1
-fi
+ReadLicenseFile()
+{	if [[ ! -e LICENSE ]]; then
+		echo "Missing LICENSE file"
+		exit 1
+	fi
+	read -r license < LICENSE
+	echo "License: ${license}"
+}
 
 AddPath()
 {	shopt -s nullglob
@@ -38,7 +41,16 @@ AddSources()
 	AddPath "*.c" ${sources}
 }
 
-AddSources
-#cat ${sources}
+main()
+{	if [ -z "$AUTHOR" ]; then 
+		echo "In bash set your name: % export AUTHOR=\"Your Name\""
+		exit 1
+	fi
+	ReadLicenseFile
+	AddSources
+	#cat ${sources}
+}
+
+main
 
 
