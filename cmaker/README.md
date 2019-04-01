@@ -4,6 +4,10 @@ Robin.Rowe@Cinepaint.org 2009/3/5
 
 Cmaker is a set of programs that create a framework of cmake files. This saves time when creating a project and ensures consistency in cmake design. It also creates unit tests for use with ctest. 
 
+A project created in Cmaker will build without writing ANY code. You may run all a project's programs and unit tests from the start if created by Cmaker. All written for you. Saves a lot of time. 
+
+Works on Windows (with git bash), MacOS or Linux.
+
 ## Usage
 
 Add cmaker directory to your path or use with full path to call. 
