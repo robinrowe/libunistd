@@ -4,6 +4,10 @@ Robin.Rowe@Cinepaint.org 2009/3/5
 
 Cmaker is a set of programs that create a framework of cmake files. This saves time when creating a project and ensures consistency in cmake design. It also creates unit tests for use with ctest. 
 
+A project created in Cmaker will build without writing ANY code. You may run all a project's programs and unit tests from the start if created by Cmaker. All written for you. Saves a lot of time. 
+
+Works on Windows (with git bash), MacOS or Linux.
+
 ## Usage
 
 Add cmaker directory to your path or use with full path to call. 
@@ -28,5 +32,7 @@ Creating a complete frameworks, including project, program, class files, and uni
 To add another program or class to your project later, simply call the relevant script again. You only need to call cmaker_project.sh once. 
 
 The purpose of cmaker_sources.sh is to import existing legacy files. Is not needed by new projects.
+
+Use cmaker_top.sh to create the top level CMakelists.txt that calls CMakelists.txt files in subdirectories. Of course, create the subdirectories first.
 	
 --0--
