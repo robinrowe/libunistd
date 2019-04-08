@@ -1,4 +1,4 @@
-# libssh2/cmake/zlib-config.cmake
+# zlib/cmake/zlib-config.cmake
 # Edit zlib/CMakeLists.txt:
 #   find_package(ZLIB REQUIRED CONFIG)
 # cmake -DENABLE_ZLIB_COMPRESSION=ON -DZLIB_DIR=../cmake .. -A x64
