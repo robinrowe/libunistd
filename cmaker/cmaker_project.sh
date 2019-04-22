@@ -8,10 +8,38 @@ date=$(date +%Y-%m-%d)
 project=$1
 project_file="$0.txt"
 
+CreateDocs()
+{	docfile=CHANGES.md
+	if [[ ! -e ${docfile} ]]; then
+		echo "Writing ${docfile}"
+		echo "#${docfile}" > ${docfile}
+		echo "" >> ${docfile}
+		echo "${AUTHOR} ${data}" >> ${docfile}
+		echo "" >> ${docfile}
+		echo "## To-Do" >> ${docfile}
+		echo "" >> ${docfile}
+		echo "## Done" >> ${docfile}
+		echo "" >> ${docfile}
+	fi
+	docfile=README.md
+	if [[ ! -e ${docfile} ]]; then
+		echo "Writing ${docfile}"
+		echo "#${docfile}" > ${docfile}
+		echo "" >> ${docfile}
+		echo "${AUTHOR} ${data}" >> ${docfile}
+		echo "" >> ${docfile}
+	fi
+}
+
 ReadLicenseFile()
 {	if [[ ! -e LICENSE ]]; then
 		echo "Missing LICENSE file"
-		exit 1
+		if [[ -e ../LICENSE ]]; then
+			echo "Copying LICENSE file"
+			cp ../LICENSE .
+		else
+			exit 1
+		fi
 	fi
 	read -r license < LICENSE
 	echo "License: ${license}"
@@ -52,6 +80,7 @@ main()
 	fi
 	ReadLicenseFile
 	CreateCmakeList
+	CreateDocs
 #	cat ${cmakelist}
 }
 
