@@ -14,7 +14,7 @@ CreateDocs()
 		echo "Writing ${docfile}"
 		echo "#${docfile}" > ${docfile}
 		echo "" >> ${docfile}
-		echo "${AUTHOR} ${data}" >> ${docfile}
+		echo "${AUTHOR} ${date}" >> ${docfile}
 		echo "" >> ${docfile}
 		echo "## To-Do" >> ${docfile}
 		echo "" >> ${docfile}
@@ -26,7 +26,7 @@ CreateDocs()
 		echo "Writing ${docfile}"
 		echo "#${docfile}" > ${docfile}
 		echo "" >> ${docfile}
-		echo "${AUTHOR} ${data}" >> ${docfile}
+		echo "${AUTHOR} ${date}" >> ${docfile}
 		echo "" >> ${docfile}
 	fi
 }
