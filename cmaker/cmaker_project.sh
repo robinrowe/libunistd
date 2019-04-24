@@ -8,27 +8,30 @@ date=$(date +%Y-%m-%d)
 project=$1
 project_file="$0.txt"
 
+CreateDoc()
+{	local docfile=$1
+	if [[ -e ${docfile} ]]; then
+		return 0
+	fi
+	echo "Creating ${docfile}"
+	echo "#${docfile}" > ${docfile}
+	echo "" >> ${docfile}
+	echo "${AUTHOR} ${date}" >> ${docfile}
+	echo "" >> ${docfile}
+	return 1
+}
+
 CreateDocs()
-{	docfile=CHANGES.md
-	if [[ ! -e ${docfile} ]]; then
-		echo "Writing ${docfile}"
-		echo "#${docfile}" > ${docfile}
-		echo "" >> ${docfile}
-		echo "${AUTHOR} ${date}" >> ${docfile}
+{	if(CreateDoc CHANGES.md); then
+		docfile=CHANGES.md
 		echo "" >> ${docfile}
 		echo "## To-Do" >> ${docfile}
 		echo "" >> ${docfile}
 		echo "## Done" >> ${docfile}
 		echo "" >> ${docfile}
 	fi
-	docfile=README.md
-	if [[ ! -e ${docfile} ]]; then
-		echo "Writing ${docfile}"
-		echo "#${docfile}" > ${docfile}
-		echo "" >> ${docfile}
-		echo "${AUTHOR} ${date}" >> ${docfile}
-		echo "" >> ${docfile}
-	fi
+	CreateDoc README.md
+	CreateDoc INSTALL.md
 }
 
 ReadLicenseFile()
