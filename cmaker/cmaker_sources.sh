@@ -34,6 +34,7 @@ AddSources()
 		return
 	fi
 	echo Creating ${sources}...
+	echo ${sources} >> ${sources}
 	AddPath "*.h" ${sources}
 	AddPath "*.H" ${sources}
 	AddPath "*.cpp" ${sources}

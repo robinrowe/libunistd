@@ -23,7 +23,7 @@ CreateDoc()
 
 CreateDocs()
 {	if(CreateDoc CHANGES.md); then
-		docfile=CHANGES.md
+		local docfile=CHANGES.md
 		echo "" >> ${docfile}
 		echo "## To-Do" >> ${docfile}
 		echo "" >> ${docfile}
