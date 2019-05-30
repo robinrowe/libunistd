@@ -1,17 +1,12 @@
 // File:Int128.h
 // https://stackoverflow.com/questions/6759592/how-to-enable-int128-on-visual-studio
-#pragma once
 
-//#include "PragmaLib.h" 
-// contains #pragma comment(lib,"Yourlib.lib")
+#ifndef Int128_h
+#define Int128_h
 
-#ifndef _M_X64
+// Int128 is available only in x64 arhcitecture
 
-#error Int128 is available only in x64 arhcitecture
-
-#endif
-
-#ifdef __cplusplus
+#if defined(_M_X64) && defined(__cplusplus)
 
 class _int128;
 class _uint128;
@@ -383,4 +378,5 @@ unsigned int convertNumberChar(char digit);
 #define __int128 _int128
 #define __uint128 _uint128 
 
+#endif
 #endif

@@ -34,6 +34,7 @@ AddSources()
 		return
 	fi
 	echo Creating ${sources}...
+	echo ${sources} >> ${sources}
 	AddPath "*.h" ${sources}
 	AddPath "*.H" ${sources}
 	AddPath "*.cpp" ${sources}
@@ -42,7 +43,8 @@ AddSources()
 }
 
 main()
-{	if [ -z "$AUTHOR" ]; then 
+{	echo "cmaker_sources: $PWD"
+	if [ -z "$AUTHOR" ]; then 
 		echo "In bash set your name: % export AUTHOR=\"Your Name\""
 		exit 1
 	fi

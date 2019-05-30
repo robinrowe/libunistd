@@ -23,7 +23,7 @@ CreateDoc()
 
 CreateDocs()
 {	if(CreateDoc CHANGES.md); then
-		docfile=CHANGES.md
+		local docfile=CHANGES.md
 		echo "" >> ${docfile}
 		echo "## To-Do" >> ${docfile}
 		echo "" >> ${docfile}
@@ -60,10 +60,6 @@ CreateCmakeList()
 		echo "Skipping... ${cmakelist} already exists!"
 		return
 	fi
-	if [[ -e ${cmakelist} ]]; then
-		echo "Skipping... ${cmakelist} already exists!"
-		return
-	fi
 	echo Creating ${cmakelist} for project ${project}...
 	cp ${project_file} ${cmakelist}
 	Sed "s/PROJECT/${project}/g" ${cmakelist}
@@ -73,8 +69,9 @@ CreateCmakeList()
 }
 
 main()
-{	if [ -z "${project}" ]; then 
-		echo 'Usage: % make_cmake Project_Name'
+{	echo "cmaker_cmakelist: $PWD"
+	if [ -z "${project}" ]; then 
+		echo 'Usage: % cmaker_cmakelist ProjectName'
 		exit 1
 	fi
 	if [ -z "$AUTHOR" ]; then 
