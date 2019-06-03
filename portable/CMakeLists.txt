@@ -70,6 +70,7 @@ set(SOURCE
 	ipc/BsdSocketClient.cpp
 	ipc/BsdSocketPool.cpp
 	ipc/BsdSocketServer.cpp
+	ipc/BsdSocketStartup.cpp
 	CommandLine.cpp
 	http/Http.cpp
 	Network.cpp

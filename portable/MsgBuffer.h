@@ -31,8 +31,9 @@ class MsgBuffer
 		Append(p);
 	}
 	void SetPerLastError()
-	{	const unsigned len=length();
+	{	
 #ifdef _WIN32
+		const unsigned len = length();
 		const DWORD num = FormatMessageA(
 			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL,
@@ -42,7 +43,7 @@ class MsgBuffer
 			bufsize-len-1,
 			NULL);
 #else
-		SetBufferErrno();
+		SetPerErrno();
 #endif
 	}
 public:

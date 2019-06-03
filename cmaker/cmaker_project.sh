@@ -45,6 +45,7 @@ ReadLicenseFile()
 		fi
 	fi
 	read -r license < LICENSE
+	license=${license%%[[:space:]]}
 	echo "License: ${license}"
 }
 
@@ -62,10 +63,10 @@ CreateCmakeList()
 	fi
 	echo Creating ${cmakelist} for project ${project}...
 	cp ${project_file} ${cmakelist}
-	Sed "s/PROJECT/${project}/g" ${cmakelist}
-	Sed "s/DATE/${date}/g" ${cmakelist}
-	Sed "s/AUTHOR/${AUTHOR}/g" ${cmakelist}
-	Sed "s/LICENSE/${license}/g" ${cmakelist}
+	Sed "s/<NAME>/${project}/g" ${cmakelist}
+	Sed "s/<DATE>/${date}/g" ${cmakelist}
+	Sed "s/<AUTHOR>/${AUTHOR}/g" ${cmakelist}
+	Sed "s/<LICENSE>/${license}/g" ${cmakelist}
 }
 
 main()

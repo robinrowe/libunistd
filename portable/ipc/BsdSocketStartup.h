@@ -6,6 +6,8 @@
 #ifndef BsdSocketStartup_h
 #define BsdSocketStartup_h
 
+#ifdef _WIN32
+
 #ifdef UNREAL_ENGINE
 #include <AllowWindowsPlatformTypes.h>
 #endif
@@ -18,24 +20,19 @@ namespace portable
 {
 	
 class BsdSocketStartup
-{
-public:
+{	static BsdSocketStartup startup;
 	BsdSocketStartup()
-	{
-#ifdef _WIN32
-		WORD version_requested=MAKEWORD(2,0);
+	{	WORD version_requested=MAKEWORD(2,0);
 		WSADATA data;
 		WSAStartup(version_requested,&data);
-#endif
 	}
+public:
 	~BsdSocketStartup()
-	{	
-#ifdef _WIN32
-		WSACleanup();
-#endif
+	{	WSACleanup();
 	}
 };
 
 }
+#endif
 
 #endif

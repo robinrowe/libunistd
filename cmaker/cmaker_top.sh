@@ -1,5 +1,5 @@
 #!/bin/bash 
-# cmaker_cmakelist.sh
+# cmaker_top.sh
 # Created by Robin Rowe 2019/3/6
 # License MIT open source
 
@@ -53,7 +53,7 @@ AddSubdirs()
 
 main()
 {	if [ -z "${project}" ]; then 
-		echo 'Usage: % make_cmake Project_Name'
+		echo 'Usage: % cmaker_top Project_Name'
 		exit 1
 	fi
 	if [ -z "$AUTHOR" ]; then 

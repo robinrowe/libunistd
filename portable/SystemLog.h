@@ -55,7 +55,7 @@ void SystemLog(const char* filename,int lineNo,const char* msg)
 	printf("%s@%i: %s\n",filename,lineNo,msg);
 #ifdef _DEBUG
 #ifdef QT
-	qDebug() << filename << '@' << lineNo << ': " << msg;
+	qDebug() << filename << "@" << lineNo << ": " << msg;
 #else
 	_CrtDbgReport( _CRT_WARN,filename,lineNo,msg,NULL);
 #endif

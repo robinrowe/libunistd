@@ -73,6 +73,13 @@ extern int optind, opterr, optopt;
 
 #pragma warning(disable : 4996)
 
+/*
+inline
+int read(int fh,void* buf,unsigned count)
+{	return _read(fh,buf,count);
+}
+*/
+
 inline
 int snprintb(char *buf, size_t buflen, const char *fmt, uint64_t val)
 {	(void)buf;
