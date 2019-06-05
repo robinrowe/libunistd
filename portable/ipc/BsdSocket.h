@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <portable/string.h>
+#include "../string.h"
 #include "../MsgBuffer.h"
 #include "../AtomicCounter.h"
 #include "../VerboseCounter.h"
@@ -23,6 +23,7 @@
 #pragma warning(disable:4265)
 #ifndef _WIN32
 	typedef int SOCKET;
+	#define closesocket close
 #endif
 
 namespace portable 

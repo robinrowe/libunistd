@@ -1,10 +1,10 @@
 # libunistd/lmdb/CMakeLists.txt
 
-set(NAME libregex)
-message("--- Building ${NAME} ---")
+project(libregex)
+message("--- Building ${PROJECT_NAME} ---")
 set(SOURCES
 	regex.h
 	regex.c
 )
 
-add_library(${NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES})

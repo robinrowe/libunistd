@@ -24,12 +24,9 @@ static long long WindowsTimeMicroseconds(FILETIME& ft)
 	tt |= ft.dwLowDateTime;
 	tt /=10;
 	tt -= 11644473600000000ULL;
-//	tt /=1000000; //micro to mille
 	if(tt<0)
 	{	tt=0;
 	}
-//		time64_t t;
-//        _time64( &t);  
 	return tt;
 }
 #else
@@ -37,7 +34,8 @@ static long long WindowsTimeMicroseconds(FILETIME& ft)
 static long long LinuxTimeMicroseconds()
 {	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	return tv.tv_sec * factor + tv.tv_usec;
+	const int toMicroseconds = 1000000; 
+	return tv.tv_sec * toMicroseconds + tv.tv_usec;
 }
 #endif 
 
@@ -54,24 +52,27 @@ time64_t Timestamp::currentTimeMicros()
 }
 
 const char* Timestamp::toTimeString(const char* timeFormat,bool isMicros)
-{	tm t;
+{	
 #ifdef WIN32
+	tm t;
+	tm* tp=&t;
 	const time64_t t64 = microseconds/1000000; 
-    const errno_t err = _localtime64_s(&t,&t64); 
+    const errno_t err = _localtime64_s(tp,&t64); 
 	const bool isOk=!err;
 	if(!isOk)
     {	_strerror_s(buffer,bufsize,"");
 		return buffer;
     }
 #else
-	tm* ok=localtime_r(const time_t *timep, struct tm *result);
-	const bool isOk=0!=ok;
-	if(!isOk)
+	time_t time;
+	tm result;
+	tm* tp=localtime_r(&time,&result);
+	if(!tp)
     {	memcpy(buffer,"Error",6);
 		return buffer;
     }
 #endif
-	strftime(buffer,bufsize-1,timeFormat,&t);
+	strftime(buffer,bufsize-1,timeFormat,tp);
 	if(isMicros)
 	{	char* p=buffer+strlen(buffer);
 		const int micros = int(microseconds%1000000);
@@ -127,7 +128,8 @@ void Timestamp::StringToEpoch(const char* cstring)
 	t.tm_mon--; // Month, 0 - jan
 	t.tm_isdst = -1; // Is DST on? 1 = yes, 0 = no, -1 = unknown
 	t.tm_year-=1900;
-	microseconds = mktime(&t)*factor;//not timegm
+	const int toMicroseconds = 1000000; 
+	microseconds = mktime(&t)*toMicroseconds;//not timegm
 }
 #endif
 }

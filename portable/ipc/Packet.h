@@ -11,7 +11,7 @@
 #include "PacketSizer.h"
 #include "../SoftLock.h"
 #include "../StdFile.h"
-#include "../xxHash/xxhash.h"
+#include "../../xxHash/xxhash.h"
 /*
 #if 1
 #define TRACE(msg) puts("ERROR: " msg); Dump()
@@ -19,6 +19,10 @@
 #define TRACE(msg)
 #endif
 */
+#ifndef _WIN32
+typedef int SOCKET;
+#endif
+
 namespace portable 
 {
 

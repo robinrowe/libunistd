@@ -12,7 +12,7 @@ SOCKET BsdSocketServer::ListenAccept()
 {   const int backlog = 1; //point-to-point, not SOMAXCONN;
 	listen(socketfd,backlog); 
 	sockaddr_in cli_addr;
-	int clilen = sizeof(cli_addr);
+	socklen_t clilen = sizeof(cli_addr);
 #ifdef _DEBUG
 	puts("\nAccepting connections...");
 #endif

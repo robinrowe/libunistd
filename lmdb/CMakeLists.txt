@@ -2,9 +2,9 @@
 
 # git clone git://git.openldap.org/openldap.git --branch OPENLDAP_REL_ENG_2_4
 
-set(NAME liblmdb)
+project(liblmdb)
 set(LDAP liblmdb)
-message("--- Building ${NAME} ---")
+message("--- Building ${PROJECT_NAME} ---")
 
 set(LIBLMDB
 	${LDAP}/lmdb.h
@@ -36,6 +36,6 @@ set(INCDIR
 	${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-add_library(${NAME} ${SOURCES})
-target_include_directories(${NAME} PUBLIC ${INCDIR})
+add_library(${PROJECT_NAME} ${SOURCES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${INCDIR})
 add_subdirectory(test)

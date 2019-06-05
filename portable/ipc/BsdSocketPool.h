@@ -59,7 +59,7 @@ public:
 	bool SetSlot(SOCKET sid);
 	bool SetZombieSlot(SOCKET sid);
 	bool ReleaseSlot(SOCKET* sock);
-	void BsdSocketPool::ReleaseSlot(SOCKET slot);
+	void ReleaseSlot(SOCKET slot);
 	int DirectMulticast(Packet* framePacket);
 };
 

@@ -5,9 +5,11 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}/../unistd" 
-	"${CMAKE_CURRENT_SOURCE_DIR}/..")
+if(WIN32)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../unistd")
+endif(WIN32)
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 add_subdirectory(test_PosixQueue)
 add_subdirectory(test_unit)

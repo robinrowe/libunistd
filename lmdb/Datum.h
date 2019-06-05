@@ -101,7 +101,7 @@ public:
 		return true;
 	}
 	bool GetLast(Cursor& cursor)
-	{	if(!cursor.GetLast(&k,&v))
+	{	if(!cursor.GetLast(&key,&value))
 		{	return false;
 		}
 		Decode();

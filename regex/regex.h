@@ -39,9 +39,9 @@
 #ifndef _REGEX_H_
 #define	_REGEX_H_
 
-#include "../unistd/unistd.h"
-#include "sys/cdefs.h"
-#include "sys/_types.h"
+#include <unistd.h>
+#include <sys/cdefs.h>
+#include <sys/types.h>
 
 /* types */
 typedef	off_t		regoff_t;

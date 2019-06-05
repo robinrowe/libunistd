@@ -5,6 +5,8 @@
 #ifndef Timestamp_h
 #define Timestamp_h
 
+#include <memory.h>
+
 namespace portable {
 
 // At 11:01:20 UTC on 13 July 2012, the Unix time number reached 0x50000000 (1,342,177,280 seconds).

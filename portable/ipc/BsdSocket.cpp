@@ -5,6 +5,9 @@
 
 #pragma comment(lib, "libunistd.lib")
 
+#include <netdb.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include "BsdSocket.h"
 #define ON_SOCKET_ERROR(msg) OnSocketError(__FILE__,__LINE__,msg)
 
@@ -65,6 +68,7 @@ bool BsdSocket::SetAsyncMode(bool isAsync)
 	if (flags < 0)
 	{	return false;
 	}
+	const bool isBlocking = !isAsync;
 	flags = isBlocking ? (flags&~O_NONBLOCK) : (flags | O_NONBLOCK);
 	return (fcntl(socketfd, F_SETFL, flags) == 0) ? true : false;
 #endif
@@ -134,7 +138,7 @@ bool BsdSocket::SendTo(const char* msg,unsigned len)
 {	if(!IsOpen())
 	{	return false;
 	}
-	int slen = sizeof(sockaddr_in);
+	socklen_t slen = sizeof(sockaddr_in);
 	Trace("SendTo",msg,len);
 	if(sendto(socketfd,msg,len,0,(struct sockaddr *)&server_sockaddr,slen)==-1)
 	{	ON_SOCKET_ERROR("sendto");
@@ -144,7 +148,7 @@ bool BsdSocket::SendTo(const char* msg,unsigned len)
 }
 
 int BsdSocket::RecvFrom(char* buffer,unsigned bufsize,unsigned offset)
-{	int slen = sizeof(sockaddr_in);
+{	socklen_t slen = sizeof(sockaddr_in);
 	if(socketfd<=0)
 	{	ON_SOCKET_ERROR("Socket not open");
 		return -1;

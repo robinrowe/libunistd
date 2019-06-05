@@ -1,7 +1,7 @@
 # libunistd/portable/CMakeLists.txt
 
-set(NAME libportable)
-message("--- Building ${NAME} ---")
+project(libportable)
+message("--- Building ${PROJECT_NAME} ---")
 
 set(HEADERS
 #	Astring.h
@@ -81,10 +81,8 @@ set(SOURCE
 	WormFile.cpp
 )
 
+add_library(${PROJECT_NAME}	${HEADERS} ${SOURCE})
+
 if(WIN32)
-include_directories(../vcpp)
-endif()
-
-add_library(${NAME}	${HEADERS} ${SOURCE})
-
-target_include_directories (${NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../unistd")
+	target_include_directories (${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/../unistd")
+endif(WIN32)

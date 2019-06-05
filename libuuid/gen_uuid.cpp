@@ -58,6 +58,9 @@
 #include <sys/time.h>
 #endif
 #include <sys/stat.h>
+#ifndef _WIN32
+#define HAVE_SYS_FILE_H
+#endif
 #ifdef HAVE_SYS_FILE_H
 #include <sys/file.h>
 #endif

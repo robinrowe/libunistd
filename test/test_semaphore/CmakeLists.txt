@@ -1,6 +1,4 @@
 # libunistd/test/test_semaphore/CMakeList.txt
 
 add_executable(test_semaphore_server semaphore_server.cpp)
-target_link_libraries(test_semaphore_server libunistd)
 add_executable(test_semaphore_client semaphore_client.cpp)
-target_link_libraries(test_semaphore_client libunistd)

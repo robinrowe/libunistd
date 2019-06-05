@@ -10,13 +10,13 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
-#include <more/shm_more.h>
+#include "../../unistd/more/shm_more.h"
 
 int main(int argc, char **argv) 
 {	int oflags=O_RDWR;
 	oflags = O_RDWR | O_CREAT;
 	off_t length = 2 * 1024;
-	char *name = "/mmanjunk";
+	const char *name = "/mmanjunk";
 	int fd = shm_open(name, oflags, 0644 );
 	shm_ftruncate(fd, length);
 	fprintf(stderr,"Shared Mem Descriptor: fd=%d\n", fd);
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 	fprintf(stderr, "Shared Memory Address: %p [0..%lu]\n", ptr, length-1);
 	fprintf(stderr, "Shared Memory Path: /dev/shm/%s\n", name );
 	assert (ptr);
-	char *msg = "hello world!!\n";
+	const char *msg = "hello world!!\n";
 #pragma warning(disable : 4996)
 	strcpy((char*)ptr,msg);
 #pragma warning(default : 4996)

@@ -1,16 +1,18 @@
 # lmdb/test/CMakeLists.txt
 
-include_directories(
-	"${CMAKE_CURRENT_SOURCE_DIR}/../../unistd" 
-	"${CMAKE_CURRENT_SOURCE_DIR}/../source")
+if(WIN32)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../unistd")
+endif(WIN32)
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../source")
 
 #message("CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
 
 if(WIN32)
 	set(EXTRALIB libunistd)
-else()
+else(WIN32)
 	set(EXTRALIB)
-endif()
+endif(WIN32)
 
 set(LDAP ../liblmdb)
 

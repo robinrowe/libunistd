@@ -19,6 +19,10 @@
 #include "PacketReader.h"
 
 #pragma warning(disable:4265)
+#ifndef _WIN32
+	typedef int SOCKET;
+	#define closesocket close
+#endif
 
 namespace portable 
 {
@@ -91,7 +95,7 @@ public:
 		return SendTo(packet.GetPacket(),packet.GetPacketSize());
 	}
 	int RecvFrom(char* buffer,unsigned bufsize,unsigned offset=0)
-	{	int slen = sizeof(sockaddr_in);
+	{	socklen_t slen = sizeof(sockaddr_in);
 		if(socketfd<=0)
 		{	errorMsg.Set("Socket not open");
 			return -1;

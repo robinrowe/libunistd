@@ -11,7 +11,7 @@
 
 #include <limits.h>
 #include <stddef.h>
-#include <chrono.h>
+//#include <chrono.h>
 #include <stdint.h>
 
 #ifdef HAVE_STDINT_H
@@ -133,6 +133,8 @@
 	const __typeof__( ((type *)0)->member ) *__mptr = (ptr); \
 	(type *)( (char *)__mptr - offsetof(type,member) );})
 #endif
+
+#define HAVE_PROGRAM_INVOCATION_SHORT_NAME
 
 #ifndef HAVE_PROGRAM_INVOCATION_SHORT_NAME
 # ifdef HAVE___PROGNAME

@@ -10,17 +10,18 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
-#include <more/shm_more.h>
+
+#include "../../unistd/more/shm_more.h"
 
 int main(int argc, char **argv) 
 {	int oflags=O_RDWR;
-	char *name = "/mmanjunk";
+	const char *name = "/mmanjunk";
 	int fd = shm_open(name, oflags, 0644 );
 	printf("Shared Mem Descriptor: fd=%d\n", fd);
 	assert (fd>0);
 	size_t length = shm_size(fd);
 	char* p = (char *) mmap(NULL, length, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-	printf("Shared Mem Address: %p [0..%llu]\n", p, length-1);
+	printf("Shared Mem Address: %p [0..%zu]\n", p, length-1);
 	assert (p);
 	printf("%s",p);
 	// change 1st byte

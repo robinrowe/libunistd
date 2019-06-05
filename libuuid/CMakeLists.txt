@@ -1,11 +1,13 @@
 # libunistd/libuuid/CMakeLists.txt
 
-set(NAME libuuid)
-message("--- Building ${NAME} ---")
+project(libuuid)
+message("--- Building ${PROJECT_NAME} ---")
 
+if(WIN32)
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}/../unistd" 
 )
+endif(WIN32)
 
 add_definitions(
 	-DHAVE_UNISTD_H 
@@ -41,5 +43,5 @@ set(SOURCES
 	randutils.cpp
 )
 
-add_library(${NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES})
 add_subdirectory(test)

@@ -7,7 +7,6 @@
 #define BsdSocketServer_h
 
 #include "PacketSocket.h"
-#include "BsdSocketStartup.h"
 #include "BsdSocketPool.h"
 
 namespace portable 
@@ -15,7 +14,7 @@ namespace portable
 
 class BsdSocketServer
 :	public PacketSocket
-{	BsdSocketStartup socketStartup;
+{	
 protected:
 	std::thread listenWorker;
 	BsdSocketPool pool;
