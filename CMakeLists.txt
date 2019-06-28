@@ -23,7 +23,10 @@ endif(UE4)
 # _HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;
 
 if(WIN32)
-add_subdirectory(unistd)
+	include_directories(unistd)
+	add_subdirectory(unistd)
+	link_directories(build/win64)
+	link_libraries(libunistd)
 endif(WIN32)
 if(NOT WIN32 AND NOT APPLE)
 	link_libraries(rt pthread dl)

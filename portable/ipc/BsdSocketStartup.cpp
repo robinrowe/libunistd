@@ -7,6 +7,6 @@
 
 #include "BsdSocketStartup.h"
 
-BsdSocketStartup::startup;
+bool portable::BsdSocketStartup::isSingleton;
 
 #endif

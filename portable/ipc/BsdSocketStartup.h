@@ -20,16 +20,20 @@ namespace portable
 {
 	
 class BsdSocketStartup
-{	static BsdSocketStartup startup;
-	BsdSocketStartup()
-	{	WORD version_requested=MAKEWORD(2,0);
-		WSADATA data;
-		WSAStartup(version_requested,&data);
-	}
+{	static bool isSingleton;
 public:
+    BsdSocketStartup()
+    {   if(!isSingleton)
+        {   WSADATA data; 
+            const WORD version_requested = MAKEWORD(2, 0);
+            WSAStartup(version_requested, &data);
+            isSingleton = true;
+    }   }
 	~BsdSocketStartup()
-	{	WSACleanup();
-	}
+	{	if(isSingleton)
+        {   WSACleanup();
+            isSingleton = false;
+    }	}
 };
 
 }

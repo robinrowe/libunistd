@@ -83,6 +83,3 @@ set(SOURCE
 
 add_library(${PROJECT_NAME}	${HEADERS} ${SOURCE})
 
-if(WIN32)
-	target_include_directories (${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/../unistd")
-endif(WIN32)

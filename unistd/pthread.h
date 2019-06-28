@@ -6,6 +6,7 @@
 #define pthread_t_h
 
 #include <thread>
+#include <system_error>
 #include "unistd.h"
 #include "../portable/Logger.h"
 

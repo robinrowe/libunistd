@@ -134,7 +134,9 @@
 	(type *)( (char *)__mptr - offsetof(type,member) );})
 #endif
 
+#ifndef _WIN32
 #define HAVE_PROGRAM_INVOCATION_SHORT_NAME
+#endif 
 
 #ifndef HAVE_PROGRAM_INVOCATION_SHORT_NAME
 # ifdef HAVE___PROGNAME

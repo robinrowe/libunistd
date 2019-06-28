@@ -8,6 +8,7 @@
 #include <map>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 namespace portable
 {
