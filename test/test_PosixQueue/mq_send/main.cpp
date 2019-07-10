@@ -23,7 +23,7 @@ int main()
 		return 1;
 	}
 	buffer[0]=0;
-	cout << "Send to server (enter \"exit\" to stop it):\n";
+	cout << "Send to server (enter \"quit\" to stop it):\n";
 	while(strncmp(buffer, MSG_STOP, strlen(MSG_STOP)))
 	{	cout<< "> ";
 		cin.getline(buffer,MAX_SIZE);
