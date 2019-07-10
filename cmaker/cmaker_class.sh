@@ -56,8 +56,8 @@ CreateFile()
 UpdateCmakeList()
 {	local arg=$1
 	echo "Updating ${cmakelist} with $arg..."
-	echo "add_executable(test_${arg} test/test_${arg}.cpp)" >> ${cmakelist}
-	echo "add_test(test_${arg} test_${arg})" >> ${cmakelist}
+	echo "add_executable(test_${PROJECT_NAME}_${arg} test/test_${arg}.cpp)" >> ${cmakelist}
+	echo "add_test(test_${PROJECT_NAME}_${arg} test_${arg})" >> ${cmakelist}
 }
 
 UpdateCmakeSources()

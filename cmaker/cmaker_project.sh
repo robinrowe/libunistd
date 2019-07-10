@@ -31,7 +31,7 @@ CreateDocs()
 		echo "" >> ${docfile}
 	fi
 	CreateDoc README.md
-	CreateDoc INSTALL.md
+#	CreateDoc INSTALL.md
 }
 
 ReadLicenseFile()

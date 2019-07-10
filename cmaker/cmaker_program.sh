@@ -44,7 +44,7 @@ UpdateCmakeList()
 {	exe=$1
 	echo "Updating ${cmakelist} with executable ${exe}..."
 	echo "add_executable(${exe} ${exe}.cpp)" >> ${cmakelist}
-	echo '' >> ${cmakelist}
+#	echo '' >> ${cmakelist}
 }
 
 main()
