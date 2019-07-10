@@ -1,5 +1,5 @@
 #!/bin/bash 
-# cmaker_cmakelist.sh
+# cmaker_project.sh
 # Created by Robin Rowe 2019/1/11
 # License MIT open source
 
@@ -70,9 +70,9 @@ CreateCmakeList()
 }
 
 main()
-{	echo "cmaker_cmakelist: $PWD"
+{	echo "cmaker_project: $PWD"
 	if [ -z "${project}" ]; then 
-		echo 'Usage: % cmaker_cmakelist ProjectName'
+		echo 'Usage: % cmaker_project ProjectName'
 		exit 1
 	fi
 	if [ -z "$AUTHOR" ]; then 
