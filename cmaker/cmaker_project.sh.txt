@@ -1,4 +1,4 @@
-# PROJECT/CMakeLists.txt
+# NAME/CMakeLists.txt
 # Created by <AUTHOR> <DATE>
 # License: <LICENSE>
 

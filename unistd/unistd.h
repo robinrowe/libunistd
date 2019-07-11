@@ -15,14 +15,13 @@
 
 //#define _CRT_SECURE_NO_DEPRECATE 
 //#undef _CRT_SECURE_NO_WARNINGS
-//#define _CRT_NONSTDC_NO_WARNINGS
-#if _MSC_VER == 1900
-#include <vcruntime.h>
-#include <corecrt_io.h>
-#endif
+#define _CRT_NONSTDC_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 #include <WinSock2.h>
 #include <winnt.h>
+#include <corecrt_io.h>
+//#if _MSC_VER == 1900
+#include <vcruntime.h>
 #undef socklen_t
 #include <WS2tcpip.h>
 #include <windows.h>

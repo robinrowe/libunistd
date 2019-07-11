@@ -23,6 +23,7 @@ class FieldMap
 public:
 	FieldMap()
 	{	empty = 0;
+		p = nullptr;
 	}
 	void Clear()
 	{	p=0;
