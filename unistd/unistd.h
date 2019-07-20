@@ -128,12 +128,6 @@ int fcntl(int handle, int mode)
 #endif
 
 inline
-int mkdir(const char* path)
-{
-	return _mkdir(path);
-}
-
-inline
 int fcntl(int handle,int mode,int mode2)
 {	(void)handle;
 	(void)mode;
