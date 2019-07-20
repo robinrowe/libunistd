@@ -2011,6 +2011,7 @@ mdb_page_spill(MDB_cursor *m0, MDB_val *key, MDB_val *data)
 		i += txn->mt_dbs[MAIN_DBI].md_depth;
 	/* For puts, roughly factor in the key+data size */
 	if (key)
+#pragma warning(disable:4267)
 		i += (LEAFSIZE(key, data) + txn->mt_env->me_psize) / txn->mt_env->me_psize;
 	i += i;	/* double it for good measure */
 	need = i;
@@ -7414,6 +7415,7 @@ mdb_node_del(MDB_cursor *mc, int ksize)
 		if (x)
 			memmove(base, base + ksize, x * ksize);
 		mp->mp_lower -= sizeof(indx_t);
+#pragma warning(disable:4267)
 		mp->mp_upper += ksize - sizeof(indx_t);
 		return;
 	}

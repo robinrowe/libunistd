@@ -34,5 +34,7 @@ To add another program or class to your project later, simply call the relevant 
 The purpose of cmaker_sources.sh is to import existing legacy files. Is not needed by new projects.
 
 Use cmaker_top.sh to create the top level CMakelists.txt that calls CMakelists.txt files in subdirectories. Of course, create the subdirectories first.
+
+Udrt cmaker_redo.sh to add cmaker frameworks to legacy projects. Note this appends the old files to the new, requires editing results by hand.
 	
 --0--

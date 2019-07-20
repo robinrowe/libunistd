@@ -30,6 +30,8 @@ class Finder
 		h = INVALID_HANDLE_VALUE;
 		error = ERROR_NO_MORE_FILES;
 	}
+#pragma warning(disable:4996)
+#pragma warning(disable:26495)
 	Finder()
 	{	Reset();
 	}
@@ -37,6 +39,8 @@ class Finder
 	{	strcpy(this->path,path);
 		strcat(this->path,"\\*");
 	}
+#pragma warning(default:4996)
+#pragma warning(default:26495)
 	bool Open()
 	{	h = FindFirstFile(path,&data);
 		if(INVALID_HANDLE_VALUE == h) 

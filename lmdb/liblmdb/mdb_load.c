@@ -64,6 +64,9 @@ flagbit dbflags[] = {
 	{ 0, NULL, 0 }
 };
 
+#pragma warning(disable:4669)
+#pragma warning(disable:4267)
+
 static void readhdr(void)
 {
 	char *ptr;

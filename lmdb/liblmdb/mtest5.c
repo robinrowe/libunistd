@@ -37,7 +37,7 @@ int main(int argc,char * argv[])
 	int *values;
 	char sval[32];
 	char kval[sizeof(int)];
-
+#pragma warning(disable:4267)
 	srand(time(NULL));
 
 	memset(sval, 0, sizeof(sval));
