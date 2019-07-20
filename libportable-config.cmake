@@ -1,64 +1,49 @@
-# libunistd/libportable-config.cmake
-#find_package(LIBUNISTD REQUIRED
-#    NAMES libuuid liblmdb libportable libregex libsqlite libunistd libxxhash
-#	PATHS ${LIBUNISTD_PATH} NO_DEFAULT_PATH
-#)
-
-set(LIBUUID_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR})
-set(LIBUUID_INCLUDE_DIRS ${LIBUUID_INCLUDE_DIR})
-if(WIN64)
-        set(LIBUUID_LIBRARY
-        debug /build/win64/unistd/Debug/libuuid.lib
-        optimized /build/win64/unistd/Release/libuuid.lib )
-endif(WIN64)
-set(LIBUUID_LIBRARIES ${LIBUUID_LIBRARY})
-
-set(LIBLMDB_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR})
-set(LIBLMDB_INCLUDE_DIRS ${LIBLMDB_INCLUDE_DIR})
-if(WIN64)
-        set(LIBLMDB_LIBRARY
-        debug /build/win64/unistd/Debug/liblmdb.lib
-        optimized /build/win64/unistd/Release/liblmdb.lib )
-endif(WIN64)
-set(LIBLMDB_LIBRARIES ${LIBLMDB_LIBRARY})
-
-set(LIBPORTABLE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR})
-set(LIBPORTABLE_INCLUDE_DIRS ${LIBPORTABLE_INCLUDE_DIR})
-if(WIN64)
-        set(LIBPORTABLE_LIBRARY
-        debug /build/win64/unistd/Debug/libportable.lib
-        optimized /build/win64/unistd/Release/libportable.lib )
-endif(WIN64)
-set(LIBPORTABLE_LIBRARIES ${LIBPORTABLE_LIBRARY})
-
-set(LIBREGEX_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR})
-set(LIBREGEX_INCLUDE_DIRS ${LIBREGEX_INCLUDE_DIR})
-if(WIN64)
-        set(LIBREGEX_LIBRARY
-        debug /build/win64/unistd/Debug/libregex.lib
-        optimized /build/win64/unistd/Release/libregex.lib )
-endif(WIN64)
-set(LIBREGEX_LIBRARIES ${LIBREGEX_LIBRARY})
-
-set(LIBSQLITE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR})
-set(LIBSQLITE_INCLUDE_DIRS ${LIBSQLITE_INCLUDE_DIR})
-if(WIN64)
-        set(LIBSQLITE_LIBRARY
-        debug /build/win64/unistd/Debug/libsqlite.lib
-        optimized /build/win64/unistd/Release/libsqlite.lib )
-endif(WIN64)
-set(LIBSQLITE_LIBRARIES ${LIBSQLITE_LIBRARY})
-
-set(LIBXXHASH_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR})
-set(LIBXXHASH_INCLUDE_DIRS ${LIBXXHASH_INCLUDE_DIR})
-if(WIN64)
-        set(LIBXXHASH_LIBRARY
-        debug /build/win64/unistd/Debug/libxxhash.lib
-        optimized /build/win64/unistd/Release/libxxhash.lib )
-endif(WIN64)
-set(LIBXXHASH_LIBRARIES ${LIBXXHASH_LIBRARY})
+# portable-config.cmake
+# Created by Robin Rowe 2019-07-19
+# find_package(PORTABLE REQUIRED)
+#   NAMES portable uuid lmdb regex sqlite xxhash
+#   PATHS ${PORTABLE_PATH} NO_DEFAULT_PATH
+# include_directories(${PORTABLE_PATH})
+# if(WIN32)
+# include_directories(${PORTABLE_INCLUDE_DIRS})
+#   link_directories(${PORTABLE_LIB_DIRS})
+#   link_libraries(${PORTABLE_LIBRARIES})
+# endif(WIN32)
 
 
-
-
-
+# --- portable ---
+set(LIBPORTABLE_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR})
+set(LIBPORTABLE_LIBRARIES libportable.lib)
+set(LIBPORTABLE_LIB_DIRS
+        debug ${CMAKE_CURRENT_LIST_DIR}/build/win64/portable/Debug
+        optimized ${CMAKE_CURRENT_LIST_DIR}/build/win64/portable/Release )
+# --- uuid ---
+set(LIBUUID_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR})
+set(LIBUUID_LIBRARIES libuuid.lib)
+set(LIBUUID_LIB_DIRS
+        debug ${CMAKE_CURRENT_LIST_DIR}/build/win64/uuid/Debug
+        optimized ${CMAKE_CURRENT_LIST_DIR}/build/win64/uuid/Release )
+# --- lmdb ---
+set(LIBLMDB_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR})
+set(LIBLMDB_LIBRARIES liblmdb.lib)
+set(LIBLMDB_LIB_DIRS
+        debug ${CMAKE_CURRENT_LIST_DIR}/build/win64/lmdb/Debug
+        optimized ${CMAKE_CURRENT_LIST_DIR}/build/win64/lmdb/Release )
+# --- regex ---
+set(LIBREGEX_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR})
+set(LIBREGEX_LIBRARIES libregex.lib)
+set(LIBREGEX_LIB_DIRS
+        debug ${CMAKE_CURRENT_LIST_DIR}/build/win64/regex/Debug
+        optimized ${CMAKE_CURRENT_LIST_DIR}/build/win64/regex/Release )
+# --- sqlite ---
+set(LIBSQLITE_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR})
+set(LIBSQLITE_LIBRARIES libsqlite.lib)
+set(LIBSQLITE_LIB_DIRS
+        debug ${CMAKE_CURRENT_LIST_DIR}/build/win64/sqlite/Debug
+        optimized ${CMAKE_CURRENT_LIST_DIR}/build/win64/sqlite/Release )
+# --- xxhash ---
+set(LIBXXHASH_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR})
+set(LIBXXHASH_LIBRARIES libxxhash.lib)
+set(LIBXXHASH_LIB_DIRS
+        debug ${CMAKE_CURRENT_LIST_DIR}/build/win64/xxhash/Debug
+        optimized ${CMAKE_CURRENT_LIST_DIR}/build/win64/xxhash/Release )

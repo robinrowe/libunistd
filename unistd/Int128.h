@@ -30,7 +30,7 @@ private:
 public:
   unsigned __int64 lo;
   unsigned __int64 hi;
-
+#pragma warning(disable:26495)
   _int128() {
   }
   _int128(unsigned __int64 n) : lo(n), hi(0) {
@@ -379,4 +379,6 @@ unsigned int convertNumberChar(char digit);
 #define __uint128 _uint128 
 
 #endif
+
+#pragma warning(default:26495)
 #endif

@@ -32,7 +32,7 @@ if(NOT WIN32 AND NOT APPLE)
 	link_libraries(rt pthread dl)
 endif(NOT WIN32 AND NOT APPLE)
 
-add_subdirectory(libuuid)
+add_subdirectory(uuid)
 add_subdirectory(lmdb)
 add_subdirectory(portable)
 add_subdirectory(regex)
