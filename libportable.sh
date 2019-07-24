@@ -1,4 +1,6 @@
 #!/bin/bash
+# Created by Robin Rowe 2019/7/15
+# License open source MIT
 
 #/c/code/github/libunistd/build/win64/libuuid/Debug/libuuid.lib
 #/c/code/github/libunistd/build/win64/lmdb/Debug/liblmdb.lib

@@ -10,9 +10,7 @@
 
 set(LIBUNISTD_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/unistd)
 set(LIBUNISTD_LIBRARIES libunistd.lib)
-set(LIBUNISTD_LIB_DIRS 
-	debug ${CMAKE_CURRENT_LIST_DIR}/build/win64/unistd/Debug
-	optimized ${CMAKE_CURRENT_LIST_DIR}/build/win64/unistd/Release ) 
-
+set(LIBUNISTD_LIB_DIRS ${CMAKE_CURRENT_LIST_DIR})
+message("Use LIBUNISTD_LIB_DIRS = ${CMAKE_CURRENT_LIST_DIR}")
 
 	
