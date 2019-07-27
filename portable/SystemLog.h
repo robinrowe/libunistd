@@ -5,9 +5,6 @@
 #ifndef SystemLog_h
 #define SystemLog_h
 
-namespace portable
-{
-
 #ifdef _WIN32
 #include "../unistd/unistd.h"
 #ifdef _DEBUG
@@ -23,6 +20,12 @@ namespace portable
 #ifdef SYSTEM_LOGFILE
 extern FILE* systemLogfile;
 #endif
+
+#include <string.h>
+#include <errno.h>
+
+namespace portable
+{
 
 inline
 void SystemLog(const char* filename,int lineNo,const char* msg)

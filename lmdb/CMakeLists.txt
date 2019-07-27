@@ -1,16 +1,16 @@
 # libunistd/lmdb/CMakeLists.txt
 
-# git clone git://git.openldap.org/openldap.git --branch OPENLDAP_REL_ENG_2_4
+# git clone git://git.openldap.org/openldap.git --branch OPENPROJECT_NAME_REL_ENG_2_4
 
 project(liblmdb)
-set(LDAP liblmdb)
+set(CMAKE_STATIC_LIBRARY_PREFIX "") #Avoid Linux "liblib__.a"
 message("--- Building ${PROJECT_NAME} ---")
 
 set(LIBLMDB
-	${LDAP}/lmdb.h
-	${LDAP}/midl.h
-	${LDAP}/mdb.c
-	${LDAP}/midl.c
+	${PROJECT_NAME}/lmdb.h
+	${PROJECT_NAME}/midl.h
+	${PROJECT_NAME}/mdb.c
+	${PROJECT_NAME}/midl.c
 )
 
 set(SOURCES
@@ -36,6 +36,6 @@ set(INCDIR
 	${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCDIR})
 add_subdirectory(test)
