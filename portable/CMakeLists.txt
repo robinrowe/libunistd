@@ -12,7 +12,7 @@ set(HEADERS
 	AtomicMutex.h
 	Breakpoint.h
 	ipc/BsdMulticast.h
-	ipc/BSdPacketServer.h
+	ipc/BsdPacketServer.h
 	ipc/BsdSocket.h
 	ipc/BsdSocketClient.h
 	ipc/BsdSocketPool.h
