@@ -3,8 +3,7 @@
 # git clone git://git.openldap.org/openldap.git --branch OPENPROJECT_NAME_REL_ENG_2_4
 
 project(liblmdb)
-set(CMAKE_STATIC_LIBRARY_PREFIX "") #Avoid Linux "liblib__.a"
-message("--- Building ${PROJECT_NAME} ---")
+message("--- Building library ${PROJECT_NAME} ---")
 
 set(LIBLMDB
 	${PROJECT_NAME}/lmdb.h
@@ -22,9 +21,13 @@ set(SOURCES
 	Db.cpp
 )
 
-#add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
-add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+if(WIN32)
+	message("Suppressing Windows warnings for lmdb")
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+	add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+	add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+endif(WIN32)
+
 #necessary for building mdb_dkey for mtest6:
 add_definitions(-DMDB_DEBUG)
 
@@ -38,4 +41,5 @@ set(INCDIR
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCDIR})
+
 add_subdirectory(test)

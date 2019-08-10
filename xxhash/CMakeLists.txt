@@ -1,16 +1,12 @@
-# libunistd/xxHash/CMakeLists.txt
+# libunistd/xxhash/CMakeLists.txt
 
-set(HEADERS
-	xxhash.h
-)
+project(libxxhash)
+message("--- Building library ${PROJECT_NAME} ---")
 
 set(SOURCES
+	xxhash.h
 	xxhash.c
 	xxhsum.c
 )
 
-add_library( libxxhash
-	${HEADERS} ${SOURCES}
-)
-
-target_include_directories (libxxhash PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/..")
+add_library(${PROJECT_NAME} STATIC ${SOURCES})

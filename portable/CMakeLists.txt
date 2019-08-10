@@ -1,8 +1,7 @@
 # libunistd/portable/CMakeLists.txt
 
 project(libportable)
-set(CMAKE_STATIC_LIBRARY_PREFIX "") #Avoid Linux "liblib__.a"
-message("--- Building ${PROJECT_NAME} ---")
+message("--- Building library ${PROJECT_NAME} ---")
 
 set(HEADERS
 #	Astring.h
@@ -83,6 +82,3 @@ set(SOURCE
 )
 
 add_library(${PROJECT_NAME}	STATIC ${HEADERS} ${SOURCE})
-link_directories(${CMAKE_CURRENT_BINARY_DIR})
-message("libportable: ${CMAKE_CURRENT_BINARY_DIR}")
-

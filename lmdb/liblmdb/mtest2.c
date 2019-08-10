@@ -37,7 +37,7 @@ int main(int argc,char * argv[])
 	int *values;
 	char sval[32] = "";
 
-	srand(time(NULL));
+	srand((unsigned) time(NULL));
 
 	count = (rand()%384) + 64;
 	values = (int *)malloc(count*sizeof(int));

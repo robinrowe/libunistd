@@ -1,8 +1,7 @@
 # libunistd/libuuid/CMakeLists.txt
 
 project(libuuid)
-set(CMAKE_STATIC_LIBRARY_PREFIX "") #Avoid Linux "liblib__.a"
-message("--- Building ${PROJECT_NAME} ---")
+message("--- Building library ${PROJECT_NAME} ---")
 
 if(WIN32)
 include_directories(
@@ -45,4 +44,5 @@ set(SOURCES
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
+
 add_subdirectory(test)

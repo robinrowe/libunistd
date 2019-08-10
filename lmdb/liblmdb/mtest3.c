@@ -38,7 +38,7 @@ int main(int argc,char * argv[])
 	char sval[32];
 	char kval[sizeof(int)];
 
-	srand(time(NULL));
+	srand((unsigned) time(NULL));
 
 	memset(sval, 0, sizeof(sval));
 

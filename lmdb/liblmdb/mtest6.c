@@ -25,6 +25,7 @@
 	"%s:%d: %s: %s\n", __FILE__, __LINE__, msg, mdb_strerror(rc)), abort()))
 
 char dkbuf[1024];
+char * mdb_dkey(MDB_val *key, char *buf);
 
 int main(int argc,char * argv[])
 {
@@ -35,12 +36,12 @@ int main(int argc,char * argv[])
 	MDB_txn *txn;
 	MDB_stat mst;
 	MDB_cursor *cursor;
-	int count;
-	int *values;
+//	int count;
+//	int *values;
 	long kval;
 	char *sval;
 
-	srand(time(NULL));
+	srand((unsigned) time(NULL));
 
 	E(mdb_env_create(&env));
 	E(mdb_env_set_mapsize(env, 10485760));

@@ -32,11 +32,23 @@ endif(NOT WIN32 AND NOT APPLE)
 
 include(libportable-config.cmake)
 
-add_subdirectory(uuid)
-add_subdirectory(lmdb)
+#set(CMAKE_STATIC_LIBRARY_PREFIX "") #Avoid Linux "liblib__.a"
+message("Setting output directories...")
+set(OUTPUTDIR ${CMAKE_CURRENT_BINARY_DIR}/unistd)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUTDIR} )
+message("  CMAKE_LIBRARY_OUTPUT_DIRECTORY = ${OUTPUTDIR}")
+foreach( outputconfig ${CMAKE_CONFIGURATION_TYPES} )
+    string( TOUPPER ${outputconfig} OUTPUTCONFIG )
+    set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${OUTPUTDIR}/${outputconfig} )
+    set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${OUTPUTDIR}/${outputconfig} )
+	message("  CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} = ${OUTPUTDIR}/${outputconfig}" )
+endforeach( outputconfig ${CMAKE_CONFIGURATION_TYPES} )
+
 add_subdirectory(portable)
-add_subdirectory(regex)
+add_subdirectory(lmdb)
 add_subdirectory(sqlite)
-add_subdirectory(test)
+add_subdirectory(uuid)
+add_subdirectory(regex)
 add_subdirectory(xxhash)
 
+add_subdirectory(test)
