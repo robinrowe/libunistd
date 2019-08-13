@@ -30,8 +30,6 @@ if(NOT WIN32 AND NOT APPLE)
 	message("Linking rt pthread dl")
 endif(NOT WIN32 AND NOT APPLE)
 
-include(libportable-config.cmake)
-
 #set(CMAKE_STATIC_LIBRARY_PREFIX "") #Avoid Linux "liblib__.a"
 message("Setting output directories...")
 set(OUTPUTDIR ${CMAKE_CURRENT_BINARY_DIR}/unistd)
