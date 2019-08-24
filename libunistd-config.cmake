@@ -8,7 +8,8 @@
 #	PATHS ${LIBUNISTD_PATH} NO_DEFAULT_PATH
 # )
 
-message("Found libunistd: ${CMAKE_CURRENT_LIST_DIR}")
+message("--- Found libunistd! ---")
+message("  CMAKE_CURRENT_LIST_DIR = ${CMAKE_CURRENT_LIST_DIR}")
 
 set(LIBUNISTD_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/unistd)
 set(LIBUNISTD_LIBRARIES libunistd.lib)
@@ -27,12 +28,12 @@ if(${LIBUNISTD_DOWNLOAD})
 	message("Adjusting LIBUNISTD_DOWNLOAD path ${LIBUNISTD_LIB_DIRS}...")
 	set(LIBUNISTD_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR})
 	set(LIBUNISTD_LIB_DIRS 
-		debug ${LIBUNISTD_LIB_DIRS}/unistd/Debug
-		optimized ${LIBUNISTD_LIB_DIRS}/unistd/Release ) 
-else(${LIBUNISTD_DOWNLOAD})
-	set(LIBUNISTD_LIB_DIRS 
 		debug ${LIBUNISTD_LIB_DIRS}/build/win64/unistd/Debug
 		optimized ${LIBUNISTD_LIB_DIRS}/build/win64/unistd/Release ) 
+else(${LIBUNISTD_DOWNLOAD})
+	set(LIBUNISTD_LIB_DIRS 
+		debug ${LIBUNISTD_LIB_DIRS}/unistd/Debug
+		optimized ${LIBUNISTD_LIB_DIRS}/unistd/Release ) 
 endif(${LIBUNISTD_DOWNLOAD})
 
 set(LIBPORTABLE_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR})

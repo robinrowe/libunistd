@@ -31,7 +31,7 @@ if(NOT WIN32 AND NOT APPLE)
 endif(NOT WIN32 AND NOT APPLE)
 
 #set(CMAKE_STATIC_LIBRARY_PREFIX "") #Avoid Linux "liblib__.a"
-message("Setting output directories...")
+message("---Setting output directories ---")
 if(${LIBUNISTD_DOWNLOAD})
 #	message("Downloading libunistd...")
 	set(OUTPUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/unistd)
