@@ -13,7 +13,7 @@ message("Found libunistd:  CMAKE_CURRENT_LIST_DIR = ${CMAKE_CURRENT_LIST_DIR}")
 
 #if (NOT DEFINED CMAKE_STATIC_LIBRARY_SUFFIX)
     if (WIN32)
-        set(CMAKE_STATIC_LIBRARY_PREFIX "")
+        set(CMAKE_STATIC_LIBRARY_PREFIX "lib")
         set(CMAKE_STATIC_LIBRARY_SUFFIX ".lib")
     else()
         set(CMAKE_STATIC_LIBRARY_PREFIX "lib")
