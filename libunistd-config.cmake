@@ -8,8 +8,8 @@
 #	PATHS ${LIBUNISTD_PATH} NO_DEFAULT_PATH
 # )
 
-message("--- Found libunistd! ---")
-message("  CMAKE_CURRENT_LIST_DIR = ${CMAKE_CURRENT_LIST_DIR}")
+message("*** libunistd-config.cmake ***")
+message("Found libunistd:  CMAKE_CURRENT_LIST_DIR = ${CMAKE_CURRENT_LIST_DIR}")
 
 #if (NOT DEFINED CMAKE_STATIC_LIBRARY_SUFFIX)
     if (WIN32)
