@@ -35,11 +35,12 @@ if(${LIBUNISTD_DOWNLOAD})
 		debug ${LIBUNISTD_LIB_DIRS}/build/win64/unistd/Debug
 		optimized ${LIBUNISTD_LIB_DIRS}/build/win64/unistd/Release ) 
 else(${LIBUNISTD_DOWNLOAD})
+	message("Adjusting local libunistd path ${LIBUNISTD_LIB_DIRS}...")
 	set(LIBUNISTD_LIB_DIRS ${CMAKE_CURRENT_LIST_DIR})
 	set(LIBUNISTD_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR})
 	set(LIBUNISTD_LIB_DIRS 
-		debug ${LIBUNISTD_LIB_DIRS}/unistd/Debug
-		optimized ${LIBUNISTD_LIB_DIRS}/unistd/Release ) 
+		debug ${LIBUNISTD_LIB_DIRS}/build/win64/Debug
+		optimized ${LIBUNISTD_LIB_DIRS}/build/win64/Release ) 
 endif(${LIBUNISTD_DOWNLOAD})
 
 set(LIBPORTABLE_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR})
