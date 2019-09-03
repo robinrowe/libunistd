@@ -6,7 +6,7 @@
 #ifndef WormFile_h
 #define WormFile_h
 
-#include "Stdfile.h"
+#include "StdFile.h"
 
 namespace portable
 {

@@ -11,7 +11,7 @@
 #include "PacketSizer.h"
 #include "../SoftLock.h"
 #include "../StdFile.h"
-#include "../../xxHash/xxhash.h"
+#include "../../xxhash/xxhash.h"
 /*
 #if 1
 #define TRACE(msg) puts("ERROR: " msg); Dump()

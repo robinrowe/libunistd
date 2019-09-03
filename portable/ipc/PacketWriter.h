@@ -32,7 +32,7 @@ public:
 		}
 		return Packet::IsGood();
 	}
-	void Reset()
+	void Reset() override
 	{	header.ResetWrite();
 	}
 	bool Skip(unsigned length) override

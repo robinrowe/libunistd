@@ -30,7 +30,7 @@ public:
 	BsdSocketClient(unsigned bufsize)
 	:	bufsize(bufsize)
 	{}
-	void Close()
+	void Close() override
 	{	Stop();
 		if(socketfd)
 		{	closesocket(socketfd);

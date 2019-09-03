@@ -41,8 +41,8 @@ public:
 	PacketWriter headerPacket;
 	PacketQueue<bufSize> framePacket;
 	BsdPacketServer(const char* programVersion)
-	:	isVerbose(false)
-	,	BsdSocketServer(bufsize)
+	:	BsdSocketServer(bufsize)
+	,	isVerbose(false)
 	,	programVersion(programVersion)
 	,	headerBuffer(bufSize)
 	,	headerPacket(&headerBuffer[0],bufSize)
