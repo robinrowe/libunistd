@@ -1,5 +1,5 @@
 #!/bin/bash 
-# cmaker_project.sh
+# cmaker_redo.sh
 # Created by Robin Rowe 2019/7/10
 # License MIT open source
 

@@ -1,5 +1,5 @@
 #!/bin/sh
-# rename_cpp.sh
+# cmaker_rename_cpp.sh
 # Copyright 2019/5/27 Robin.Rowe@Cinepaint.org
 # License open source MIT
 
