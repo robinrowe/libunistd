@@ -31,6 +31,8 @@ Creating a complete frameworks, including project, program, class files, and uni
 
 To add another program or class to your project later, simply call the relevant script again. You only need to call cmaker_project.sh once. 
 
+### Legacy Code
+
 Use cmaker_sources.sh to import existing legacy files. Is not needed by new projects.
 
 	cmaker_sources.sh
@@ -39,7 +41,9 @@ Use cmaker_top.sh to create the top level CMakelists.txt that calls CMakelists.t
 
 	cmaker_top.sh
 	
-Use cmaker_redo.sh to add cmaker frameworks to legacy projects. Note this appends the old files to the new, requires editing results by hand.
+Use cmaker_merge.sh to add cmaker frameworks to legacy projects. Note this appends the old files to the new, requires editing results by hand.
+
+	cmaker_merge.sh old_dir
 
 Use cmaker_rename_cpp.sh to recursively rename .c files to .cpp files.
 
