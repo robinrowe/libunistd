@@ -27,7 +27,7 @@
 #include <windows.h>
 #include <math.h>
 #include <fcntl.h>
-#include <process.h>
+#include <process.h> // getpid()
 #include <io.h>
 #include <malloc.h>
 #include <stddef.h>
@@ -52,12 +52,38 @@
 #include "uni_signal.h"
 #include "../portable/stub.h"
 #include "gettimeofday.h"
+
 // Use: cmake -A x64 ..
 #ifdef _M_X64
 #include "Int128.h"
 #endif
+
 #ifdef __cplusplus
 #include "chrono.h"
+
+inline
+pid_t getpgrp() /* POSIX.1 version */
+{	STUB_0(getpgrp);
+}
+
+inline
+pid_t getpgrp(pid_t pid) /* BSD version */
+{	(void)pid;
+	STUB_0(getpgrp);
+}
+
+inline
+int setpgrp() /* System V version */
+{	STUB_0(setpgrp);
+}
+
+inline
+int setpgrp(pid_t pid, pid_t pgid) /* BSD version */ 
+{	(void)pid;
+	(void)pgid;
+	STUB_0(setpgrp);
+}
+
 extern "C"
 {
 	extern char *optarg;
@@ -65,9 +91,9 @@ extern "C"
 }
 #else
 //#define inline __inline
-
-extern char *optarg;
-extern int optind, opterr, optopt;
+	typedef long long useconds_t;
+	extern char *optarg;
+	extern int optind, opterr, optopt;
 #endif
 
 #pragma warning(disable : 4996)
@@ -257,8 +283,6 @@ int S_ISSOCK(int v)
 //#define lround floor
 //#define roundl floor
 
-#define getpid _getpid
-
 inline
 pid_t gettid()
 {	HANDLE h = GetCurrentThread();
@@ -316,7 +340,6 @@ gid_t getegid()
 {	STUB_NEG(getegid);
 }
 
-
 inline
 char* realpath(const char *path, char *resolved_path)
 {	if(!resolved_path)
@@ -337,28 +360,6 @@ ssize_t readlink(const char *path, char *buf, size_t bufsize)
 	STUB_0(readlink);
 }
 
-inline
-int fsync (int fd)
-{	HANDLE h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE)
-	{	return -1;
-	}
-	if (!FlushFileBuffers (h))
-	{	return -1;
-	}
-	return 0;
-}
-
-inline
-void sync()
-{	_flushall();
-}
-
-inline
-int syncfs(int fd)
-{	fsync(fd);
-}
-
 #if _MSC_VER <= 1900
 
 inline
@@ -369,6 +370,11 @@ int gethostname(char *name, size_t len)
 }
 
 #endif
+
+inline
+char *getlogin()
+{	STUB_0(getlogin);
+}
 
 inline
 int getlogin_r(char *buf, size_t len)
@@ -398,7 +404,302 @@ void PrintDirectory()
 
 inline
 unsigned int alarm(unsigned int seconds)
-{	STUB_0(alarm);
+{	(void)seconds;
+	STUB_0(alarm);
+}
+
+inline
+int chown(const char *path, uid_t owner, gid_t group)
+{	(void)path;
+	(void)owner;
+	(void)group;
+	STUB_0(chown);
+}
+
+inline
+int fchown(int fd, uid_t owner, gid_t group)
+{	(void)fd;
+	(void)owner;
+	(void)group;
+	STUB_0(fchown);
+}
+
+inline
+int lchown(const char *path, uid_t owner, gid_t group)
+{	(void)path;
+	(void)owner;
+	(void)group;
+	STUB_0(lchown);
+}
+
+inline
+int chroot(const char *path)
+{	(void)path;
+	STUB_NEG(chroot);
+}
+
+inline
+size_t confstr(int name, char *buf, size_t len)
+{	(void)name;
+	(void)buf;
+	(void)len;
+	STUB_0(confstr);
+}
+
+inline
+char *ctermid(char *s)
+{	char* term = "/dev/tty";
+	if(s)
+	{	strcpy(s,term);
+		return s;
+	}
+	return term;
+}
+
+// The POSIX name for this item is deprecated by MSVC:
+
+#define write _write
+#define unlink _unlink
+#define rmdir _rmdir
+#define read _read
+#define lseek _lseek
+#define isatty _isatty
+#define getcwd _getcwd
+#define dup2 _dup2
+#define dup _dup
+#define close _close
+#define chdir _chdir
+
+/*
+inline
+int chdir(const char *path)
+{	return _chdir(path);
+}*/
+
+inline
+int fchdir(int fd)
+{	(void)fd;
+	STUB_NEG(fchdir);
+}
+
+inline
+pid_t fork()
+{	STUB_NEG(fork);
+}
+
+inline
+int getdtablesize()
+{	STUB_0(getdtablesize);
+}
+
+inline
+int fsync (int fd)
+{	HANDLE h = (HANDLE) _get_osfhandle(fd);
+	if (h == INVALID_HANDLE_VALUE)
+	{	return -1;
+	}
+	if (!FlushFileBuffers (h))
+	{	return -1;
+	}
+	return 0;
+}
+
+inline
+void sync()
+{	_flushall();
+}
+
+inline
+int syncfs(int fd)
+{	fsync(fd);
+}
+
+inline
+int fdatasync(int fd)
+{	(void)fd;
+	STUB_NEG(fdatasync);
+}
+
+inline
+long fpathconf(int fd, int name)
+{	(void)fd;
+	(void)name;
+	STUB_NEG(fpathconf);
+}
+
+inline
+long pathconf(const char *path, int name)
+{	(void)path;
+	(void)name;
+	STUB_NEG(pathconf);
+}
+
+inline
+long gethostid()
+{	STUB_NEG(gethostid);
+}
+
+inline
+int sethostid(long hostid)
+{	(void)hostid;
+	STUB_NEG(sethostid);
+}
+
+// char *cuserid(char *string); 
+
+inline
+int getpagesize()
+{	STUB_0(getpagesize);
+}
+
+inline
+char *getpass(const char *prompt)
+{	(void)prompt;
+	STUB_0(getpass);
+}
+
+inline
+int setpgid(pid_t pid, pid_t pgid)
+{	(void)pid;
+	(void)pgid;
+	STUB_0(setpgid);
+}
+
+inline
+pid_t getpgid(pid_t pid)
+{	(void)pid;
+	STUB_0(getpgid);
+}
+
+#define getpid _getpid
+
+/*
+
+In process.h:
+
+inline
+pid_t getpid()
+{	return _getpid();
+}
+*/
+
+inline
+pid_t getppid()
+{	STUB_0(getppid);
+}
+
+inline
+int link(const char *oldpath, const char *newpath)
+{	(void)oldpath;
+	(void)newpath;
+	STUB_NEG(link);
+}
+
+#define F_LOCK 1
+#define F_TLOCK 2
+#define F_ULOCK 3
+#define F_TEST 4
+
+inline
+int lockf(int fd, int cmd, off_t len)
+{	(void)fd;
+	(void)cmd;
+	(void)len;
+	STUB_NEG(lockf);
+}
+
+inline
+int nice(int inc)
+{	(void)inc;
+	STUB_NEG(nice);
+}
+
+inline
+int pause()
+{	STUB_NEG(pause);
+}
+
+inline
+int brk(void *addr)
+{	(void)addr;
+	STUB_NEG(brk);
+}
+
+inline
+void *sbrk(intptr_t increment)
+{	(void)increment;
+	STUB_0(sbrk);
+}
+
+inline
+int setreuid(uid_t ruid, uid_t euid)
+{	(void)ruid;
+	(void)euid;
+	STUB_NEG(setreuid);
+}
+
+inline
+int setregid(gid_t rgid, gid_t egid)
+{	(void)rgid;
+	(void)egid;
+	STUB_NEG(setregid);
+}
+
+inline
+int setsid()
+{	STUB_NEG(setsid);
+}
+
+inline
+int symlink(const char *target, const char *linkpath)
+{	(void)target;
+	(void)linkpath;
+	STUB_NEG(symlink);
+}
+
+inline
+long sysconf(int name)
+{	(void)name;
+	STUB_NEG(sysconf);
+}
+
+inline
+pid_t tcgetpgrp(int fd)
+{	(void)fd;
+	STUB_NEG(tcgetpgrp);
+}
+
+inline
+int tcsetpgrp(int fd, pid_t pgrp)
+{	(void)fd;
+	(void)pgrp;
+	STUB_NEG(tcsetpgrp);
+}
+
+inline
+char *ttyname(int fd)
+{	(void)fd;
+	STUB_0(ttyname);
+}
+
+inline
+int ttyname_r(int fd, char *buf, size_t buflen)
+{	(void)fd;
+	(void)buf;
+	(void)buflen;
+	STUB_NEG(ttyname_r);
+}
+
+inline
+useconds_t ualarm(useconds_t usecs, useconds_t interval)
+{	(void)usecs;
+	(void)interval;
+	STUB_0(ualarm);
+}
+
+inline
+pid_t vfork()
+{	STUB_NEG(vfork);
 }
 
 #ifdef __cplusplus
@@ -414,6 +715,8 @@ int ftruncate(int fd, off_t length);
 #ifdef __cplusplus
 }
 #endif
+
+#define access _access
 
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 

@@ -14,7 +14,12 @@
 #pragma warning(disable:4996)
 
 typedef long long useconds_t;
-#define sleep(x) Sleep(x)
+
+inline
+int sleep(useconds_t delay)
+{	std::this_thread::sleep_for(std::chrono::seconds(delay));
+	return 0;
+}
 
 inline
 int usleep(useconds_t delay)

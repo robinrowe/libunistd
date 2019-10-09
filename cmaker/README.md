@@ -39,7 +39,7 @@ Use cmaker_sources.sh to import existing legacy files. Is not needed by new proj
 
 Use cmaker_top.sh to create the top level CMakelists.txt that calls CMakelists.txt files in subdirectories. Of course, create the subdirectories first.
 
-	cmaker_top.sh
+	cmaker_top.sh project_name
 	
 Use cmaker_merge.sh to add cmaker frameworks to legacy projects. Note this appends the old files to the new, requires editing results by hand.
 

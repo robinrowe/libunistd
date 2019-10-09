@@ -4,6 +4,9 @@
 # License MIT open source
 
 sources=sources.cmake
+cmakelist=CMakeLists.txt
+date=$(date +%Y-%m-%d)
+library=$1
 
 ReadLicenseFile()
 {	if [[ ! -e LICENSE ]]; then
@@ -42,14 +45,34 @@ AddSources()
 	AddPath "*.c" ${sources}
 }
 
+UpdateCmakeList()
+{	if [[ -e ${cmakelist} ]]; then
+		echo "${cmakelist} already exists!"
+	else
+		echo Creating ${cmakelist} for library ${library}...
+		echo "# ${library}/CMakeLists.txt" >> ${cmakelist}
+		echo "# Created by ${AUTHOR} ${date}" >> ${cmakelist}
+		echo "# License: ${license}" >> ${cmakelist}
+		echo "" >> ${cmakelist}
+		echo "project(${library})" >> ${cmakelist}
+		echo "file(STRINGS sources.cmake SOURCES)" >> ${cmakelist}
+	fi
+	echo "add_library(${library} \${SOURCES})" >> ${cmakelist}
+}
+
 main()
-{	echo "cmaker_sources: $PWD"
+{	if [ -z "${library}" ]; then 
+		echo 'Usage: % cmaker_sources.sh library_name'
+		exit 1
+	fi
 	if [ -z "$AUTHOR" ]; then 
 		echo "In bash set your name: % export AUTHOR=\"Your Name\""
 		exit 1
 	fi
+	echo "cmaker_sources: $PWD"
 	ReadLicenseFile
 	AddSources
+	UpdateCmakeList
 	#cat ${sources}
 }
 
