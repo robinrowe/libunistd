@@ -7,6 +7,7 @@ add_library(libunistd
 	unistd.h
 	gettimeofday.cpp
 	uni_signal.cpp
+	syslog.cpp
 	Int128.h
 	Int128.cpp
 	Uint128.cpp

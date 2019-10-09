@@ -14,8 +14,6 @@
 #include "dirent.h"
 #include "../portable/Finder.h"
 
-FILE* syslog_fp = 0;
-
 #define SUFFIX	'*'
 #define	SLASH	'\\'
 
