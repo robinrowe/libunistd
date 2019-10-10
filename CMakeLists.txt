@@ -2,6 +2,7 @@
 
 cmake_minimum_required (VERSION 3.0.0)
 project(libunistd)
+message("<<< Parsing libunistd/CMakeList.txt")
 message("--- Building ${PROJECT_NAME} ${CMAKE_SYSTEM_NAME}:${CMAKE_HOST_SYSTEM_PROCESSOR}:${CMAKE_GENERATOR_TOOLSET} ---")
 
 option(UE4 "Disable _ITERATOR_DEBUG_LEVEL for UE4 compatibility" OFF)
@@ -18,23 +19,7 @@ endif(UE4)
 # cmake -D_HAS_ITERATOR_DEBUGGING=0 -D_ITERATOR_DEBUG_LEVEL=0 -A x64 ..
 # _HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;
 
-#set(CMAKE_STATIC_LIBRARY_PREFIX "") #Avoid Linux "liblib__.a"
-message("---Setting output directories ---")
-if(${LIBUNISTD_DOWNLOAD})
-#	message("Downloading libunistd...")
-	set(OUTPUTDIR ${CMAKE_CURRENT_SOURCE_DIR})
-else(${LIBUNISTD_DOWNLOAD})
-	set(OUTPUTDIR ${CMAKE_CURRENT_BINARY_DIR})
-endif(${LIBUNISTD_DOWNLOAD})
-
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUTDIR} )
-message("  CMAKE_LIBRARY_OUTPUT_DIRECTORY = ${OUTPUTDIR}")
-foreach( outputconfig ${CMAKE_CONFIGURATION_TYPES} )
-    string( TOUPPER ${outputconfig} OUTPUTCONFIG )
-    set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${OUTPUTDIR}/${outputconfig} )
-    set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${OUTPUTDIR}/${outputconfig} )
-	message("  CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} = ${OUTPUTDIR}/${outputconfig}" )
-endforeach( outputconfig ${CMAKE_CONFIGURATION_TYPES} )
+include(libunistd-config.cmake)
 
 if(WIN32)
 	include_directories(unistd)
