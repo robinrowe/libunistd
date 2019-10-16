@@ -45,7 +45,7 @@ class BsdSocket
 	{	if(!isVerbose)
 		{	return;
 		}
-		portable::SystemLog(filename,lineno,msg);
+		SystemLog(filename,lineno,msg);
 	}
 	void Trace(const char* msg)
 	{	if(!isTrace)

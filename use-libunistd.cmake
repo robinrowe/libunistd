@@ -89,9 +89,10 @@ if(WIN32)
 	include_directories(${LIBUNISTD_INCLUDE_DIRS})
 	link_directories(${LIBUNISTD_LIB_DIRS})
 	link_libraries(${LIBUNISTD_LIBRARIES})
+else(WIN32)
+	link_directories(${LIBPORTABLE_LIB_DIRS})
 endif(WIN32)
 
 include_directories(${LIBPORTABLE_INCLUDE_DIRS})
-link_directories(${LIBPORTABLE_LIB_DIRS})
 link_libraries(${LIBPORTABLE_LIBRARIES})
 

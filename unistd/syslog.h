@@ -11,7 +11,9 @@ struct Syslog_data
 {	FILE* fp;
 //	int option;
 	int facility;
+	int mask;
 	char programname[SYSLOG_PROG_SIZE];
+	bool isTTY;
 };
 
 extern Syslog_data syslog_data;
@@ -52,27 +54,26 @@ enum
 
 // level:
 enum
-{	LOG_DEBUG = 1,
-	LOG_INFO = 2,
-	LOG_NOTICE = 4,
-	LOG_WARNING = 8,
-	LOG_ERR = 16,
-	LOG_CRIT = 32,
-	LOG_ALERT = 64,
-	LOG_EMERG = 128
+{	LOG_EMERG,
+	LOG_ALERT,
+	LOG_CRIT,
+	LOG_ERR,
+	LOG_WARNING,
+	LOG_NOTICE,
+	LOG_INFO,
+	LOG_DEBUG
 };
 
 void openlog(const char *programname, int option, int facility);
 void syslog(int priority, const char *format, ...);
 void closelog();
+int setlogmask(int mask);
 
 inline
-int setlogmask(int mask)
-{	(void) mask;
-	return 0;
+int LOG_UPTO(const int maxMask) 
+{	const int mask = ((1<<((maxMask)+1))-1);
+	return mask;
 }
-
-#define LOG_UPTO(x) x
 
 /*
 
