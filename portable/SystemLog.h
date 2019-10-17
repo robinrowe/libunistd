@@ -23,6 +23,8 @@
 
 namespace portable {
 
+#ifdef OLD_SYSLOG
+
 #ifdef SYSTEM_LOGFILE
 extern FILE* systemLogfile;
 #endif
@@ -148,6 +150,8 @@ void StatusMsg(const char* msg)
 #endif
 #pragma warning(default:4996)
 
+#endif
+
 inline
 unsigned IsArgMode(const char* mode,int argc,char* argv[],bool isTerse = true)
 {	if(!mode)
@@ -222,8 +226,6 @@ void error_msg(const char* msg,const char* function,int lineno)
 }
 
 }
-
-#define TRACE_MSG_FUNCTIONS
 
 #ifdef TRACE_MSG_FUNCTIONS
 #define status_msg(msg) portable::status_msg(msg,__FUNCTION__,__LINE__)

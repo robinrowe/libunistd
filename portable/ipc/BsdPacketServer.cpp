@@ -24,7 +24,7 @@ void BsdPacketServer::LogSocketError(const PacketSocket& bsdSocket)
 	bsdSocket.GetPeerName(msg);
 	msg+=" SendTo error: ";
 	msg+=bsdSocket.errorMsg;
-	LogMsg(msg);
+	error_msg(msg.c_str());
 }
 
 #if 0

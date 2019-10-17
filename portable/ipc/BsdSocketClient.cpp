@@ -56,11 +56,11 @@ unsigned BsdSocketClient::OnPacket(unsigned bytes,portable::PacketReader& packet
 		{	printf("reading packet #%u\n",packet.header.packetId);
 		}
 		if(!packet.header.packetSize)
-		{	LogError("invalid packet");
+		{	error_msg("invalid packet");
 			return bytes;
 		}
 		if(0==packet.header.packetId)
-		{	LogMsg("Reading header");
+		{	trace_msg("Reading header");
 			if(!ReadHeader(packet))
 			{	//stats.Print(packet.header.packetId,bytes,packet.header.packetSize, capacity);
 				SocketReset("Packet header corrupted",packet);

@@ -9,7 +9,9 @@ using namespace portable;
 #define P(name) cout << "** " << #name << " ** " 
 
 int main()
-{	P(SysLogMsg);
+{
+#ifdef OLD_SYSLOG
+	P(SysLogMsg);
 	SysLogMsg("msg",__FUNCTION__);
 #ifdef TEST_DEBUG_BREAK
 	P(SysLogError);
@@ -29,6 +31,7 @@ int main()
 	SystemLog(__FILE__,__LINE__,"msg");
 	P(StatusMsg);
 	StatusMsg("msg");
+#endif
 	P(tty_msg);
 	tty_msg("tag","msg");
 	P(status_msg);
