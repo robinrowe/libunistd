@@ -58,7 +58,7 @@ void LogMsg(const std::string& msg)
 
 inline
 void LogError(const std::string& msg)
-{	printf("ERROR: %s",msg.c_str());
+{	printf("ERROR: %s\n",msg.c_str());
 }
 
 #endif
@@ -81,24 +81,6 @@ void debugLogf(const char * functionName, const char * format, ...)
     va_end(ap);
 }
 */
-
-inline
-unsigned IsArgModeX(const char* mode,int argc,char* argv[],bool isTerse = true)
-{	if(!mode)
-	{	return 0;
-	}
-	for(unsigned i=1; i < (unsigned) argc; i++)
-	{	if(('-' != argv[i][0]) || (*mode != argv[i][1]))
-		{	continue;
-		}
-		if(isTerse)
-		{	return i;
-		}
-		if(!strcmp(mode,argv[i]+1))
-		{	return i;
-	}	}
-	return 0;
-}
 
 inline
 void SystemLog(const char* filename,int lineNo,const char* msg)
@@ -166,10 +148,26 @@ void StatusMsg(const char* msg)
 #endif
 #pragma warning(default:4996)
 
+inline
+unsigned IsArgMode(const char* mode,int argc,char* argv[],bool isTerse = true)
+{	if(!mode)
+	{	return 0;
+	}
+	for(unsigned i=1; i < (unsigned) argc; i++)
+	{	if(('-' != argv[i][0]) || (*mode != argv[i][1]))
+		{	continue;
+		}
+		if(isTerse)
+		{	return i;
+		}
+		if(!strcmp(mode,argv[i]+1))
+		{	return i;
+	}	}
+	return 0;
 }
 
 inline
-void tty_msg(const char* tag,const char* msg)
+void tty_msg(const char* tag,const char* msg,const char* functionName=0,int lineNo=0)
 {	static int tty_state = -1;
 	if(-1 == tty_state)
 	{	tty_state = isatty(fileno(stdout));
@@ -177,33 +175,67 @@ void tty_msg(const char* tag,const char* msg)
 	if(!tty_state)
 	{	return;
 	}
+	if(functionName)
+	{	printf("%s: %s (%s@%i)\n",tag,msg,functionName,lineNo);
+		return;
+	}	
 	printf("%s: %s\n",tag,msg);
 }
 
+inline 
+const char* Safe(const char* msg)
+{	if(!msg)
+	{	return "unknown";
+	}
+	return msg;
+}
+
+inline 
+void syslog_function(int level,const char* tag,const char* msg,const char* function,int lineno)
+{	if(!function)
+	{	syslog(level,"%s: %s",Safe(tag),Safe(msg));
+		return;
+	}
+	syslog(level,"%s: %s (%s@%i)",Safe(tag),Safe(msg),function,lineno);
+}
 inline
-void status_msg(const char* msg)
-{	syslog(LOG_NOTICE,"Status: %s",msg);
-	tty_msg("Status",msg);
+void status_msg(const char* msg,const char* function=0,int lineno=0) 
+{	syslog_function(LOG_NOTICE,"Status",msg,function,lineno);
+	tty_msg("Status",msg,function,lineno);
 }
 
 inline
-void warning_msg(const char* msg) 
+void warning_msg(const char* msg,const char* function=0,int lineno=0) 
 {	syslog(LOG_WARNING,"Warning: %s",msg);
-	tty_msg("Warning",msg);
+	tty_msg("Warning",msg,function,lineno);
 }
 
 inline
-void trace_msg(const char* msg) 
-{	tty_msg("Trace",msg);
+void trace_msg(const char* msg,const char* function=0,int lineno=0) 
+{	tty_msg("Trace",msg,function,lineno);
 }
 
 inline
-void error_msg(const char* msg) 
-{	syslog(LOG_ERR,"Error: %s",msg);
-	tty_msg("Error",msg);
+void error_msg(const char* msg,const char* function,int lineno) 
+{	syslog(LOG_ERR,"Error: %s",msg,function,lineno);
+	tty_msg("Error",msg,function,lineno);
 }
 
-#define return_msg(x) status_msg(#x);return int(x)
-#define IsArgMode(mode) portable::IsArgModeX(mode,argc,argv)
+}
+
+#define TRACE_MSG_FUNCTIONS
+
+#ifdef TRACE_MSG_FUNCTIONS
+#define status_msg(msg) portable::status_msg(msg,__FUNCTION__,__LINE__)
+#define warning_msg(msg) portable::warning_msg(msg,__FUNCTION__,__LINE__)
+#define trace_msg(msg) portable::trace_msg(msg,__FUNCTION__,__LINE__)
+#else
+#define status_msg(msg) portable::status_msg(msg)
+#define warning_msg(msg) portable::warning_msg(msg)
+#define trace_msg(msg) portable::trace_msg(msg)
+#endif
+#define error_msg(msg) portable::error_msg(msg,__FUNCTION__,__LINE__)
+#define return_msg(enum_name) status_msg(#enum_name);return int(enum_name)
+#define IsArgMode(mode) portable::IsArgMode(mode,argc,argv)
 
 #endif

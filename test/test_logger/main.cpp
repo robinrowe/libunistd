@@ -6,21 +6,25 @@
 using namespace std;
 using namespace portable;
 
-#define P(name) cout << #name << ":" << endl
+#define P(name) cout << "** " << #name << " ** " 
 
 int main()
 {	P(SysLogMsg);
-	SysLogMsg("msg","function");
+	SysLogMsg("msg",__FUNCTION__);
+#ifdef TEST_DEBUG_BREAK
 	P(SysLogError);
 	SysLogError("msg","function");
+#endif
 	P(LogMsg);
 	LogMsg("msg");
 	P(LogError);
 	LogError("msg");
 	P(SYSLOG);
 	SYSLOG("msg");
+#ifdef TEST_DEBUG_BREAK
 	P(SYSERR);
 	SYSERR("msg");
+#endif
 	P(SystemLog);
 	SystemLog(__FILE__,__LINE__,"msg");
 	P(StatusMsg);
