@@ -240,4 +240,10 @@ void error_msg(const char* msg,const char* function,int lineno)
 #define return_msg(enum_name) status_msg(#enum_name);return int(enum_name)
 #define IsArgMode(mode) portable::IsArgMode(mode,argc,argv)
 
+inline
+void signal_safe_puts(const char* msg)
+{	if(msg)
+	{	write(fileno(stdout),msg,(int) strlen(msg));
+}	}
+
 #endif

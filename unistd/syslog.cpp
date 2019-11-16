@@ -11,32 +11,34 @@
 #include <crtdbg.h>
 #endif
 // debugapi.h 
+#include "../portable/SystemLog.h"
 
 #pragma warning(disable:4996)
 
 Syslog_data syslog_data;
 
-void openlog(const char *programname, int option, int facility)
+void openlog(const char *ident, int option, int facility)
 {	if(isatty(fileno(stdout)))
 	{	syslog_data.isTTY = true;
 	}
 	const char* err = "Error: can't openlog()";
-	if(!programname || syslog_data.fp != 0)
+	if(!ident || syslog_data.fp != 0)
 	{	puts(err);
 		return;
 	}
 	(void) option;
-	const char* filename = "/var/log/messages";
-	strcpy(syslog_data.programname,filename);
+	if(!ident || !*ident)
+	{	const char* ident = "unknown";
+	}
+	syslog_data.ident=ident;
 	if(facility >= LOG_LOCAL0 && facility <= LOG_LOCAL7)
-	{	strncpy(syslog_data.programname+9,programname,SYSLOG_PROG_SIZE-10);
-		syslog_data.programname[SYSLOG_PROG_SIZE-1] = 0;
-	}
-	syslog_data.fp = fopen(filename,"w+");
-    if(!syslog_data.fp)
-	{	puts(err);
-		return;
-	}
+	{	std::string filename(ident);
+		filename += ".log";
+		syslog_data.fp = fopen(filename.c_str(),"w+");
+		if(!syslog_data.fp)
+		{	error_msg(err);
+			return;
+	}	}
 	// syslog_option = option;
 	// syslog_facility = facility;
 }
@@ -48,7 +50,7 @@ void syslog(int priority, const char *format, ...)
 	va_list argp;
 	va_start(argp,format);
 	if(syslog_data.fp)
-	{	fprintf(syslog_data.fp,"%s: ",syslog_data.programname+9);
+	{	fprintf(syslog_data.fp,"%s: ",syslog_data.ident.c_str());
 		vfprintf(syslog_data.fp,format,argp);
 		fputs("",syslog_data.fp);
 	}
@@ -65,8 +67,7 @@ void closelog()
 	{	return;
 	}
 	fclose(syslog_data.fp);
-	syslog_data.fp = 0;
-	syslog_data.programname[0] = 0;
+	syslog_data.ident.clear();
 }
 
 int setlogmask(int mask)

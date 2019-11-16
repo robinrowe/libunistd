@@ -19,6 +19,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <stdio.h>
+#include <vector>
 #include "../SystemCall.h"
 
 namespace portable 
@@ -33,6 +34,7 @@ class Pump
     bool isGo;
 	bool isWake;
 	const char* pumpName;// Expects static string, not copied!
+	static std::vector<Pump*> pumps;
     static void Main(Pump* self)
     {   self->Run();
     }
@@ -57,11 +59,7 @@ class Pump
     void Run();
 	bool Start(bool isJoin = false);
 public:
-    Pump(const char* pumpName)
-    :   pumpName(pumpName)
-	,	isGo(false)
-	,	isWake(false)
-    {}
+    Pump(const char* pumpName);
     virtual ~Pump()
 	{	Stop();
 		Stop();
@@ -72,7 +70,9 @@ public:
 	bool StartDetach()
 	{	return Start(false);
 	}
-    bool Stop()
+	// CAUTION! Stop() may be called from SIGINT, must be signal-safe:
+	// http://man7.org/linux/man-pages/man7/signal-safety.7.html
+    virtual bool Stop()
     {   isGo=false;
 		Wake();
         return true;
@@ -86,6 +86,7 @@ public:
 		}
 #endif
 	}
+	static void Shutdown(int signal);
 };
 
 }

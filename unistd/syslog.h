@@ -5,14 +5,14 @@
 #ifndef syslog_h
 #define syslog_h
 
-enum {SYSLOG_PROG_SIZE = 40};
+#include <string>
 
 struct Syslog_data
 {	FILE* fp;
 //	int option;
 	int facility;
 	int mask;
-	char programname[SYSLOG_PROG_SIZE];
+	std::string ident;
 	bool isTTY;
 };
 
