@@ -12,8 +12,7 @@
 #include <stdio.h>
 #include <stdio.h>
 
-#ifdef _WIN32
-#ifdef _DEBUG
+#if defined(_WIN32) && defined(_DEBUG)
 #include <crtdbg.h>
 #endif
 
@@ -150,8 +149,6 @@ void StatusMsg(const char* msg)
 #endif
 #pragma warning(default:4996)
 
-#endif
-
 inline
 unsigned IsArgMode(const char* mode,int argc,char* argv[],bool isTerse = true)
 {	if(!mode)
@@ -202,6 +199,7 @@ void syslog_function(int level,const char* tag,const char* msg,const char* funct
 	}
 	syslog(level,"%s: %s (%s@%i)",Safe(tag),Safe(msg),function,lineno);
 }
+
 inline
 void status_msg(const char* msg,const char* function=0,int lineno=0) 
 {	syslog_function(LOG_NOTICE,"Status",msg,function,lineno);
