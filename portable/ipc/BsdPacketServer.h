@@ -12,12 +12,11 @@
 
 namespace portable 
 {
-	
+
 class BsdPacketServer
 :	public BsdSocketServer
 {	bool isVerbose;
 	const char* programVersion;
-	static const unsigned bufSize = 64*1024;
 	std::vector<char> headerBuffer;
 	bool SendTo(PacketWriter& packet,SOCKET fd)
 	{	PacketSocket bsdSocket(fd);
@@ -37,11 +36,12 @@ class BsdPacketServer
 	bool Subscribe(SOCKET fd);
 	BsdMulticast multicast;
 //	bool isStreaming;
+	static const unsigned bufSize = 64*1024;
 public:
 	PacketWriter headerPacket;
 	PacketQueue<bufSize> framePacket;
 	BsdPacketServer(const char* programVersion)
-	:	BsdSocketServer(bufsize)
+	:	BsdSocketServer(bufSize)
 	,	isVerbose(false)
 	,	programVersion(programVersion)
 	,	headerBuffer(bufSize)
