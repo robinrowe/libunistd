@@ -65,7 +65,7 @@ public:
 	,	isGo(false)
 	,	isConnected(false)
 	{}
-	PacketSocket(const PacketSocket&) = default;
+//	PacketSocket(const PacketSocket&) = default;
 	bool IsGood() const
 	{	return socketfd > 0;
 	}
