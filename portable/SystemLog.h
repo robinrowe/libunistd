@@ -221,7 +221,7 @@ void trace_msg(const char* msg,const char* function=0,int lineno=0)
 
 inline
 void error_msg(const char* msg,const char* function,int lineno) 
-{	syslog(LOG_ERR,"Error: %s",msg,function,lineno);
+{	syslog(LOG_ERR,"Error: %s, %s:%i",msg,function,lineno);
 	tty_msg("Error",msg,function,lineno);
 }
 
