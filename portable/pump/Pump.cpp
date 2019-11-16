@@ -5,8 +5,8 @@
 
 #include <string>
 #include <signal.h>
-#include <bsd/string.h>
 #include "Pump.h"
+#include "../bsd_string.h"
 #include "../SystemLog.h"
 using namespace std;
 

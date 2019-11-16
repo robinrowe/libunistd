@@ -48,7 +48,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include "sys/sys_types.h"
-#include "bsd/string.h"
+#include "../portable/bsd_string.h"
 #include "uni_signal.h"
 #include "../portable/stub.h"
 #include "gettimeofday.h"
