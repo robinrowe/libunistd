@@ -17,7 +17,7 @@ namespace portable {
 
 class UdpPump
 :	public Pump
-{	bool isVerbose;
+{	
 protected:
 	bool Receive() override
 	{	if(!udpSocket.Receive())
@@ -31,13 +31,10 @@ public:
 	~UdpPump()
 	{	Close();
 	}
-	UdpPump(const char* pumpName,size_t bufsize)
+	UdpPump(const char* pumpName,size_t bufsize,bool isVerbose = true)
 	:	Pump(pumpName)
 	,	udpSocket(bufsize)
-	,	isVerbose(false)
-	{}
-	void SetVerbose(bool isVerbose = true)
-	{	this->isVerbose = isVerbose;
+	{	udpSocket.SetVerbose(isVerbose);
 	}
 	void SetTrace(bool isTrace = true)
 	{	udpSocket.SetTrace(isTrace);

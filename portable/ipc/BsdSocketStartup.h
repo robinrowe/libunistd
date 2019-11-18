@@ -24,7 +24,7 @@ class BsdSocketStartup
 public:
     BsdSocketStartup()
     {   if(!isSingleton)
-        {   WSADATA data; 
+        {  	WSADATA data; 
             const WORD version_requested = MAKEWORD(2, 0);
             WSAStartup(version_requested, &data);
             isSingleton = true;

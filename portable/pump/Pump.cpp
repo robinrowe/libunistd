@@ -35,6 +35,7 @@ void Pump::Run()
     {   if(Receive())
 		{	Action();
     }   }
+	printf("Shutdown %s\n",pumpName);
 }
 
 bool Pump::Start(bool isJoin)
@@ -66,7 +67,7 @@ void Pump::Shutdown(int signal)
 	enum {size = 40};
 	char s[size]; // Note: not std::string because inside interrupt routine!
 	for(Pump* pump:pumps)
-	{	strlcpy(s,"Shutdown ",size);
+	{	strlcpy(s,"Stop ",size);
 		strlcat(s,pump->pumpName,size);
 		strlcat(s,"\n",size);
 		signal_safe_puts(s);

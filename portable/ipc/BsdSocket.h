@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include "BsdSocketStartup.h"
 #include "../bsd_string.h"
 #include "../MsgBuffer.h"
 #include "../AtomicCounter.h"

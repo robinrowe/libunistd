@@ -31,8 +31,8 @@ class Pump
     std::mutex mut;
     std::condition_variable cv;
 	std::thread worker;
-    bool isGo;
-	bool isWake;
+    volatile bool isGo;
+	volatile bool isWake;
 	const char* pumpName;// Expects static string, not copied!
 	static std::vector<Pump*> pumps;
     static void Main(Pump* self)
@@ -44,8 +44,8 @@ class Pump
 	virtual bool Receive()
 	{	Lock lock(mut);
 		Wait(lock);
-		if(!isWake)
-		{	// spurious thread wake
+		if(!isWake || !isGo)
+		{	// spurious thread wake or Stop()
 			return false;
 		}
 		isWake=false;

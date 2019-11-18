@@ -94,12 +94,14 @@ void SystemLog(const char* filename,int lineNo,const char* msg)
 #ifdef _WIN32
 	enum {len = 60};
 	char buffer[len];
+	buffer[0] = 0;
+	const int wsaError = WSAGetLastError();
 	const DWORD num = FormatMessageA(
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		NULL,
-		WSAGetLastError(),
-		0,
-		buffer,
+		wsaError,
+		0,//MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPSTR)&buffer,
 		len-1,
 		NULL);
 	if(!msg && *buffer)
@@ -177,7 +179,7 @@ void tty_msg(const char* tag,const char* msg,const char* functionName=0,int line
 	{	return;
 	}
 	if(functionName)
-	{	printf("%s: %s (%s@%i)\n",tag,msg,functionName,lineNo);
+	{	printf("%s: %s (%s:%i)\n",tag,msg,functionName,lineNo);
 		return;
 	}	
 	printf("%s: %s\n",tag,msg);
@@ -197,7 +199,7 @@ void syslog_function(int level,const char* tag,const char* msg,const char* funct
 	{	syslog(level,"%s: %s",Safe(tag),Safe(msg));
 		return;
 	}
-	syslog(level,"%s: %s (%s@%i)",Safe(tag),Safe(msg),function,lineno);
+	syslog(level,"%s: %s (%s:%i)",Safe(tag),Safe(msg),function,lineno);
 }
 
 inline
