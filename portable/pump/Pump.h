@@ -86,7 +86,10 @@ public:
 		}
 #endif
 	}
-	static void Shutdown(int signal);
+	virtual void Shutdown()
+	{	printf("Shutdown %s\n",pumpName);
+	}
+	static void Signal(int signal);
 };
 
 }

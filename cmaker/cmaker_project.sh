@@ -30,6 +30,7 @@ CreateDocs()
 		echo "## Done" >> ${docfile}
 		echo "" >> ${docfile}
 	fi
+	echo "cmaker_project.sh ${project}" >> ${docfile}
 	CreateDoc README.md
 #	CreateDoc INSTALL.md
 }

@@ -5,6 +5,8 @@
 
 #include <string>
 #include <signal.h>
+#include <chrono>
+#include <thread>
 #include "Pump.h"
 #include "../bsd_string.h"
 #include "../SystemLog.h"
@@ -20,8 +22,8 @@ Pump::Pump(const char* pumpName)
 ,	isGo(false)
 ,	isWake(false)
 {	if(!pumps.size())
-	{	signal(SIGINT,Shutdown);
-		signal(SIGTERM,Shutdown);
+	{	signal(SIGINT,Signal);
+		signal(SIGTERM,Signal);
 		trace_msg("Pump hooked SIGINT");
 	}
 	pumps.push_back(this);
@@ -35,7 +37,7 @@ void Pump::Run()
     {   if(Receive())
 		{	Action();
     }   }
-	printf("Shutdown %s\n",pumpName);
+	Shutdown();
 }
 
 bool Pump::Start(bool isJoin)
@@ -54,10 +56,10 @@ bool Pump::Start(bool isJoin)
     return true;
 }
 
-// CAUTION! Pump::Shutdown(int signal) may be called from SIGINT, must be signal-safe:
+// CAUTION! Pump::Signal(int signal) to be called from SIGINT, must be signal-safe:
 // http://man7.org/linux/man-pages/man7/signal-safety.7.html
 
-void Pump::Shutdown(int signal)
+void Pump::Signal(int signal)
 {	if(SIGINT == signal)
 	{	signal_safe_puts("SIGINT interrupt\n");
 	}
@@ -74,6 +76,8 @@ void Pump::Shutdown(int signal)
 		pump->Stop();	
 	}
 	pumps.clear();
+	using namespace std::chrono_literals;
+	std::this_thread::sleep_for(2s);
 }
 
 }

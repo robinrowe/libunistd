@@ -88,6 +88,7 @@ main()
 		CreateFile ${test_file} "./test/test_${arg}.cpp" ${arg}
 		UpdateCmakeList $arg
 		UpdateCmakeSources $arg
+		echo "cmaker_class.sh ${arg}" >> ${CHANGES.md}
 	done
 }
 

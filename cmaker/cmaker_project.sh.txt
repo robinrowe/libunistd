@@ -15,9 +15,31 @@ link_libraries(${PROJECT_NAME}_lib)
 if(NOT WIN32 AND NOT APPLE)
 	link_libraries(rt pthread)
 endif(NOT WIN32 AND NOT APPLE)
-#set(LIBUNISTD_PATH /code/libunistd)
-#if(WIN32)
-#	include_directories(${LIBUNISTD_PATH}/unistd)
-#	link_directories(${LIBUNISTD_PATH}/build/unistd/Release)
-#	link_libraries(libunistd)
-#endif()
+
+option(UNISTD "Enable libunistd" false)
+if(UNISTD)
+	set(LIBUNISTD_PATH /code/libunistd)
+	if(WIN32)
+		include_directories(${LIBUNISTD_PATH}/unistd)
+		link_directories(${LIBUNISTD_PATH}/build/unistd/Release)
+		link_libraries(libunistd)
+	endif(WIN32)
+endif(UNISTD)
+
+option(FLTK "Enable FLTK" false)
+if(FLTK)
+	set(FLTK_PATH /Code/fltk)
+	include_directories(${FLTK_PATH} ${FLTK_PATH}/build)
+	link_directories(${FLTK_PATH}/build/lib/Debug)
+	set(FLTK_LIBS
+		fltk_formsd
+		fltk_gld
+		fltk_imagesd
+		fltk_jpegd
+		fltk_pngd
+		fltk_zd
+		fltkd
+	)
+	link_libraries(${FLTK_LIBS} comctl32)
+endif(FLTK)
+
