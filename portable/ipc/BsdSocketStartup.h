@@ -37,6 +37,19 @@ public:
 };
 
 }
+#else
+namespace portable 
+{
+	
+class BsdSocketStartup
+{	
+public:
+    BsdSocketStartup()
+	{}
+};
+
+}
+
 #endif
 
 #endif
