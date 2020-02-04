@@ -56,7 +56,7 @@ main()
 	for arg in "${args[@]}"; do
 		CreateMainCpp ${main_file} ${arg}
 		UpdateCmakeList $arg
-		echo "cmaker_program.sh ${arg}" >> ${CHANGES.md}
+		echo "cmaker_program.sh ${arg}" >> CHANGES.md
 	done
 }
 

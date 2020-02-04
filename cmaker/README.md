@@ -45,8 +45,8 @@ Use cmaker_merge.sh to add cmaker frameworks to legacy projects. Note this appen
 
 	cmaker_merge.sh old_dir
 
-Use cmaker_rename_cpp.sh to recursively rename .c files to .cpp files.
+Use cmaker_to_cpp.sh to recursively rename .c files to .cpp files.
 
-	cmaker_rename_cpp.sh
+	cmaker_to_cpp.sh
 	
 --0--
