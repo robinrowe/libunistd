@@ -157,7 +157,8 @@ unsigned IsArgMode(const char* mode,int argc,char* argv[],bool isTerse = true)
 	{	return 0;
 	}
 	for(unsigned i=1; i < (unsigned) argc; i++)
-	{	if(('-' != argv[i][0]) || (*mode != argv[i][1]))
+	{	const char* arg = argv[i];
+		if((mode[0] != arg[0]) || (mode[1] != arg[1]))
 		{	continue;
 		}
 		if(isTerse)
@@ -238,6 +239,7 @@ void error_msg(const char* msg,const char* function,int lineno)
 #endif
 #define error_msg(msg) portable::error_msg(msg,__FUNCTION__,__LINE__)
 #define return_msg(enum_name) status_msg(#enum_name);return int(enum_name)
+#define show_msg(enum_name) status_msg(#enum_name)
 #define IsArgMode(mode) portable::IsArgMode(mode,argc,argv)
 
 inline
