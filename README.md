@@ -2,7 +2,7 @@
 
 Robin Rowe's libunistd is a lightweight Windows POSIX library that enables typical Linux C/C++ code to build in Windows Microsoft Visual Studio. If you're maintaining C++ code across Windows, Linux and MacOS you need a Windows POSIX library to make single codebase work. This is it.
 
-Libunistd supports all the commons Linux POSIX calls, except fork(). Please don't fork. Use C++ standard threads or libunistd's POSIX pthreads instead. 
+Libunistd supports all the common Linux POSIX calls, except fork(). Please don't fork. Use C++ standard threads or libunistd's POSIX pthreads instead. 
 
 Usage: Set the include path in your VC++ project to include the directory libunistd/unistd (where the unistd.h file is). In any Linux code you have that won't compile in VC++, include the following at top of your header file:
 
