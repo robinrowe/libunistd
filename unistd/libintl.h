@@ -11,16 +11,19 @@ extern "C" {
 #define inline __inline
 #endif
 
+#define PACKAGE "English"
+#if 0
 #define PACKAGE IntlGetPackage()
 
 inline 
 const char* IntlGetPackage()
 {	return "English";
 }
-
+#endif
 inline
-void bindtextdomain(const char* package, const char* localdir)
-{   STUB(bindtextdomain);
+const char* bindtextdomain(const char* package, const char* localdir)
+{   MSG_BUG("bindtextdomain");
+	return "";
 }
 
 inline

@@ -129,18 +129,20 @@ int uni_open(const char* filename,unsigned oflag,int mode)
 {	return _open(filename,oflag,mode);
 }
 
+#define mkdir mkdir2
+
+inline
+int mkdir2(const char* path, int mask)
+{	(void) mask;
+	return _mkdir(path);
+}
+
 #ifdef __cplusplus
 
 inline
 int uni_open(const char* filename, unsigned oflag)
 {
 	return _open(filename, oflag, 0);
-}
-
-inline
-int mkdir(const char* path, int)
-{
-	return _mkdir(path);
 }
 
 inline
@@ -702,9 +704,52 @@ pid_t vfork()
 {	STUB_NEG(vfork);
 }
 
+/* between 0.0 and 1.0 */
+inline
+double drand48(void)
+{	double r=(double)rand();
+	r/=RAND_MAX;
+	return r > 1.0? 1.0:r;
+}
+
+/*double srand48(time_t);*/
+inline
+void srand48(long int seedval)
+{	srand(seedval);
+}
+
+inline
+long int random(void)
+{	return rand();
+}
+
+#define RETSIGTYPE void
+
 #ifdef __cplusplus
 extern "C"
 {
+#else
+inline
+unsigned sleep(unsigned seconds)
+{	Sleep(1000*seconds);
+	return 0;
+}
+
+inline
+int usleep(useconds_t usec)
+{	LARGE_INTEGER time1;
+	LARGE_INTEGER time2;
+	LARGE_INTEGER freq;
+	time1.QuadPart = 0;
+	time2.QuadPart = 0;
+	freq.QuadPart = 0;
+	QueryPerformanceCounter(&time1);
+	QueryPerformanceFrequency(&freq);
+	do 
+	{	QueryPerformanceCounter(&time2);
+	} while((time2.QuadPart-time1.QuadPart) < usec);
+	return 0;
+}
 #endif
 
 int setenv(const char *name, const char *value, int overwrite);

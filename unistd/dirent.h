@@ -38,6 +38,7 @@ typedef int scandir_alphasort(const struct dirent** a,const struct dirent** b);
 int alphasort(const struct dirent** a,const struct dirent** b);
 int versionsort(const struct dirent** a,const struct dirent** b);
 
+typedef struct DIR DIR;
 struct DIR* opendir(const char* path);
 struct dirent* readdir(struct DIR* dir);
 int readdir_r(struct DIR* dir,struct dirent* entry, struct dirent** result);

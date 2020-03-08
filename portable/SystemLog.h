@@ -152,7 +152,7 @@ void StatusMsg(const char* msg)
 #pragma warning(default:4996)
 
 inline
-unsigned IsArgMode(const char* mode,int argc,char* argv[],bool isTerse = true)
+unsigned IsArg(const char* mode,int argc,char* argv[],bool isTerse = true)
 {	if(!mode)
 	{	return 0;
 	}
@@ -169,6 +169,8 @@ unsigned IsArgMode(const char* mode,int argc,char* argv[],bool isTerse = true)
 	}	}
 	return 0;
 }
+
+#define IsArgMode(mode) portable::IsArgMode(mode,argc,argv)
 
 inline
 void tty_msg(const char* tag,const char* msg,const char* functionName=0,int lineNo=0)
@@ -240,7 +242,6 @@ void error_msg(const char* msg,const char* function,int lineno)
 #define error_msg(msg) portable::error_msg(msg,__FUNCTION__,__LINE__)
 #define return_msg(enum_name) status_msg(#enum_name);return int(enum_name)
 #define show_msg(enum_name) status_msg(#enum_name)
-#define IsArgMode(mode) portable::IsArgMode(mode,argc,argv)
 
 inline
 void signal_safe_puts(const char* msg)

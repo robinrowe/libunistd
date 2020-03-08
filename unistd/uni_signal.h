@@ -43,6 +43,8 @@ SIGTERM Termination request
 
 #define WNOHANG 0
 
+typedef struct siginfo_t siginfo_t;
+
 struct siginfo_t {
     int      si_signo;     /* Signal number */
     int      si_errno;     /* An errno value */

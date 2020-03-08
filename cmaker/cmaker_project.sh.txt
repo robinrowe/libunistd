@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(<NAME>)
+message("Configuring ${PROJECT_NAME}...")
 enable_testing()
 file(STRINGS sources.cmake SOURCES)
 add_library(${PROJECT_NAME}_lib ${SOURCES})

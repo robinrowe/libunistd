@@ -14,9 +14,6 @@ struct ipc_perm
 	uid_t cuid;
 	gid_t cgid;
 	mode_t mode;
-	ipc_perm()
-	{	memset(this,0,sizeof(*this));
-	}
 };
 
 enum
@@ -29,7 +26,8 @@ enum
 	IPC_STAT
 };
 
-key_t ftok(const char*, int)
+inline
+key_t ftok(const char *pathname, int proj_id)
 {	STUB_NEG(ftok);
 }
 
