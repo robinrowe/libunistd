@@ -114,7 +114,7 @@ class Finder
 		memset(&entry,0,sizeof(entry));	
 		entry->d_type=DT_UNKNOWN;
 		entry->d_name = data.cFileName;
-		entry->d_namlen = (int) strlen(entry->d_name);
+		entry->d_namlen = (unsigned short) strlen(entry->d_name);
 		if(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{	entry->d_type = DT_DIR;
 		}
