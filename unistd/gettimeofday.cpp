@@ -3,6 +3,10 @@
 // License open source MIT
 
 #include <unistd.h>
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 int gettimeofday(struct timeval* tv, struct timezone* tz)
 {	(void)tz;
@@ -19,3 +23,7 @@ int gettimeofday(struct timeval* tv, struct timezone* tz)
 	tv->tv_usec=(long) x;
 	return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif

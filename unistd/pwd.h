@@ -48,14 +48,16 @@ int getpwuid_r(uid_t uid, struct passwd *pwd,char *buf, size_t buflen, struct pa
 }
 
 inline
-passwd *getpwent()
+struct passwd *getpwent()
 {	STUB_0(getpwent);
 }
 
+inline
 void setpwent()
 {	STUB(setpwent);
 }
 
+inline
 void endpwent()
 {	STUB(endpwent);
 }
