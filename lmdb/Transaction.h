@@ -7,7 +7,9 @@
 #define LMDB_Transaction_h
 
 #include <portable/no_copy.h>
-#include <lmdb.h>
+#include "liblmdb/lmdb.h"
+
+#define MDB_WRITE 0
 
 namespace lmdb {
 
@@ -15,12 +17,12 @@ class LightningDb;
 
 class Transaction
 {	no_copy(Transaction);
-	LightningDb& db;
 	MDB_txn* txn;
 	int rc;
 	const char* status;
 public:
-	Transaction(LightningDb& db,unsigned int flags = 0); //MDB_RDONLY
+	LightningDb& db;
+	Transaction(LightningDb& db,unsigned int flags = MDB_RDONLY); //MDB_WRITE
 	~Transaction()
 	{	Commit();
 	}
@@ -50,6 +52,8 @@ public:
 	}
 	bool Begin(unsigned int flags = 0);
 	bool Put(Item& item,int flags = 0);
+	bool Get(Item& item);
+	bool Drop(Item& item);
 };
 
 }

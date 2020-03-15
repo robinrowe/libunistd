@@ -6,12 +6,14 @@
 #include "LightningDb.h"
 #include "Transaction.h"
 
+#define VERBOSE(x) if(db.isVerbose) puts(x)
+
 namespace lmdb {
 
 Transaction::Transaction(LightningDb& db,unsigned int flags)
 :	rc(0)
 ,	db(db)
-,	status("ok")
+,	status("LMDB: ok")
 {	if(!Begin(flags))
 	{	txn = 0;
 }	}
@@ -21,12 +23,14 @@ bool Transaction::Begin(unsigned int flags)
 //		MDB_env* env = db.GetEnv();
 	rc = mdb_txn_begin(db.GetEnv(),parent,flags,&txn);
 	const int ok = 0;
+	if(ok == rc)
+	{	VERBOSE("LMDB: Transaction ok");
+		return true;
+	}
 	switch(rc)
 	{	default:
 			status = "unknown";
 			return false;
-		case ok:
-			break;	
 		case MDB_PANIC: // A fatal error occurred earlier and the environment must be shut down.
 			status = "unknown";
 			return false;
@@ -42,12 +46,23 @@ bool Transaction::Begin(unsigned int flags)
 			return false;
 #endif
 	} 
+	VERBOSE(status);
 	return true;
 }
 
 bool Transaction::Put(Item& item,int flags)
 {	item.Set();
 	return db.Put(txn,item.GetKey(),item.GetVal());
+}
+
+bool Transaction::Get(Item& item)
+{	item.Set();
+	return db.Get(txn,item.GetKey(),item.GetVal());
+}
+
+bool Transaction::Drop(Item& item)
+{	item.Set();
+	return db.Drop(txn,item.GetKey(),item.GetVal());
 }
 
 }

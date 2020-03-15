@@ -31,15 +31,15 @@ int main(int argc,char * argv[])
 	if(!db.Open(filename,MDB_CREATE))
 	{	return open_failed;
 	}
+	lmdb::Transaction tr(db);
+	if(!tr)
+	{	return lock_failed;
+	}	
 	{	
 		ProductData data;
 		data.id = 41;
 		data.product = "Widget";
 		data.description = "Generic";
-		lmdb::Transaction tr(db);
-		if(!tr)
-		{	return lock_failed;
-		}		
 		cout << "Put: " << data << endl;
 		if(!tr.Put(data))
 		{	return write_failed;
@@ -51,8 +51,9 @@ int main(int argc,char * argv[])
 		if(!tr.Put(data))
 		{	return write_failed;
 		}
+		tr.Commit();
 	}
-	{	lmdb::Cursor cursor(db);
+	{	lmdb::Cursor cursor(db,tr,0);
 		if(!cursor)
 		{	return cursor_failed;
 		}
@@ -73,11 +74,24 @@ int main(int argc,char * argv[])
 
 /* Output:
 
+	LMDB: ok
+	LMDB: drop db failed
+	LMDB: Transaction ok
+	LMDB: open
+	LMDB: Transaction ok
 	Put: 41, Widget, Generic
+	LMDB: put ok
 	Put: 32, Gadget, Special
+	LMDB: put ok
+	LMDB: Transaction ok
+	LMDB: Cursor ok
+	LMDB: Cursor get ok
 	Cursor: 32, Gadget, Special
+	LMDB: Cursor drop ok
 	Dropped id #32
+	LMDB: Cursor get ok
 	Cursor: 41, Widget, Generic
+	LMDB: Cursor get not found
 	Done
 
 */

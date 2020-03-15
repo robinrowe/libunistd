@@ -16,7 +16,7 @@ class LightningDb;
 
 class Cursor
 {	no_copy(Cursor);
-	Transaction tr;
+	LightningDb& lightningDb;
 	MDB_cursor* mCursor;
 	int rc;
 	bool Retrieve(MDB_val* key,MDB_val* value,MDB_cursor_op op = MDB_NEXT)
@@ -24,7 +24,7 @@ class Cursor
 		return 0 == rc;
 	}
 public:
-	Cursor(LightningDb& lightningDb);
+	Cursor(LightningDb& lightningDb,Transaction& tr,int flags = MDB_RDONLY);
 	~Cursor()
 	{	Close();
 	}
@@ -38,13 +38,7 @@ public:
 	{	if(mCursor)
 		{	mdb_cursor_close(mCursor);
 		}
-		tr.Abort();
 		mCursor = 0;
-	}
-	bool Drop(bool isDelAllKeys=false)
-	{	const unsigned flags = isDelAllKeys ? 0:MDB_NODUPDATA;
-		rc = mdb_cursor_del(mCursor,flags);
-		return 0 == rc;
 	}
 	bool GetFirst(Item& item)
 	{	return Get(item,MDB_FIRST);
@@ -53,6 +47,7 @@ public:
 	{	return Get(item,MDB_LAST);
 	}
 	bool Get(Item& item,MDB_cursor_op op = MDB_NEXT);
+	bool Drop(bool isDelAllKeys=false);
 };
 
 }

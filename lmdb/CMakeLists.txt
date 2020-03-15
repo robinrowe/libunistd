@@ -20,8 +20,6 @@ set(SOURCES
 	Item.h
 	LightningDb.h
 	LightningDb.cpp
-	LmdbError.h
-	LmdbError.cpp
 	Transaction.h
 	Transaction.cpp
 )

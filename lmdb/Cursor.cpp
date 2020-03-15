@@ -5,110 +5,49 @@
 
 #include "LightningDb.h"
 
+#define VERBOSE(x) if(lightningDb.isVerbose) puts(x)
+
 namespace lmdb {
 
-Cursor::Cursor(LightningDb& lightningDb)
-:	tr(lightningDb,MDB_RDONLY)
+Cursor::Cursor(LightningDb& lightningDb,Transaction& tr,int flags)
+:	lightningDb(lightningDb)
 ,	mCursor(0)
 ,	rc(-1)
-{	if(!tr)
-	{	return;
-	}		
-	rc = mdb_cursor_open(tr,lightningDb.GetDbi(),&mCursor);
+{	rc = mdb_cursor_open(tr,lightningDb.GetDbi(),&mCursor);
+	VERBOSE("LMDB: Cursor ok");
 }
 
 bool Cursor::Get(Item& item,MDB_cursor_op op)
 {	rc = mdb_cursor_get(mCursor,item.GetKey(),item.GetVal(),op);
 	const int ok = 0;
-	if(ok != rc)
-	{	return false;
+	if(ok == rc)
+	{	VERBOSE("LMDB: Cursor get ok");
+		return item.Retrieve();
 	}
-	return item.Retrieve();
+	VERBOSE("LMDB: Cursor get not found");
+	return false;
+}
+
+bool Cursor::Drop(bool isDelAllKeys)
+{	const unsigned flags = isDelAllKeys ? 0:MDB_NODUPDATA;
+	rc = mdb_cursor_del(mCursor,flags);
+	const int ok = 0;
+	if(ok == rc)
+	{	VERBOSE("LMDB: Cursor drop ok");
+		return true;
+	}
+	switch(rc)
+	{	default:
+			VERBOSE("LMDB: Cursor unknown drop failure");
+			break;
+		case EACCES:
+			VERBOSE("LMDB: Cursor failed to write read-only transaction");
+			break;
+		case EINVAL:
+			VERBOSE("LMDB: Cursor invalid parameter");
+			break;
+	}
+	return false;
 }
 
 }
-
-#if 0
-
-
-	bool GetFirst(MDB_val* key, MDB_val* value)
-	{	return GetNext(key,value,MDB_NEXT);
-	}
-	bool GetLast(MDB_val* key, MDB_val* value)
-	{	return GetNext(key,value,MDB_LAST);
-	}
-
-template <typename T>
-struct Field2
-:	public Field
-{	Field2()
-	{}
-	Field2(T* data,size_t size)
-	{	Set(data,size);
-	}
-	void Set(T* data,size_t size)
-	{	Set(data,size);
-	}
-	const T* GetData()
-	{	return (const T*) FieldBase::GetData();
-	}
-};
-
-template <typename K>
-class Item2
-:	public Blob
-{	 
-public:
-	Field<K> key;
-	FieldBase value;
-	void Encode()
-	{	lmdb::Encode(key);
-		lmdb::Encode(value);
-	}
-	void Decode()
-	{	lmdb::Decode(key);
-		lmdb::Decode(value);
-	}
-	void Set(K* key,V* value)
-	{	this->key = key;
-		this->value = value;
-		Encode();
-	}
-	Item(K* key,V* value)
-	:	key(key)
-	,	value(value)
-	{	Encode();
-	}
-	bool Put(Transaction& t)
-	{	return t.Put(&key.mval,&value.mval);
-	}
-	void Print(std::ostream& os)
-	{	os << key.v << " = " << value.v;
-	}
-};
-
-std::ostream& operator<<(std::ostream& os,const lmdb::Item& item)
-{	return item.Print(os);
-}
-#endif
-
-#if 0
-bool LightningDb::Get(const K& key)
-{
-	this->key = key;
-	mdbKey.mv_size = sizeof(K);
-	memcpy(mdbKey.mv_data, &k, sizeof(K));
-	rc = mdb_get(lmdb.GetTxn(), lmdb.GetDbi(), &data);
-	// If the database supports duplicate keys (MDB_DUPSORT) then the first data item for 
-	// the key will be returned. Retrieval of other items requires the use of mdb_cursor_get().
-	// 0 on success. Some possible errors are:
-	// MDB_NOTFOUND - the key was not in the database.
-	// EINVAL - an invalid parameter was specified.
-	if (0 != rc)
-	{
-		return false;
-	}
-	memcpy(&v, data.mv_data, sizeof(V));
-	return true;
-}
-#endif

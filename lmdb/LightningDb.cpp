@@ -6,14 +6,22 @@
 #include "LightningDb.h"
 #include "Transaction.h"
 
+#define VERBOSE(x) if(isVerbose) puts(x)
+
 namespace lmdb {
 
 LightningDb::LightningDb()
 {	Reset();
+#ifdef _DEBUG
+	isVerbose = true;
+#endif
 	rc = mdb_env_create(&env);
 	if(0!=rc)
 	{	status = "env_create failed";
-}	}
+		VERBOSE(status);
+	}
+	VERBOSE("LMDB: ok");
+}
 
 /*
 	flags	Special options for this database. This parameter must be set to 0 or by bitwise OR'ing together one or more of the values described here.
@@ -28,6 +36,7 @@ MDB_CREATE Create the named database if it doesn't exist. This option is not all
 bool LightningDb::Open(const char* filename,int flags,size_t size)
 {	if(rc)
 	{	status = "not ready";
+		VERBOSE(status);
 		return false;
 	}
 #if 0
@@ -54,31 +63,57 @@ bool LightningDb::Open(const char* filename,int flags,size_t size)
 		dbname = sep+1;
 	}
 	dbname = 0;
-	rc = mdb_env_open(env,path,0,0664);
+	rc = mdb_env_open(env,path,MDB_NOTLS,0664);
 	if(rc)
 	{	status = "env_open failed";
+		VERBOSE(status);
 		return false;
 	}
 	Transaction tr(*this);
 	if(!tr)
 	{	status = "txn failed";
+		VERBOSE(status);
 		return false;
 	}
 	rc = mdb_dbi_open(tr,dbname,flags,&dbi);
+	const int ok = 0;
+	if(ok == rc)
+	{	VERBOSE("LMDB: open");
+		return true;
+	}
 	switch(rc)
 	{	default:
 			status = "unknown";
-			return false;
+			break;	
 		case MDB_NOTFOUND:
 			status = "not found";
-			return false;
+			break;
 		case MDB_DBS_FULL: // too many databases have been opened. See mdb_env_set_maxdbs().
 			status = "dbs_full";
-			return false;
-		case 0:
 			break;
 	}
+	VERBOSE(status);
+	return false;
+}
+
+bool LightningDb::Drop(const char* filename)
+{	const int rc = remove(filename);
+	const int ok = 0;
+	if(ok != rc)
+	{	VERBOSE("LMDB: drop db failed");
+		return false;
+	}
+	VERBOSE("LMDB: drop db ok");
 	return true;
+}
+
+void LightningDb::Close()
+{	if(env)
+	{	mdb_dbi_close(env,dbi);
+		mdb_env_close(env);
+	}
+	Reset();
+	VERBOSE("LMDB: closed");
 }
 
 /*	flags	Special options for this operation. This parameter must be set to 0 or by bitwise OR'ing together one or more of the values described here.
@@ -89,37 +124,65 @@ MDB_APPEND - append the given key/data pair to the end of the database. This opt
 MDB_APPENDDUP - as above, but for sorted dup data.
 */
 bool LightningDb::Put(MDB_txn* txn,MDB_val* key,MDB_val* value,int flags)
-{	if(!txn)
-	{	status = "txn invalid";
+{	if(IsInvalid(txn,key,value))
+	{	VERBOSE(status);
 		return false;
-	}
-	if(!key)
-	{	status = "key invalid";
-		return false;
-	}
-	if(!value)
-	{	status = "value invalid";
-		return false;
-	}
+	}	
 	rc = mdb_put(txn,dbi,key,value,flags);
 	const int ok = 0;
 	if(ok!=rc)
-	{	return false;
+	{	status = "LMDB: put failed";
+		VERBOSE(status);
+		return false;
 	}
+	VERBOSE("LMDB: put ok");
 	return true;
 }
 
-bool LightningDb::Drop(const char* filename)
-{	const int err = remove(filename);
-	return !err;
+bool LightningDb::Get(MDB_txn* txn,MDB_val* key,MDB_val* value)
+{	if(IsInvalid(txn,key,value))
+	{	VERBOSE(status);
+		return false;
+	}	
+	rc = mdb_get(txn,dbi,key,value);
+	const int ok = 0;
+	if(ok!=rc)
+	{	VERBOSE("LMDB: Get failed");
+		return false;
+	}
+	VERBOSE("LMDB: Get ok");
+	return true;
 }
 
-void LightningDb::Close()
-{	if(env)
-	{	mdb_dbi_close(env,dbi);
-		mdb_env_close(env);
+bool LightningDb::Drop(MDB_txn* txn,MDB_val* key,MDB_val* value)
+{	if(IsInvalid(txn,key,value))
+	{	VERBOSE(status);
+		return false;
+	}	
+	rc = mdb_del(txn,dbi,key,value);
+	const int ok = 0;
+	if(ok!=rc)
+	{	VERBOSE("LMDB: Drop failed");
+		return false;
 	}
-	Reset();
+	VERBOSE("LMDB: Drop ok");
+	return true;
+}
+
+bool LightningDb::IsInvalid(MDB_txn* txn,MDB_val* key,MDB_val* value)
+{	if(!txn)
+	{	status = "LMDB: txn invalid";
+		return true;
+	}
+	if(!key)
+	{	status = "LMDB: key invalid";
+		return true;
+	}
+	if(!value)
+	{	status = "LMDB: value invalid";
+		return true;
+	}
+	return false;
 }
 
 }
