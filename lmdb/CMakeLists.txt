@@ -15,10 +15,15 @@ set(LIBLMDB
 set(SOURCES
 	${LIBLMDB}
 	Cursor.h
-	Datum.h
-	Db.h
+	Cursor.cpp
+	Field.h
+	Item.h
+	LightningDb.h
+	LightningDb.cpp
+	LmdbError.h
+	LmdbError.cpp
 	Transaction.h
-	Db.cpp
+	Transaction.cpp
 )
 
 if(WIN32)

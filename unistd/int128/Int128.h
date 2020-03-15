@@ -1,4 +1,5 @@
-#pragma once
+#ifndef Int128_h
+#define Int128_h
 
 #include <limits>
 #include <locale.h>
@@ -9,7 +10,7 @@
 #include <iostream>
 #include <string>
 typedef int FormatFlags; // std::_Iosb<int>::_Fmtflags
-typedef std::streamsize            StreamSize;
+typedef std::streamsize StreamSize;
 typedef std::string String;
 #endif
 
@@ -2196,4 +2197,5 @@ public:
   static constexpr int digits10 = 39;
 };
 
+#endif
 #endif

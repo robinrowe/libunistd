@@ -69,6 +69,11 @@ UpdateCmakeSources()
 	echo "${arg}.cpp" >> ${sources}
 }
 
+CreateDocs()
+{	local docfile=CHANGES.md
+	echo "cmaker: class ${arg}" >> ${docfile}
+}
+
 main()
 {	if [ -z "$AUTHOR" ]; then 
 		echo "In bash set your name: % export AUTHOR=\"Your Name\""
@@ -88,7 +93,7 @@ main()
 		CreateFile ${test_file} "./test/test_${arg}.cpp" ${arg}
 		UpdateCmakeList $arg
 		UpdateCmakeSources $arg
-		echo "cmaker_class.sh ${arg}" >> ${CHANGES.md}
+		CreateDocs
 	done
 }
 

@@ -1,12 +1,19 @@
-// Db.cpp
+// LightningDb.cpp
 
 #include <string>
 #include <stdio.h>
 #include <lmdb.h>
-#include "Db.h"
+#include "LightningDb.h"
 #include "Transaction.h"
 
 namespace lmdb {
+
+LightningDb::LightningDb()
+{	Reset();
+	rc = mdb_env_create(&env);
+	if(0!=rc)
+	{	status = "env_create failed";
+}	}
 
 /*
 	flags	Special options for this database. This parameter must be set to 0 or by bitwise OR'ing together one or more of the values described here.
@@ -18,7 +25,7 @@ MDB_INTEGERDUP This option specifies that duplicate data items are binary intege
 MDB_REVERSEDUP This option specifies that duplicate data items should be compared as strings in reverse order.
 MDB_CREATE Create the named database if it doesn't exist. This option is not allowed in a read-only transaction or a read-only environment.
 */
-bool Db::Open(const char* filename,int flags,size_t size)
+bool LightningDb::Open(const char* filename,int flags,size_t size)
 {	if(rc)
 	{	status = "not ready";
 		return false;
@@ -81,7 +88,7 @@ MDB_RESERVE - reserve space for data of the given size, but don't copy the given
 MDB_APPEND - append the given key/data pair to the end of the database. This option allows fast bulk loading when keys are already known to be in the correct order. Loading unsorted keys with this flag will cause a MDB_KEYEXIST error.
 MDB_APPENDDUP - as above, but for sorted dup data.
 */
-bool Db::Put(MDB_txn* txn,MDB_val* key,MDB_val* value,int flags)
+bool LightningDb::Put(MDB_txn* txn,MDB_val* key,MDB_val* value,int flags)
 {	if(!txn)
 	{	status = "txn invalid";
 		return false;
@@ -95,54 +102,19 @@ bool Db::Put(MDB_txn* txn,MDB_val* key,MDB_val* value,int flags)
 		return false;
 	}
 	rc = mdb_put(txn,dbi,key,value,flags);
-	switch(rc)
-	{	default:
-			status = "unknown";
-			return false;
-		case MDB_MAP_FULL: // the database is full, see mdb_env_set_mapsize().
-			status = "map full";
-			return false;
-		case MDB_TXN_FULL: // the transaction has too many dirty pages.
-			status = "txn full";
-			return false;
-		case EACCES: // an attempt was made to write in a read-only transaction.
-			status = "access denied";
-			return false;
-		case EINVAL: // an invalid parameter was specified.
-			status = "put invalid";
-			return false;
-		case 0:
-			break;
+	const int ok = 0;
+	if(ok!=rc)
+	{	return false;
 	}
 	return true;
 }
-#if 0
-bool Db::Get(const K& key)
-{
-	this->key = key;
-	mdbKey.mv_size = sizeof(K);
-	memcpy(mdbKey.mv_data, &k, sizeof(K));
-	rc = mdb_get(lmdb.GetTxn(), lmdb.GetDbi(), &data);
-	// If the database supports duplicate keys (MDB_DUPSORT) then the first data item for 
-	// the key will be returned. Retrieval of other items requires the use of mdb_cursor_get().
-	// 0 on success. Some possible errors are:
-	// MDB_NOTFOUND - the key was not in the database.
-	// EINVAL - an invalid parameter was specified.
-	if (0 != rc)
-	{
-		return false;
-	}
-	memcpy(&v, data.mv_data, sizeof(V));
-	return true;
-}
-#endif
 
-bool Db::Drop(const char* filename)
+bool LightningDb::Drop(const char* filename)
 {	const int err = remove(filename);
 	return !err;
 }
 
-void Db::Close()
+void LightningDb::Close()
 {	if(env)
 	{	mdb_dbi_close(env,dbi);
 		mdb_env_close(env);

@@ -5,9 +5,18 @@
 #ifndef FieldMap_h
 #define FieldMap_h
 
-template <unsigned fieldCount>
+#include <map>
+
+template <class T> 
+struct string_view_compare 
+{	bool operator() (const T& x, const T& y) const 
+	{	return x.compare(y)<0;
+}	};
+
+//template <unsigned fieldCount>
 class FieldMap
-{	const char* field[fieldCount] = {};
+{	std::map<std::string_view,std::string_view,string_view_compare<std::string_view> > field;
+	//const char* field[fieldCount] = {};
 	char empty;
 	char* p;
 	const char* StripFieldname(const char* text) const
@@ -27,10 +36,12 @@ public:
 	}
 	void Clear()
 	{	p=0;
+		field.clear();
 	}
 	void Set(char* data)
 	{	p = data;
 	}
+#if 0
 	bool IsInvalid(unsigned i) const
 	{	return fieldCount<=i;
 	}
@@ -49,10 +60,14 @@ public:
 	const char* operator[](unsigned i) const
 	{	return StripFieldname(GetFieldData(i));
 	}
+
 	char* Parse(const char* fieldName,unsigned i)
-	{	if(IsInvalid(i))
+	{	
+#if 0
+		if(IsInvalid(i))
 		{	return 0;
 		}
+#endif
 		char* found = strstr(p,fieldName);
 		if(!found)
 		{	return 0;
@@ -66,6 +81,7 @@ public:
 		}
 		return found;
 	}
+#endif
 	bool AdvancePast(const char* text)
 	{	char* seek = strstr(p,text);
 		if(!seek)

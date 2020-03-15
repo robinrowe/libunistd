@@ -3,13 +3,14 @@
 // Copyright (c) 2015 Robin.Rowe@CinePaint.org
 // OpenLDAP Public License
 
-#include <lmdb/Db.h>
-#include <lmdb/Datum.h>
+#include <lmdb/LightningDb.h>
+#include <lmdb/Item.h>
 #include <lmdb/Transaction.h>
 #include <lmdb/Cursor.h>
 #include <stdio.h>
 #include <string>
 #include <iostream>
+#include "ProductData.h"
 using namespace std;
 
 enum STATUS
@@ -21,20 +22,33 @@ enum STATUS
 };
 
 int main(int argc,char * argv[])
-{	lmdb::Db db;
-	const char* filename = "/Code/github/libunistd/build/test/lmdb/data.mdb";
-//	db.Drop(filename);
-	if(!db.Open(filename))//,MDB_CREATE))
+{	lmdb::LightningDb db;
+//	const char* filename = "/Code/github/libunistd/build/test/lmdb/data.mdb";
+	const char* filename = "./test-lmdb";
+#if 1
+	db.Drop(filename);
+#endif
+	if(!db.Open(filename,MDB_CREATE))
 	{	return open_failed;
 	}
 	{	
-		lmdb::Datum<int,std::string> data(41,"Hello World");
+		ProductData data;
+		data.id = 41;
+		data.product = "Widget";
+		data.description = "Generic";
 		lmdb::Transaction tr(db);
 		if(!tr)
 		{	return lock_failed;
 		}		
 		cout << "Put: " << data << endl;
-		if(!data.Put(tr))
+		if(!tr.Put(data))
+		{	return write_failed;
+		}
+		data.id = 32;
+		data.product = "Gadget";
+		data.description = "Special";
+		cout << "Put: " << data << endl;
+		if(!tr.Put(data))
 		{	return write_failed;
 		}
 	}
@@ -42,25 +56,29 @@ int main(int argc,char * argv[])
 		if(!cursor)
 		{	return cursor_failed;
 		}
-		lmdb::Datum<int,std::string> data;
-		bool ok = data.GetFirst(cursor);
+		ProductData data;
+		bool ok = cursor.GetFirst(data);
 		while(ok)
 		{	cout << "Cursor: " << data << endl;
-			if(32==data.key.v)
-			{	cursor.DropDatum();
+			if(32==data.id)
+			{	cursor.Drop();
+				cout << "Dropped id #" << 32 << endl;
 			}
-			ok = data.GetNext(cursor);
+			ok = cursor.Get(data);
 	}	}
 	puts("Done");
 	db.Close();
 	return 0;
 }
 
-/*
-	// key: 00865FDC '020 ', data: 00865FE0 '020 3141592 foo bar'
-	// key: '020 020 3141592 foo bar', data: '020 3141592 foo bar'
-key: '32', data: '100'
-key: '41', data: '14000'
-key: '540029488', data: '540029488'
+/* Output:
+
+	Put: 41, Widget, Generic
+	Put: 32, Gadget, Special
+	Cursor: 32, Gadget, Special
+	Dropped id #32
+	Cursor: 41, Widget, Generic
+	Done
+
 */
 

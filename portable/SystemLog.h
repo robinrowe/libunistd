@@ -170,7 +170,7 @@ unsigned IsArg(const char* mode,int argc,char* argv[],bool isTerse = true)
 	return 0;
 }
 
-#define IsArgMode(mode) portable::IsArgMode(mode,argc,argv)
+#define IsArgMode(mode) portable::IsArg(mode,argc,argv)
 
 inline
 void tty_msg(const char* tag,const char* msg,const char* functionName=0,int lineNo=0)

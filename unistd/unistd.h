@@ -54,12 +54,12 @@
 #include "gettimeofday.h"
 
 // Use: cmake -A x64 ..
-#ifdef _M_X64
-#include "Int128.h"
-#endif
 
 #ifdef __cplusplus
 #include "chrono.h"
+#ifdef _M_X64
+#include "int128/Int128.h"
+#endif
 
 inline
 pid_t getpgrp() /* POSIX.1 version */

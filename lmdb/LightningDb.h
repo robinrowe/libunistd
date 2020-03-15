@@ -7,13 +7,16 @@
 #define LMDB_Db_h
 
 #include <memory.h>
-#include <lmdb.h>
 #include <portable/no_copy.h>
+#include "liblmdb/lmdb.h"
+#include "Item.h"
+#include "Transaction.h"
+#include "Cursor.h"
 
 namespace lmdb {
 
-class Db
-{	no_copy(Db);
+class LightningDb
+{	no_copy(LightningDb);
 	MDB_env* env;
 	MDB_dbi dbi;
 	int rc;
@@ -25,15 +28,10 @@ class Db
 	}
 	const char* status;
 public:
-	~Db()
+	~LightningDb()
 	{	Close();
 	}
-	Db()
-	{	Reset();
-		rc = mdb_env_create(&env);
-		if(0!=rc)
-		{	status = "env_create failed";
-	}	}
+	LightningDb();
 	const char* Status() const
 	{	return status;
 	}
@@ -43,15 +41,19 @@ public:
 	MDB_env* GetEnv()
 	{	return env;
 	}
-	operator MDB_dbi()
+	MDB_dbi GetDbi()
 	{	return dbi;
 	}
 	const char* toString() const
 	{	return mdb_strerror(rc);
 	}
+	bool SetToInMemory()
+	{	return !mdb_env_set_flags(env,MDB_NOSYNC | MDB_WRITEMAP,1);
+	}	
 	bool Drop(const char* filename);
 	bool Open(const char* filename,int flags = 0,size_t size = 1024 * 1024);
-	void Close();	bool Put(MDB_txn* txn,MDB_val* key,MDB_val* value,int flags = 0);
+	void Close();	
+	bool Put(MDB_txn* txn,MDB_val* key,MDB_val* value,int flags = 0);
 };
 
 }

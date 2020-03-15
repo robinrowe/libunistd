@@ -7,29 +7,24 @@
 #define LMDB_Cursor_h
 
 #include <portable/no_copy.h>
-#include "Db.h"
-#include "Cursor.h"
 #include "Transaction.h"
+#include "Item.h"
 
 namespace lmdb {
 
-class Db;
+class LightningDb;
 
 class Cursor
 {	no_copy(Cursor);
 	Transaction tr;
 	MDB_cursor* mCursor;
 	int rc;
-public:
-	Cursor(Db& db)
-	:	tr(db,MDB_RDONLY)
-	,	mCursor(0)
-	,	rc(-1)
-	{	if(!tr)
-		{	return;
-		}		
-		rc = mdb_cursor_open(tr,tr.db,&mCursor);
+	bool Retrieve(MDB_val* key,MDB_val* value,MDB_cursor_op op = MDB_NEXT)
+	{	rc = mdb_cursor_get(mCursor,key,value,op);
+		return 0 == rc;
 	}
+public:
+	Cursor(LightningDb& lightningDb);
 	~Cursor()
 	{	Close();
 	}
@@ -46,21 +41,18 @@ public:
 		tr.Abort();
 		mCursor = 0;
 	}
-	bool DropDatum(bool isDelAllKeys=false)
+	bool Drop(bool isDelAllKeys=false)
 	{	const unsigned flags = isDelAllKeys ? 0:MDB_NODUPDATA;
 		rc = mdb_cursor_del(mCursor,flags);
 		return 0 == rc;
 	}
-	bool GetNext(MDB_val* key,MDB_val* value,MDB_cursor_op op = MDB_NEXT)
-	{	rc = mdb_cursor_get(mCursor,key,value,op);
-		return 0 == rc;
+	bool GetFirst(Item& item)
+	{	return Get(item,MDB_FIRST);
 	}
-	bool GetFirst(MDB_val* key, MDB_val* value)
-	{	return GetNext(key,value,MDB_NEXT);
+	bool GetLast(Item& item)
+	{	return Get(item,MDB_LAST);
 	}
-	bool GetLast(MDB_val* key, MDB_val* value)
-	{	return GetNext(key,value,MDB_LAST);
-	}
+	bool Get(Item& item,MDB_cursor_op op = MDB_NEXT);
 };
 
 }
