@@ -17,14 +17,22 @@ public:
 	CLASS()
 	{}
 	bool operator!() const
-	{	return true;
+	{	// to-do
+		return true;
 	}
 	std::ostream& Print(std::ostream& os) const;
+	std::istream& Input(std::istream& is);
 };
 
 inline
 std::ostream& operator<<(std::ostream& os,const CLASS& OBJECT)
 {	return OBJECT.Print(os);
+}
+
+
+inline
+std::istream& operator>>(std::istream& is,CLASS& OBJECT)
+{	return OBJECT.Input(is);
 }
 
 #endif

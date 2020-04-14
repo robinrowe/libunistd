@@ -83,6 +83,7 @@ main()
 	ReadLicenseFile
 	CreateCmakeList
 	CreateDocs
+	echo "build/" >> .gitignore
 #	cat ${cmakelist}
 }
 

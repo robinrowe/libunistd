@@ -85,13 +85,16 @@ public:
 	,	isTrace(false)
 	,	isVerbose(false)
 	,	isAutoClose(true)
-	{}
+	{	memset(&server_sockaddr,0,sizeof(server_sockaddr));
+	}
 	BsdSocket(SOCKET socketfd)
 	:	socketfd(socketfd)
+	,	bytesRead(0)
 	,	isTrace(false)
 	,	isVerbose(false)
 	,	isAutoClose(false)
-	{}
+	{	memset(&server_sockaddr,0,sizeof(server_sockaddr));
+	}
 	void SetVerbose(bool isVerbose = true)
 	{	this->isVerbose = isVerbose;
 	}

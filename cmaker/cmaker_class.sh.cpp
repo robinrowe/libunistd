@@ -6,5 +6,11 @@
 using namespace std;
 
 ostream& CLASS::Print(ostream& os) const
-{	return os << "CLASS";
+{	// to-do
+	return os << "CLASS";
 } 
+
+istream& CLASS::Input(std::istream& is) 
+{	// to-do
+	return is;
+}

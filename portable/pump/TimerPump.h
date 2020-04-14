@@ -28,6 +28,7 @@ class TimerPump
 public:
     TimerPump(const char* pumpName)
 	:	Pump(pumpName)
+    ,   wakeDelay(0)
 	,	isTimeout(false)
 	{}
     bool Start(int millis=0,bool isJoin = false)

@@ -61,7 +61,9 @@ public:
   };
 
   // constructors
-  inline _int128() {}
+  inline _int128()
+  { memset(this,0,sizeof(*this));
+  }
   inline _int128(const unsigned __int64 &n) {
     HI64(*this) = 0;
     LO64(*this) = n;
@@ -173,8 +175,10 @@ public:
   };
 
   // constructors
-  inline _uint128() {}
-
+  inline _uint128()  {
+    HI64(*this) = 0;
+    LO64(*this) = 0;
+  }
   inline _uint128(const _int128 &n) {
     HI64(*this) = HI64(n);
     LO64(*this) = LO64(n);

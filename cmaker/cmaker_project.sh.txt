@@ -19,7 +19,7 @@ endif(NOT WIN32 AND NOT APPLE)
 
 option(UNISTD "Enable libunistd" false)
 if(UNISTD)
-	set(LIBUNISTD_PATH /code/libunistd)
+	set(LIBUNISTD_PATH /code/github/libunistd)
 	if(WIN32)
 		include_directories(${LIBUNISTD_PATH}/unistd)
 		link_directories(${LIBUNISTD_PATH}/build/unistd/Release)
@@ -30,8 +30,8 @@ endif(UNISTD)
 option(FLTK "Enable FLTK" false)
 if(FLTK)
 	set(FLTK_PATH /Code/fltk)
-	include_directories(${FLTK_PATH} ${FLTK_PATH}/build)
-	link_directories(${FLTK_PATH}/build/lib/Debug)
+	include_directories(${FLTK_PATH} ${FLTK_PATH}/fltk-build ${FLTK_PATH}/fltk-src/)
+	link_directories(${FLTK_PATH}/fltk-src/build/lib/Debug)
 	set(FLTK_LIBS
 		fltk_formsd
 		fltk_gld

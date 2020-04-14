@@ -22,15 +22,6 @@ ReadLicenseFile()
 	echo "License: ${license}"
 }
 
-LowerCase()
-{	local c=${lower:0:1}
-	local body=${lower:1}
-	local octal=$(printf '%o' "'${c}")
-	octal=$((octal + 40))
-	c=$(printf '%b' '\'${octal})
-	lower="${c}${body}"
-}
-
 Sed()
 {	local arg=$1
 	local file=$2
@@ -43,8 +34,12 @@ CreateFile()
 	local dst=$2
 	local arg=$3
 	lower=$3
+	lower="${lower,}"
+	if [ "$lower" = "$3" ]; then
+		echo "FAILED! Can't lowercase $3"
+		exit
+	fi
 	echo Creating ${dst}...
-	LowerCase
 	cp ${src} ${dst}
 	Sed "s|OBJECT|${lower}|g" ${dst}
 	Sed "s|CLASS|${arg}|g" ${dst}
@@ -56,8 +51,8 @@ CreateFile()
 UpdateCmakeList()
 {	local arg=$1
 	echo "Updating ${cmakelist} with $arg..."
-	echo "add_executable(test_${arg}_\${PROJECT_NAME} test/test_${arg}.cpp)" >> ${cmakelist}
-	echo "add_test(test_${arg}_\${PROJECT_NAME} test_${arg})" >> ${cmakelist}
+	echo "add_executable(test_${arg} test/test_${arg}.cpp)" >> ${cmakelist}
+	echo "add_test(test_${arg} test_${arg})" >> ${cmakelist}
 }
 
 UpdateCmakeSources()

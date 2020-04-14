@@ -35,14 +35,15 @@ public:
 		v[v.size()-1] = 0;
 	}
 	bool Receive()
-	{	const int bufsize = (int) v.size();
+	{	int bufsize = (int) v.size();
 		bytesRead = RecvFrom(&v[0],bufsize,0);
 		if(bytesRead<=0)
 		{	v[0] = 0;
 			return false;
 		}
 		if(bytesRead >= bufsize)
-		{	v[bufsize-1] = 0;
+		{	bufsize--;
+			v[bufsize] = 0;
 			return true;
 		}
 		v[bytesRead] = 0;

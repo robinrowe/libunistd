@@ -13,15 +13,12 @@ struct string_view_compare
 	{	return x.compare(y)<0;
 }	};
 
-//template <unsigned fieldCount>
 class FieldMap
-{	std::map<std::string_view,std::string_view,string_view_compare<std::string_view> > field;
-	//const char* field[fieldCount] = {};
-	char empty;
-	char* p;
+:	public std::map<std::string_view,std::string_view,string_view_compare<std::string_view> >
+{	char* p;
 	const char* StripFieldname(const char* text) const
 	{	if(!text)
-		{	return &empty;
+		{	return "";
 		}
 		const char* sep = strstr(text,": ");
 		if(sep)
@@ -31,15 +28,44 @@ class FieldMap
 	}
 public:
 	FieldMap()
-	{	empty = 0;
-		p = nullptr;
+	{	p = nullptr;
 	}
 	void Clear()
 	{	p=0;
-		field.clear();
+		clear();
 	}
 	void Set(char* data)
 	{	p = data;
+	}
+	std::string_view Find(const std::string_view key) const
+	{	auto it = find(key);
+		if(it == end())
+		{	return std::string_view();
+		}
+		return it->second;
+	}
+	std::string_view operator[](const std::string_view key)
+	{	return Find(key);
+	}
+	std::string_view operator[](const std::string_view key) const
+	{	return Find(key);
+	}
+	bool AdvancePast(const char* text)
+	{	char* seek = strstr(p,text);
+		if(!seek)
+		{	return false;
+		}
+		p = seek + 2;
+		return true;	
+	}
+	char* SkipWhitespace()
+	{	while(isspace(*p))
+		{	p++;
+		}
+		return p;
+	}
+	char* Find(char c)
+	{	return strchr(p,c);
 	}
 #if 0
 	bool IsInvalid(unsigned i) const
@@ -82,23 +108,6 @@ public:
 		return found;
 	}
 #endif
-	bool AdvancePast(const char* text)
-	{	char* seek = strstr(p,text);
-		if(!seek)
-		{	return false;
-		}
-		p = seek + 2;
-		return true;	
-	}
-	char* SkipWhitespace()
-	{	while(isspace(*p))
-		{	p++;
-		}
-		return p;
-	}
-	char* Find(char c)
-	{	return strchr(p,c);
-	}
 };
 
 #endif

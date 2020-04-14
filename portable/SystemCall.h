@@ -88,25 +88,25 @@ bool std_cpy(const char* start,const char* end,T& dest)
 	return true;
 }
 
-enum OS {unknown_os,android_os,linux_os,ios_os,mac_os,windows_os};
+enum class OS {unknown_os,android_os,linux_os,ios_os,mac_os,windows_os};
 
 inline 
 OS OperatingSystem()
 {
 #if defined(__ANDROID__)
-	return android_os;
+	return OS::android_os;
 #elif defined(__gnu_linux__) || defined(__linux__)
-	return linux_os;
+	return OS::linux_os;
 #elif defined(__APPLE__) && defined(__MACH__)
 #if defined(TARGET_OS_IPHONE)
-	return ios_os;
+	return OS::ios_os;
 #else
-	return mac_os;
+	return OS::mac_os;
 #endif
 #elif defined(_WIN16) || defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__) || defined(WIN32)
-	return windows_os;
+	return OS::windows_os;
 #else
-	return unknown_os;
+	return OS::unknown_os;
 #endif
 }
 

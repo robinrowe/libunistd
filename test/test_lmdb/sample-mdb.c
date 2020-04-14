@@ -41,7 +41,7 @@ int main(int argc,char * argv[])
 	int d=100;
 	data.mv_size = sizeof(int);//sizeof(sval);
 	data.mv_data = &d;//sval;
-
+#pragma warning(disable:4996)
 	sprintf(sval, "%03x %d foo bar", 32, 3141592);
 	rc = mdb_put(txn, dbi, &key, &data, 0);
 	rc = mdb_txn_commit(txn);

@@ -10,9 +10,10 @@ int main(int argc,char* argv[])
 {	cout << "Testing CLASS" << endl;
 	CLASS OBJECT;
 	if(!OBJECT)
-	{	cout << "CLASS failed, operator! == true" << endl;
+	{	cout << "CLASS failed on operator!" << endl;
 		return 1;
 	}
-	cout << OBJECT << endl << "Done!" << endl;
+	cout << OBJECT << endl;
+	cout << "CLASS Passed!" << endl;
 	return 0;
 }
