@@ -1,6 +1,6 @@
 // CLASS.h 
 // Created by AUTHOR DATE
-// License LICENSE
+// LICENSE
 
 #ifndef CLASS_h
 #define CLASS_h

@@ -10,6 +10,10 @@
 #include <string.h>
 #include "unistd.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum
 {	DT_BLK,		// This is a block device.
 	DT_CHR,		// This is a character device.
@@ -29,8 +33,18 @@ struct dirent
 	char* d_name;
 };
 
+typedef ptrdiff_t handle_type; /* C99's intptr_t not sufficiently portable */
+
 struct DIR
-{	void* p;
+{
+#ifdef GLIB_STYLE
+    handle_type         handle; /* -1 for failed rewind */
+    struct _finddata_t  info;
+    struct dirent       result; /* d_name null iff first time */
+    char                *name;  /* null-terminated char string */
+#else
+	int dummy;
+#endif
 };
 
 typedef int scandir_f(const struct dirent* d);
@@ -47,5 +61,9 @@ void rewinddir(struct DIR* dir);
 long telldir(struct DIR* dir);
 void seekdir(struct DIR* dir,long tell);
 int scandir(const char* buf,struct dirent*** namelist,scandir_f sf,scandir_alphasort af);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

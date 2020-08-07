@@ -1,6 +1,6 @@
 // test_CLASS.cpp 
 // Created by AUTHOR DATE
-// License LICENSE
+// LICENSE
 
 #include <iostream>
 #include "../CLASS.h"

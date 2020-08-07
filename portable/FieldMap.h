@@ -6,6 +6,7 @@
 #define FieldMap_h
 
 #include <map>
+#include <string_view>
 
 template <class T> 
 struct string_view_compare 
@@ -16,6 +17,7 @@ struct string_view_compare
 class FieldMap
 :	public std::map<std::string_view,std::string_view,string_view_compare<std::string_view> >
 {	char* p;
+	std::string_view empty;
 	const char* StripFieldname(const char* text) const
 	{	if(!text)
 		{	return "";
@@ -37,14 +39,21 @@ public:
 	void Set(char* data)
 	{	p = data;
 	}
-	std::string_view Find(const std::string_view key) const
+	std::string_view& Find(const std::string_view key) 
 	{	auto it = find(key);
 		if(it == end())
-		{	return std::string_view();
+		{	return empty;
 		}
 		return it->second;
 	}
-	std::string_view operator[](const std::string_view key)
+	const std::string_view& Find(const std::string_view key) const 
+	{	auto it = find(key);
+		if(it == end())
+		{	return empty;
+		}
+		return it->second;
+	}
+	std::string_view& operator[](const std::string_view key)
 	{	return Find(key);
 	}
 	std::string_view operator[](const std::string_view key) const

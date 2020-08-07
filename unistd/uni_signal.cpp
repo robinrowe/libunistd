@@ -82,8 +82,6 @@ int unsetenv(const char *name)
 	return _putenv(buf);
 }
 #pragma warning(default : 4996)
-char *optarg;
-int optind, opterr, optopt;
 
 int truncate(const char *filename,off_t length)
 {	//OFSTRUCT buffer;
@@ -103,11 +101,11 @@ int truncate(const char *filename,off_t length)
 	return ok ? 0:-1;
 }
 
-int ftruncate(int fd, off_t length)
-{	intptr_t h = _get_osfhandle(fd);
-	const BOOL ok = SetEndOfFile((HANDLE)h);
-	return ok;
-}
+//int ftruncate(int fd, off_t length)
+//{	intptr_t h = _get_osfhandle(fd);
+//	const BOOL ok = SetEndOfFile((HANDLE)h);
+//	return ok;
+//}
 
 #ifdef __cplusplus
 }

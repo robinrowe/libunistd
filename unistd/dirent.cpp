@@ -19,6 +19,8 @@
 
 typedef portable::Finder Finder;
 
+extern "C" {
+
 DIR* opendir(const char *path)
 {	errno = 0;
 	if(!path)
@@ -198,4 +200,6 @@ int scandir(const char* path, dirent*** namesList, scandir_f selector, scandir_a
 	{	qsort(names, matches, sizeof(dirent*),alphaqsort);
 	}
 	return matches;
+}
+
 }

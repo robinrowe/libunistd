@@ -111,7 +111,8 @@ class Finder
 	{	if(!entry)
 		{	return;
 		}
-		memset(&entry,0,sizeof(entry));	
+		entry->d_ino = 0;
+		entry->d_reclen = sizeof(data.cFileName);
 		entry->d_type=DT_UNKNOWN;
 		entry->d_name = data.cFileName;
 		entry->d_namlen = (unsigned short) strlen(entry->d_name);

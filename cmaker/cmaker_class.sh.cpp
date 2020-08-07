@@ -1,6 +1,6 @@
 // CLASS.cpp
 // Created by AUTHOR DATE
-// License LICENSE
+// LICENSE
 
 #include "CLASS.h"
 using namespace std;

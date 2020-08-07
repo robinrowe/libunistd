@@ -56,6 +56,17 @@
 // Use: cmake -A x64 ..
 
 #ifdef __cplusplus
+	#define CFUNC extern "C"
+#else
+	#define CFUNC extern
+#endif
+
+CFUNC char *optarg;
+CFUNC int optind;
+CFUNC int opterr;
+CFUNC int optopt;
+
+#ifdef __cplusplus
 #include "chrono.h"
 #ifdef _M_X64
 #include "int128/Int128.h"
@@ -84,16 +95,9 @@ int setpgrp(pid_t pid, pid_t pgid) /* BSD version */
 	STUB_0(setpgrp);
 }
 
-extern "C"
-{
-	extern char *optarg;
-	extern int optind, opterr, optopt;
-}
 #else
 //#define inline __inline
 	typedef long long useconds_t;
-	extern char *optarg;
-	extern int optind, opterr, optopt;
 #endif
 
 #pragma warning(disable : 4996)
@@ -190,20 +194,20 @@ size_t safe_strlen(const char* s)
 
 inline
 int uni_sscanf(char* input,const char* format,...)
-{	if(!input || !format)
+{	if(!input || !*input || !format)
 	{	return 0;
 	}
 	const size_t length = strlen(input);
 	va_list argList;
-	va_start(argList,format);
+	va_start(argList,format);// BUG/BROKEN: should be count of args, not format
 #pragma warning(disable:4996)
-	const int retval = _snscanf(input,length-1,format,argList);
+	const int retval = _snscanf(input,length,format,argList);
 	va_end(argList);
 	input[length-1]=0;
 	return retval;
 }
 
-#define sscanf uni_sscanf
+//#define sscanf uni_sscanf
 
 #undef MAX_PRIORITY /* remove winspool.h warning */
 
@@ -385,13 +389,7 @@ int getlogin_r(char *buf, size_t len)
     return ok? 0:-1;
 }
 
-inline
-int getopt(int argc, char * const argv[],const char *optstring)
-{	(void)argc;
-	(void)argv;
-	(void)optstring;
-	STUB_0(getopt);
-}
+CFUNC int getopt(int argc, char * const argv[],const char *optstring);
 
 inline
 void PrintDirectory()
@@ -755,7 +753,11 @@ int usleep(useconds_t usec)
 int setenv(const char *name, const char *value, int overwrite);
 int unsetenv(const char *name);
 int truncate(const char *path, off_t length);
-int ftruncate(int fd, off_t length);
+
+inline
+int ftruncate(int fd, off_t length)
+{	return _chsize(fd,length);
+}
 
 #ifdef __cplusplus
 }
