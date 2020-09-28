@@ -5,10 +5,15 @@
 #ifndef DLFCN_H
 #define DLFCN_H
 
+#include "unistd.h"
+
 #define dlopen(mLibName,unused) LoadLibrary(mLibName)
-#define dlsym(mHandle,funcname) GetProcAddress(HMODULE(mHandle),funcname)
-#define dlclose(mHandle) FreeLibrary(HMODULE(mHandle))
-#define dlerror() "error loading dll"
+#define dlsym(mHandle,funcname) GetProcAddress((HMODULE)(mHandle),funcname)
+#define dlclose(mHandle) FreeLibrary((HMODULE)(mHandle))
+inline
+char* dlerror() 
+{	return 0;
+}
 
 #endif
 
