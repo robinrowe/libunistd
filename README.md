@@ -28,7 +28,7 @@ Open Source MIT/BSD. In other words, you may do pretty much whatever you want wi
 
 ## Author
 
-Robin.Rowe@cinepaint.org Hollywood, California 424-777-2024
+Robin.Rowe@cinepaint.org Hollywood, California 323-535-0952
 
 ## History
 
