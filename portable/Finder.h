@@ -28,7 +28,7 @@ class Finder
 	void Reset()
 	{	memset(this,0,sizeof(*this));
 		h = INVALID_HANDLE_VALUE;
-		error = ERROR_NO_MORE_FILES;
+		error = NO_ERROR;//ERROR_NO_MORE_FILES;
 	}
 #pragma warning(disable:4996)
 #pragma warning(disable:26495)
@@ -64,14 +64,20 @@ class Finder
 		filesize.HighPart = data.nFileSizeHigh;
 		return filesize.QuadPart;
 	}
-	bool operator!() const
-	{	return h == INVALID_HANDLE_VALUE || error != ERROR_NO_MORE_FILES;
+	bool IsGood() const
+	{	if(h == INVALID_HANDLE_VALUE)
+		{	return false;
+		}
+		if(error != ERROR_NO_MORE_FILES && error != NO_ERROR)
+		{	return false;
+		}
+		return true;
 	}
 	bool IsEof() const
 	{	return error == ERROR_NO_MORE_FILES;
 	}
 	bool Read()
-	{	if(!*this)
+	{	if(!IsGood())
 		{	return false;
 		}
 		if(!tell)

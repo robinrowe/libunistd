@@ -1,1 +1,1 @@
-libunistd v1.1 2016/2/20
+libunistd v1.2 2021/06/21

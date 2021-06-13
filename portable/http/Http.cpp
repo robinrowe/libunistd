@@ -199,6 +199,9 @@ bool Http::http_put(char *data,int length,int overwrite,char *type)
  *
  * limitations: filename is truncated to first 256 characters
  */
+
+#pragma warning(disable : 4996)
+
 bool Http::http_get(char *pdata,int  *plength,char *typebuf)
 {	char header[MAXBUF];
 	char *pc;

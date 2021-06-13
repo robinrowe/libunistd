@@ -101,11 +101,17 @@ int truncate(const char *filename,off_t length)
 	return ok ? 0:-1;
 }
 
-//int ftruncate(int fd, off_t length)
-//{	intptr_t h = _get_osfhandle(fd);
-//	const BOOL ok = SetEndOfFile((HANDLE)h);
-//	return ok;
-//}
+#if 0
+int ftruncate(int fd, off_t length)
+{	intptr_t h = _get_osfhandle(fd);
+	const BOOL ok = SetEndOfFile((HANDLE)h);
+	return ok;
+}
+
+int ftruncate(int fd, off_t length)
+{	return _chsize(fd, length);
+}
+#endif
 
 #ifdef __cplusplus
 }

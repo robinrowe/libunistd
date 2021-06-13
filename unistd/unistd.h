@@ -47,6 +47,7 @@
 #include <sys/stat.h>
 #include <assert.h>
 #include <inttypes.h>
+#include <io.h>
 #include "sys/sys_types.h"
 #include "../portable/bsd_string.h"
 #include "uni_signal.h"
@@ -56,12 +57,12 @@
 // Use: cmake -A x64 ..
 
 #ifdef __cplusplus
-	#define CFUNC extern "C"
+#define CFUNC extern "C"
 #else
-	#define CFUNC extern
+#define CFUNC extern
 #endif
 
-CFUNC char *optarg;
+CFUNC const char* optarg;
 CFUNC int optind;
 CFUNC int opterr;
 CFUNC int optopt;
@@ -170,7 +171,7 @@ int fcntl(int handle,int mode,int mode2)
 //#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 inline 
-size_t safe_strlen(const char* s)
+size_t unistd_safe_strlen(const char* s)
 {	if(!s)
 	{	puts("ERROR: strlen(null)");
 		return 0;
@@ -178,10 +179,12 @@ size_t safe_strlen(const char* s)
 	return (s ? strlen(s):0);
 }
 
-//#define strlen safe_strlen
+//#define strlen unistd_safe_strlen
 //#define inet_ntop InetNtop
 
-#define bzero(address,size) memset(address,0,size)
+#define bzero(address,size) memset((address),0,size)
+#define bcmp(s1, s2, n)	memcmp ((s1), (s2), (n))
+#define bcopy(s, d, n)	memcpy ((d), (s), (n))
 #define pow10(x) pow(x,10)
 #define alloca _alloca
 
@@ -447,8 +450,8 @@ size_t confstr(int name, char *buf, size_t len)
 }
 
 inline
-char *ctermid(char *s)
-{	char* term = "/dev/tty";
+const char *ctermid(char *s)
+{	const char* term = "/dev/tty";
 	if(s)
 	{	strcpy(s,term);
 		return s;
@@ -759,11 +762,22 @@ int ftruncate(int fd, off_t length)
 {	return _chsize(fd,length);
 }
 
+inline
+int fseeko(FILE *stream, off_t offset, int whence)
+{	return fseek(stream,offset,whence);
+}
+
+inline
+off_t ftello(FILE *stream)
+{	return ftell(stream);
+}
+
 #ifdef __cplusplus
 }
 #endif
 
 #define access _access
+#define pipe(pipes) _pipe((pipes),8*1024,_O_BINARY)
 
 #pragma warning( error : 4013)
 #pragma warning( error : 4047) 

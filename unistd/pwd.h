@@ -4,6 +4,7 @@
 #define PWD_H
 
 #include "../portable/stub.h"
+#include "unistd.h"
 
 struct passwd {
 	char   *pw_name;       /* username */

@@ -23,6 +23,7 @@ set(HEADERS
 	Counter.h
 	CppTypes.h
 	endian.h
+	Finder.h
 	Folder.h
 	homedir.h
 	http/HtmlPage.h

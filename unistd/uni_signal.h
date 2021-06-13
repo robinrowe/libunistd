@@ -25,7 +25,7 @@ extern "C" {
 #define SIGQUIT NSIG+3
 #define SIGBUS NSIG+4
 #define SIGPIPE NSIG+5
-#define SIGKILL SIGTERM
+#define SIGKILL NSIG+9
 #define SIGCHLD NSIG+6
 #define SIGUSR1 NSIG+7
 #define SIGUSR2 NSIG+8

@@ -9,11 +9,11 @@ const char* _getprogname()
 {	return "getopt";
 }
 
-CFUNC int opterr = 1;		/* if error message should be printed */
-CFUNC int optind = 1;		/* index into parent argv vector */
-CFUNC int optopt = 0;			/* character checked for validity */
-CFUNC int optreset = 0;		/* reset getopt */
-CFUNC char	*optarg = "";		/* argument associated with option */
+int opterr = 1;		/* if error message should be printed */
+int optind = 1;		/* index into parent argv vector */
+int optopt = 0;			/* character checked for validity */
+int optreset = 0;		/* reset getopt */
+const char	*optarg = "";		/* argument associated with option */
 
 #define	BADCH	(int)'?'
 #define	BADARG	(int)':'
@@ -27,7 +27,7 @@ CFUNC char	*optarg = "";		/* argument associated with option */
 CFUNC int
 getopt(int nargc,char * const nargv[],const char *ostr)
 {
-	static char *place = EMSG;		/* option letter processing */
+	static const char *place = EMSG;		/* option letter processing */
 	const char *oli;				/* option letter list index */
 
 	if (optreset || *place == 0) {		/* update scanning pointer */

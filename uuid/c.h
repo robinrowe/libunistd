@@ -152,9 +152,9 @@ extern char *__progname;
 #  endif
 static char prog_inv_sh_nm_buf[256];
 static inline char *
-prog_inv_sh_nm_from_file(char *f, char stripext)
+prog_inv_sh_nm_from_file(const char *f, char stripext)
 {
-	char *t;
+	const char *t;
 
 	if ((t = strrchr(f, '/')) != NULL)
 		t++;
@@ -163,10 +163,10 @@ prog_inv_sh_nm_from_file(char *f, char stripext)
 #pragma warning(disable : 4996)
 	strncpy(prog_inv_sh_nm_buf, t, sizeof(prog_inv_sh_nm_buf) - 1);
 	prog_inv_sh_nm_buf[sizeof(prog_inv_sh_nm_buf) - 1] = '\0';
-
+#ifdef UNKNOWN_WHAT_THIS_DOES
 	if (stripext && (t = strrchr(prog_inv_sh_nm_buf, '.')) != NULL)
 		*t = '\0';
-
+#endif
 	return prog_inv_sh_nm_buf;
 }
 # endif
