@@ -6,6 +6,7 @@ message("<<< Parsing libunistd/CMakeList.txt")
 message("--- Building ${PROJECT_NAME} ${CMAKE_SYSTEM_NAME}:${CMAKE_HOST_SYSTEM_PROCESSOR}:${CMAKE_GENERATOR_TOOLSET} ---")
 
 option(UE4 "Disable _ITERATOR_DEBUG_LEVEL for UE4 compatibility" OFF)
+option(WITH_TESTS "Enable this to build the tests / examples as well." OFF)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
@@ -41,5 +42,6 @@ add_subdirectory(sqlite)
 add_subdirectory(uuid)
 add_subdirectory(regex)
 add_subdirectory(xxhash)
-
+if(WITH_TESTS)
 add_subdirectory(test)
+endif()
