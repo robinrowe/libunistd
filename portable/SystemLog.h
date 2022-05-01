@@ -10,7 +10,6 @@
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
-#include <stdio.h>
 
 #if defined(_WIN32) && defined(_DEBUG)
 #include <crtdbg.h>
