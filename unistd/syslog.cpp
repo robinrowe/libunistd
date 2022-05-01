@@ -13,7 +13,22 @@
 // debugapi.h 
 #include "../portable/SystemLog.h"
 
+#include <string>
+
 #pragma warning(disable:4996)
+
+struct Syslog_data
+{	FILE* fp;
+//	int option;
+	int facility;
+	int mask;
+	std::string ident;
+	bool isTTY;
+};
+typedef
+	struct Syslog_data
+	Syslog_data
+	;
 
 Syslog_data syslog_data;
 

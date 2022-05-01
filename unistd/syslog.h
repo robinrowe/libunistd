@@ -5,18 +5,9 @@
 #ifndef syslog_h
 #define syslog_h
 
-#include <string>
+struct Syslog_data;
 
-struct Syslog_data
-{	FILE* fp;
-//	int option;
-	int facility;
-	int mask;
-	std::string ident;
-	bool isTTY;
-};
-
-extern Syslog_data syslog_data;
+//extern Syslog_data Syslog_data;
 
 // option:
 enum 

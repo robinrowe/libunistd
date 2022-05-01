@@ -9,8 +9,8 @@
 #include <string.h>
 #include <io.h>
 #include <direct.h>
-#include <list>
-#include <string>
+//#include <list>
+//#include <string>
 #include "dirent.h"
 #include "../portable/Finder.h"
 

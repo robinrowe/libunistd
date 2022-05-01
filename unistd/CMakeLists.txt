@@ -12,6 +12,7 @@ add_library(libunistd
     dirent.cpp
 	unistd.h
 	getopt.cpp
+	pthread.cpp
 	gettimeofday.cpp
 	uni_signal.cpp
 	syslog.cpp

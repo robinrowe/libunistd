@@ -5,10 +5,7 @@
 #ifndef pthread_t_h
 #define pthread_t_h
 
-#include <thread>
-#include <system_error>
 #include "unistd.h"
-#include "../portable/Logger.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,14 +42,10 @@ enum ThreadState
 {	PTHREAD_CREATE_DETACHED,
 	PTHREAD_CREATE_JOINABLE
 };
+typedef enum ThreadState ThreadState;
 
-struct pthread_attr_t
-{	bool isJoinable;
-public:
-	pthread_attr_t()
-	:	isJoinable(true)
-	{}
-};
+struct pthread_attr;
+typedef struct pthread_attr pthread_attr_t;
 
 typedef int pthread_barrier_t;
 typedef int pthread_barrierattr_t;
@@ -92,7 +85,9 @@ struct pthread_attr_t
 struct sched_param 
 {	int sched_priority;
 };
+typedef struct sched_param sched_param;
 
+#if 0
 class PortableThread 
 :	public std::thread
 {	
@@ -104,17 +99,14 @@ public:
 		{	this->attr = *attr;
 	}	}
 };
+#else
+struct PortableThread;
+typedef struct PortableThread PortableThread;
+#endif
 
 typedef PortableThread* pthread_t;
 
-inline
-int pthread_setschedparam(pthread_t pthread, int policy, const sched_param* param)
-{	if(!pthread)
-	{	return -1;
-	}
-	HANDLE h = (HANDLE) pthread->native_handle();
-	return SetThreadPriority(h, param->sched_priority)? 0:-1;
-}
+int pthread_setschedparam(pthread_t pthread, int policy, const sched_param* param);
 
 /*	Windows Thread Priorities:
 
@@ -174,77 +166,17 @@ int pthread_attr_getschedparam(const pthread_attr_t *attr,struct sched_param *pa
 }
 
 #ifdef VERBOSE_PTHREAD
-inline
-int uni_pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg,const char* name)
-{	SysLogMsg("Thread",name); 
-	PortableThread* t=new PortableThread(attr,start_routine,arg);
-	*pthread=t;
-	if(!t->attr.isJoinable)
-	{	t->detach();
-	}
-	return 0;
-}
-
+int uni_pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg,const char* name);
 #define pthread_create(t,at,f,arg) uni_pthread_create(t,at,f,arg,#f)
 #else
-inline
-int pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg)
-{	PortableThread* t=0;
-    try 
-	{	t = new PortableThread(attr,start_routine,arg);
-    } 
-	catch(const std::system_error& e) 
-	{	printf("Caught system_error %s\n",e.what());
-		return -1;
-    }
-	*pthread=t;
-	if(!t->attr.isJoinable)
-	{	t->detach();
-	}
-	return 0;
-}
+int pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg);
 #endif
 
-inline
-int pthread_attr_setdetachstate(pthread_attr_t *attr, ThreadState detachstate)
-{	if(!attr)
-	{	return -1;
-	}
-	attr->isJoinable = (detachstate == PTHREAD_CREATE_JOINABLE);
-	return 0;
-}
+int pthread_attr_setdetachstate(pthread_attr_t *attr, ThreadState detachstate);
 
-inline
-int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate)
-{	if(!attr)
-	{	return -1;
-	}
-	if(attr->isJoinable)
-	{	*detachstate = (int) PTHREAD_CREATE_JOINABLE;
-		return true;
-	}
-	*detachstate = (int) PTHREAD_CREATE_DETACHED;
-	return 0;
-}
+int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate);
 
-
-inline
-int pthread_join(pthread_t thread, void **retval)
-{	if(!thread)
-	{	return -1;
-	}
-	if(!thread->attr.isJoinable)
-	{	return -1;
-	}
-    try 
-	{	thread->join();
-    } 
-	catch(const std::system_error& e) 
-	{	printf("Caught system_error %s\n",e.what());
-		return -1;
-    }
-	return 0;
-}
+int pthread_join(pthread_t thread, void **retval);
 
 inline
 int pthread_mutex_lock(pthread_mutex_t *mutex)
@@ -276,11 +208,7 @@ pthread_t pthread_self()
 {	STUB_0(pthread_self);
 }
 
-inline
-int pthread_detach(pthread_t thread)
-{	thread->detach();
-	return 0;
-}
+int pthread_detach(pthread_t thread);
 
 inline
 int pthread_cond_destroy(pthread_cond_t *cond)
