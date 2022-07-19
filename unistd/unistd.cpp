@@ -7,8 +7,6 @@
 #include "unistd.h"
 #include "sys/sys_types.h"
 
-#pragma comment(lib, "Ws2_32.lib")
-
 const char* optarg;
 int optind;
 int opterr;

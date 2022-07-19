@@ -27,7 +27,7 @@ if(WIN32)
 	include_directories(unistd)
 	add_subdirectory(unistd)
 	link_directories(build/win64)
-	link_libraries(libunistd)
+	link_libraries(libunistd Ws2_32)
 	message("Linking libunistd")
 endif(WIN32)
 
