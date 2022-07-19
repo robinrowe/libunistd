@@ -1,6 +1,10 @@
 #ifndef Int128_h
 #define Int128_h
 
+#ifndef __cplusplus
+#error C++ Compiler Required!
+#endif
+
 #include <limits>
 #include <locale.h>
 //#include <CommonHashFunctions.h>

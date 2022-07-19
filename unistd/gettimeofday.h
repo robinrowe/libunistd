@@ -6,23 +6,9 @@
 #define gettimeofday_h
 
 #include "../portable/stub.h"
+#include "cfunc.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-int gettimeofday(struct timeval* tv, struct timezone* tz);
-
-inline
-int settimeofday(const struct timeval *tv, const struct timezone *tz)
-{	(void)tv;
-	(void)tz;
-	STUB_NEG(0);
-}
-
-#ifdef __cplusplus
-}
-#endif
+CFUNC int gettimeofday(struct timeval* tv, struct timezone* tz);
+CFUNC int settimeofday(const struct timeval *tv, const struct timezone *tz);
 
 #endif

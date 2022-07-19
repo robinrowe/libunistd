@@ -39,7 +39,7 @@
 //__FBSDID("$FreeBSD$");
 
 #include <stdbool.h>
-
+#include <stdlib.h>
 /*
  * The matching engine and friends.  This file is #included by regexec.c
  * after suitable #defines of a variety of macros used herein, so that
@@ -292,7 +292,7 @@ matcher(struct re_guts *g,
 			dp = dissect(m, m->coldp, endp, gf, gl);
 		} else {
 			if (g->nplus > 0 && m->lastpos == NULL)
-				m->lastpos = malloc((g->nplus+1) *
+				m->lastpos = (const char**) malloc((g->nplus+1) *
 						sizeof(const char *));
 			if (g->nplus > 0 && m->lastpos == NULL) {
 				free(m->pmatch);

@@ -5,6 +5,15 @@
 project(liblmdb)
 message("--- Building library ${PROJECT_NAME} ---")
 
+message("CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
+message("BINARY_DIR = ${CMAKE_BINARY_DIR}/${CMAKE_GENERATOR_PLATFORM}")
+
+if(WIN32)
+	include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../unistd")
+	link_directories(${CMAKE_BINARY_DIR}/${CMAKE_GENERATOR_PLATFORM})
+	link_libraries(libunistd)
+endif(WIN32)
+
 set(LIBLMDB
 	${PROJECT_NAME}/lmdb.h
 	${PROJECT_NAME}/midl.h

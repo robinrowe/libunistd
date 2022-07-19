@@ -1,4 +1,4 @@
-// uni_signal.h
+// sigaction.h
 // Libunistd Copyright 2016 Robin.Rowe@CinePaint.org
 // License open source MIT 
 

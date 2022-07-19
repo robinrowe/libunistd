@@ -28,6 +28,7 @@ if(WIN32)
 	add_subdirectory(unistd)
 	link_directories(build/win64)
 	link_libraries(libunistd)
+	message("Linking libunistd")
 endif(WIN32)
 
 if(NOT WIN32 AND NOT APPLE)

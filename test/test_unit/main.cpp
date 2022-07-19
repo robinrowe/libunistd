@@ -1,7 +1,6 @@
 // test/UnitTest/main.cpp: 
 // robin.rowe@cinepaint.org 2017/3/31
 
-//#include <chrono.h>
 //#include <gettimeofday.h>
 //#include <magic.h>
 //#include <sys/sys_types.h>

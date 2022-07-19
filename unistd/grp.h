@@ -52,16 +52,28 @@ int initgroups(const char *user, gid_t group)
 }
 
 inline
-group *getgrent()
+struct group *getgrent()
 {	STUB_0(getgrent);
 }
 
+inline
 void setgrent()
 {	STUB(setgrent);
 }
 
+inline
 void endgrent()
 {	STUB(endgrent);
+}
+
+inline
+int getgroups(int size, gid_t list[])
+{	STUB_0(getgroups);
+}
+
+inline
+int setgroups(size_t size, const gid_t* list)
+{	STUB_0(setgroups);
 }
 
 #endif

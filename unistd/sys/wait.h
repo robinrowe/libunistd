@@ -7,7 +7,7 @@
 
 #include "sys/sys_types.h"
 #include "../portable/stub.h"
-#include "uni_signal.h"
+#include "sigaction.h"
 
 #define WIFEXITED(wstatus) 1
 #define WEXITSTATUS(wstatus) 0

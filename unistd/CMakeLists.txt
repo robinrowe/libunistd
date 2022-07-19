@@ -8,13 +8,22 @@ else(_M_X64)
 endif(_M_X64)
 
 add_library(libunistd
+	clock_gettime.h
+	clock_gettime.cpp
     dirent.h
     dirent.cpp
+	glob.h
+	unistd.cpp
 	unistd.h
 	getopt.cpp
 	gettimeofday.cpp
-	uni_signal.cpp
+	pthread.h
+	pthread.cpp
+	sigaction.cpp
+	sigaction.h
 	syslog.cpp
+	sys/sem.h
+	sys/sem.cpp
 	int128/Int128.h
 	${INT128_SRC}
 )

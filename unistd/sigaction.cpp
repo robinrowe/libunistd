@@ -3,7 +3,7 @@
 // License open source MIT 
 
 #include <unistd.h>
-#include <uni_signal.h>
+#include <sigaction.h>
 
 #ifdef __cplusplus
 extern "C"

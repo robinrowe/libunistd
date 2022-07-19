@@ -3,12 +3,23 @@
 // License open source MIT
 
 #include <unistd.h>
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
-int gettimeofday(struct timeval* tv, struct timezone* tz)
+#include <time.h>
+#include <iomanip>
+#include <sstream>
+
+extern "C" char* strptime(const char* s,const char* f,struct tm* tm) 
+{	// std::get_time is defined such that its format parameters are the exact same as strptime
+	std::istringstream input(s);
+	input.imbue(std::locale(setlocale(LC_ALL, nullptr)));
+	input >> std::get_time(tm, f);
+	if (input.fail()) {
+		return nullptr;
+	}
+	return (char*)(s + input.tellg());
+}
+
+extern "C" int gettimeofday(struct timeval* tv, struct timezone* tz)
 {	(void)tz;
     FILETIME ft;
 	ULARGE_INTEGER t;
@@ -24,6 +35,22 @@ int gettimeofday(struct timeval* tv, struct timezone* tz)
 	return 0;
 }
 
-#ifdef __cplusplus
+int settimeofday(const struct timeval *tv, const struct timezone *tz)
+{	(void)tv;
+	(void)tz;
+	STUB_NEG(settimeofday);
 }
+
+#if 0
+#include <chrono>
+
+int gettimeofday(struct timeval* tp, struct timezone* tzp) 
+{	namespace sc = std::chrono;
+	sc::system_clock::duration d = sc::system_clock::now().time_since_epoch();
+	sc::seconds s = sc::duration_cast<sc::seconds>(d);
+	tp->tv_sec = s.count();
+	tp->tv_usec = sc::duration_cast<sc::microseconds>(d - s).count();
+	return 0;
+}
+
 #endif
