@@ -16,6 +16,7 @@ add_library(libunistd
 	unistd.cpp
 	unistd.h
 	getopt.cpp
+	pthread.cpp
 	gettimeofday.cpp
 	pthread.h
 	pthread.cpp

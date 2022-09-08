@@ -44,5 +44,6 @@ set(SOURCES
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
-
+if(WITH_TESTS)
 add_subdirectory(test)
+endif()

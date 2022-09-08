@@ -53,5 +53,6 @@ set(INCDIR
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCDIR})
-
+if(WITH_TESTS)
 add_subdirectory(test)
+endif()
