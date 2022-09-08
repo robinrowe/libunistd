@@ -38,9 +38,9 @@ typedef enum
 	PTHREAD_CREATE_JOINABLE
 } ThreadState;
 
-typedef struct pthread_attr_t pthread_attr_t;
 typedef struct PortableThread PortableThread;
 typedef PortableThread* pthread_t;
+typedef struct pthread_attr pthread_attr_t;
 
 typedef int pthread_barrier_t;
 typedef int pthread_barrierattr_t;
@@ -58,16 +58,6 @@ typedef struct sched_param
 {	int sched_priority;
 } sched_param;
 
-inline
-void pthread_cleanup_push(void (*routine)(void *),void *arg)
-{   STUB(pthread_cleanup_push);
-}
-
-inline
-void pthread_cleanup_pop(int execute)
-{   STUB(pthread_cleanup_pop);
-}
-
 /*
 struct pthread_attr_t
 {	int __detachstate;
@@ -82,7 +72,9 @@ struct pthread_attr_t
 } ;
 */
 
-CFUNC int pthread_setschedparam(pthread_t pthread, int policy, const sched_param* param);
+struct PortableThread;
+typedef struct PortableThread PortableThread;
+typedef PortableThread* pthread_t;
 
 /*	Windows Thread Priorities:
 
@@ -96,126 +88,37 @@ CFUNC int pthread_setschedparam(pthread_t pthread, int policy, const sched_param
 
 */
 
-inline
-int pthread_equal(pthread_t t1, pthread_t t2)
-{	return t1==t2;
-}
-
-inline
-int pthread_attr_init(pthread_attr_t *attr)
-{	return 0;
-}
-
-inline
-int pthread_attr_destroy(pthread_attr_t *attr)
-{	return 0;
-}
-
-inline
-int pthread_attr_setinheritsched(pthread_attr_t *attr,int inheritsched)
-{   STUB_NEG(pthread_attr_setinheritsched);
-}
-
-inline
-int pthread_attr_getinheritsched(const pthread_attr_t *attr,int *inheritsched)
-{   STUB_NEG(pthread_attr_getinheritsched);
-}
-
-inline
-int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy)
-{   STUB_NEG(pthread_attr_setschedpolicy);
-}
-
-inline
-int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy)
-{   STUB_NEG(pthread_attr_getschedpolicy);
-}
-
-inline
-int pthread_attr_setschedparam(pthread_attr_t *attr,const sched_param *param)
-{   STUB_NEG(pthread_attr_setschedparam);
-}
-
-inline
-int pthread_attr_getschedparam(const pthread_attr_t *attr,sched_param *param)
-{   STUB_NEG(pthread_attr_getschedparam);
-}
-
+CFUNC void pthread_cleanup_push(void (*routine)(void *),void *arg);
+CFUNC void pthread_cleanup_pop(int execute);
+CFUNC int pthread_setschedparam(pthread_t pthread, int policy, const sched_param* param);
+CFUNC int pthread_setschedparam(pthread_t pthread, int policy, const sched_param* param);
+CFUNC int pthread_equal(pthread_t t1, pthread_t t2);
+CFUNC int pthread_attr_init(pthread_attr_t *attr);
+CFUNC int pthread_attr_destroy(pthread_attr_t *attr);
+CFUNC int pthread_attr_setinheritsched(pthread_attr_t *attr,int inheritsched);
+CFUNC int pthread_attr_getinheritsched(const pthread_attr_t *attr,int *inheritsched);
+CFUNC int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy);
+CFUNC int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy);
+CFUNC int pthread_attr_setschedparam(pthread_attr_t *attr,const sched_param *param);
+CFUNC int pthread_attr_getschedparam(const pthread_attr_t *attr,sched_param *param);
 CFUNC int pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg);
 CFUNC int pthread_attr_setdetachstate(pthread_attr_t *attr, ThreadState detachstate);
 CFUNC int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate);
 CFUNC int pthread_join(pthread_t thread, void **retval);
-
-inline
-int pthread_mutex_lock(pthread_mutex_t *mutex)
-{   STUB_NEG(pthread_mutex_lock);
-}
-
-inline
-int pthread_mutex_trylock(pthread_mutex_t *mutex)
-{   STUB_NEG(pthread_mutex_trylock);
-}
-
-inline
-int pthread_mutex_unlock(pthread_mutex_t *mutex)
-{   STUB_NEG(pthread_mutex_unlock);
-}
-
-inline
-void pthread_exit(void *retval)
-{   STUB(pthread_exit);
-}
-
-inline
-int pthread_cancel(pthread_t thread)
-{   STUB_NEG(pthread_cancel);
-}
-
-inline
-pthread_t pthread_self()
-{	STUB_0(pthread_self);
-}
-
+CFUNC int pthread_mutex_lock(pthread_mutex_t *mutex);
+CFUNC int pthread_mutex_trylock(pthread_mutex_t *mutex);
+CFUNC int pthread_mutex_unlock(pthread_mutex_t *mutex);
+CFUNC void pthread_exit(void *retval);
+CFUNC int pthread_cancel(pthread_t thread);
+CFUNC pthread_t pthread_self();
 CFUNC int pthread_detach(pthread_t thread);
-
-inline
-int pthread_cond_destroy(pthread_cond_t *cond)
-{	STUB_NEG(pthread_cond_destroy);
-}
-
-inline
-int pthread_cond_init(pthread_cond_t* restrict_cond,const pthread_condattr_t* restrict_attr)
-{	STUB_NEG(pthread_cond_destroy);
-}
-
-inline
-int pthread_cond_broadcast(pthread_cond_t *cond)
-{	STUB_NEG(pthread_cond_broadcast);
-}
-
-inline
-int pthread_cond_signal(pthread_cond_t *cond)
-{	STUB_NEG(pthread_cond_signal);
-}
-
-inline
-int pthread_cond_timedwait(pthread_cond_t* restrict_cond,pthread_mutex_t* restrict_mutex,const struct timespec * restrict_abstime)
-{	STUB_NEG(pthread_cond_timedwait);
-}
-
-inline
-int pthread_cond_wait(pthread_cond_t* restrict_cond,pthread_mutex_t * restrict_mutex)
-{	STUB_NEG(pthread_cond_wait);
-}
-
-inline
-int pthread_mutex_destroy(pthread_mutex_t *mutex)
-{	STUB_NEG(pthread_mutex_destroy);
-}
-
-inline
-int pthread_mutex_init(pthread_mutex_t* restrict_mutex,const pthread_mutexattr_t * restrict_attr)
-{	STUB_NEG(pthread_mutex_init);
-}
+CFUNC int pthread_cond_destroy(pthread_cond_t *cond);
+CFUNC int pthread_cond_init(pthread_cond_t* restrict_cond,const pthread_condattr_t* restrict_attr);
+CFUNC int pthread_cond_broadcast(pthread_cond_t *cond);
+CFUNC int pthread_cond_signal(pthread_cond_t *cond);
+CFUNC int pthread_cond_timedwait(pthread_cond_t* restrict_cond,pthread_mutex_t* restrict_mutex,const struct timespec * restrict_abstime);
+CFUNC int pthread_cond_wait(pthread_cond_t* restrict_cond,pthread_mutex_t * restrict_mutex);
+CFUNC int pthread_mutex_destroy(pthread_mutex_t *mutex);
+CFUNC int pthread_mutex_init(pthread_mutex_t* restrict_mutex,const pthread_mutexattr_t * restrict_attr);
 
 #endif

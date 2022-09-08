@@ -10,6 +10,10 @@
 #include <memory.h>
 #include "../portable/stub.h"
 #include "sys/sys_types.h"
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,7 +140,7 @@ int sigismember(const sigset_t *set, int signum)
 }
 
 extern void (*CtrlCHandler)(int, struct siginfo_t *, void *);
-BOOL WindowsCtrlCHandler(DWORD fdwCtrlType) ;
+BOOL WindowsCtrlCHandler(DWORD fdwCtrlType);
 int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact);
 
 inline

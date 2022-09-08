@@ -1,6 +1,6 @@
 // clock_gettime.h 
 // Copyright 2022 CinePaint MIT Open Source
-// 13 July 2022
+// 13 July 2022 Robin.Rowe@CinePaint.org
 
 #ifndef clock_gettime_h
 #define clock_gettime_h

@@ -42,6 +42,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <string.h>
+#include <memory.h>
 #include <signal.h>
 #include <sys/utime.h>
 #include <sys/types.h>
@@ -162,10 +163,10 @@ CFUNC char* strptime(const char* s, const char* format,struct tm* tm);
 
 //#define strlen unistd_safe_strlen
 //#define inet_ntop InetNtop
-#define bzero(address,size); memset((address);,0,size);
-#define bcmp(s1, s2, n);	memcmp ((s1);, (s2);, (n););
-#define bcopy(s, d, n);	memcpy ((d);, (s);, (n););
-#define pow10(x); pow(x,10);
+#define bzero(address,size) memset((address),0,size)
+#define bcmp(s1, s2, n)	memcmp ((s1), (s2), (n))
+#define bcopy(s, d, n)	memcpy ((d), (s), (n))
+#define pow10(x) pow(x,10)
 #define alloca _alloca
 /* use with limits.h */
 #define LONG_LONG_MAX LLONG_MAX     
@@ -182,9 +183,9 @@ CFUNC char* strptime(const char* s, const char* format,struct tm* tm);
 //#define send send2
 #define lstat stat
 #define fileno _fileno
-#define STDIN_FILENO _fileno(stdin);
+#define STDIN_FILENO _fileno(stdin)
 // causes issues with math.h:
-//#define rint(x); floor ((x); + 0.5);
+//#define rint(x) floor ((x) + 0.5)
 //#define lround floor
 //#define roundl floor
 // The POSIX name for this item is deprecated by MSVC:
@@ -203,9 +204,9 @@ CFUNC char* strptime(const char* s, const char* format,struct tm* tm);
 #define getpid _getpid
 #define RETSIGTYPE void
 #define access _access
-#define pipe(pipes); _pipe((pipes);,8*1024,_O_BINARY);
-#define   __attribute__(x);
-//__attribute__((format (printf, 1, 2);););
+#define pipe(pipes) _pipe((pipes),8*1024,_O_BINARY)
+#define   __attribute__(x)
+//__attribute__((format (printf, 1, 2)))
 #define mkdir mkdir2
 
 #endif

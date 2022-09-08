@@ -7,11 +7,6 @@
 #include "unistd.h"
 #include "sys/sys_types.h"
 
-const char* optarg;
-int optind;
-int opterr;
-int optopt;
-
 pid_t getpgrp() /* POSIX.1 version */
 {	STUB_0(getpgrp);
 }
@@ -512,6 +507,7 @@ long int random()
 {	return rand();
 }
 
+#if 0
 int sleep(useconds_t seconds)
 {	Sleep((DWORD)(1000*seconds));
 	return 0;
@@ -531,6 +527,7 @@ int usleep(useconds_t usec)
 	} while((time2.QuadPart-time1.QuadPart) < usec);
 	return 0;
 }
+#endif
 
 int ftruncate(int fd, off_t length)
 {	return _chsize(fd,length);
