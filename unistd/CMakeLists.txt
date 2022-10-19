@@ -25,6 +25,10 @@ add_library(libunistd
 	syslog.cpp
 	fnmatch.h
 	fnmatch.cpp
+	fts.c
+	fts.h
+	netdb.h
+	netdb.c
 	unistd.h
 	sys/sem.h
 	sys/sem.cpp

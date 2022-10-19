@@ -540,3 +540,17 @@ int fseeko(FILE *stream, off_t offset, int whence)
 off_t ftello(FILE *stream)
 {	return ftell(stream);
 }
+
+ssize_t pwrite(int fildes, const void *buf, size_t nbyte, size_t offset)
+{
+	if (nbyte == 0)
+		return 0;
+	OVERLAPPED overlapped;
+	memset(&overlapped, 0, sizeof(overlapped));
+	overlapped.Offset = static_cast<DWORD>(offset);
+	overlapped.OffsetHigh = offset >> 32;
+	DWORD written;
+	if (!WriteFile((HANDLE)_get_osfhandle(fildes), buf, static_cast<DWORD>(nbyte), &written, &overlapped))
+		return -1;
+	return written;
+}

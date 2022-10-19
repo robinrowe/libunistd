@@ -160,6 +160,8 @@ CFUNC int ftruncate(int fd, off_t length);
 CFUNC int fseeko(FILE *stream, off_t offset, int whence);
 CFUNC off_t ftello(FILE *stream);
 CFUNC char* strptime(const char* s, const char* format,struct tm* tm);
+CFUNC ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);
+
 
 //#define strlen unistd_safe_strlen
 //#define inet_ntop InetNtop
