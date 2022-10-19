@@ -554,3 +554,8 @@ ssize_t pwrite(int fildes, const void *buf, size_t nbyte, size_t offset)
 		return -1;
 	return written;
 }
+
+int setlinebuf(FILE *stream)
+{
+	return setvbuf(stream, NULL, _IONBF, 0);
+}

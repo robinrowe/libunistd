@@ -17,7 +17,7 @@ int getrandom(void *buf, size_t buflen, unsigned int flags)
     {
         if (0 != rand_s(&result[i]))
         {
-            return i * sizeof(unsigned int);
+            return static_cast<int>(i * sizeof(unsigned int));
         }
     }
 
@@ -28,11 +28,11 @@ int getrandom(void *buf, size_t buflen, unsigned int flags)
         unsigned char* remainderBuf = reinterpret_cast<unsigned char*>(buf) + buflen - remainder;
         if (0 != rand_s(&val))
         {
-            return count * sizeof(unsigned int);
+            return static_cast<int>(count * sizeof(unsigned int));
         }
 
         memcpy_s(remainderBuf, remainder, &val, remainder);
     }
 
-    return buflen;
+    return static_cast<int>(buflen);
 }

@@ -4,7 +4,7 @@
 
 #include <Shlwapi.h>
 #include "fnmatch.h"
-
+#pragma comment(lib, "shlwapi.lib")
 int fnmatch(const char *pattern, const char *string, int flags)
 {
 	BOOL match = PathMatchSpecA(string, pattern); // flags are not supported in Windows

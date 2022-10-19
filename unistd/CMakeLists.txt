@@ -34,6 +34,8 @@ add_library(libunistd
 	sys/sem.cpp
 	sys/random.h
 	sys/random.cpp
+	sys/file.h
+	sys/file.cpp
 	int128/Int128.h
 	${INT128_SRC}
 )
