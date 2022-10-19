@@ -8,6 +8,7 @@
 #define libgen_h
 
 #include <string.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,7 +18,26 @@ extern "C" {
 
 inline
 const char* dirname(char *path)
-{	return "error";
+{	
+	char drive[_MAX_DRIVE] = { 0 };
+	char dir[_MAX_DIR] = { 0 };
+	errno_t error = _splitpath_s(path, drive, _MAX_DRIVE, dir, _MAX_DIR, NULL, 0, NULL, 0);
+	if (error) {
+		return NULL;
+	}
+
+	char result[_MAX_PATH] = { 0 };
+	error = _makepath_s(result, drive, dir, NULL, NULL);
+	if (error) {
+		return NULL;
+	}
+
+	// Modifying path in-place to match GNU implementation's behavior.
+	error = strncpy_s(path, strlen(path) + 1, result, _MAX_PATH);
+	if (error && error != STRUNCATE) {
+		return NULL;
+	}
+	return path;
 }
 
 inline 

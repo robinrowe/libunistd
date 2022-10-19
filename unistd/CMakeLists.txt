@@ -23,8 +23,13 @@ add_library(libunistd
 	sigaction.cpp
 	sigaction.h
 	syslog.cpp
+	fnmatch.h
+	fnmatch.cpp
+	unistd.h
 	sys/sem.h
 	sys/sem.cpp
+	sys/random.h
+	sys/random.cpp
 	int128/Int128.h
 	${INT128_SRC}
 )
