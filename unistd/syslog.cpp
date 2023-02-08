@@ -59,22 +59,30 @@ void openlog(const char *ident, int option, int facility)
 }
 
 void syslog(int priority, const char *format, ...)
-{	if(!(syslog_data.mask & priority))
-	{	return;
-	}
+{	
 	va_list argp;
-	va_start(argp,format);
-	if(syslog_data.fp)
-	{	fprintf(syslog_data.fp,"%s: ",syslog_data.ident.c_str());
-		vfprintf(syslog_data.fp,format,argp);
-		fputs("",syslog_data.fp);
+	va_start(argp, format);
+	vsyslog(priority, format, argp);
+	va_end(argp);
+}
+
+void vsyslog(int priority, const char* format, va_list argp)
+{
+	if (!(syslog_data.mask & priority))
+	{
+		return;
+	}
+	if (syslog_data.fp)
+	{
+		fprintf(syslog_data.fp, "%s: ", syslog_data.ident.c_str());
+		vfprintf(syslog_data.fp, format, argp);
+		fputs("", syslog_data.fp);
 	}
 #ifdef _DEBUG
 	char msg[80];
-	vsprintf(msg,format,argp);
+	vsprintf(msg, format, argp);
 	OutputDebugStringA(msg);
 #endif
-	va_end(argp);
 }
 
 void closelog() 

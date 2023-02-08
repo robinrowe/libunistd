@@ -59,6 +59,7 @@ void openlog(const char *programname, int option, int facility);
 void syslog(int priority, const char *format, ...);
 void closelog();
 int setlogmask(int mask);
+void vsyslog(int priority, const char* format, va_list argp);
 
 inline
 int LOG_UPTO(const int maxMask) 
