@@ -34,7 +34,7 @@ Libunistd is being used for safety-critical Linux embedded systems. Not to deliv
 
 ## Contributors
 
-Although libunistd was predominately written by me, appreciate any good0 bug fixes, patches or pull requests. Thank you!
+Although libunistd was predominately written by me, appreciate any good bug fixes, patches or pull requests. Thank you!
 
 Approach... 
 
