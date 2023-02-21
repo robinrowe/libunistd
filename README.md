@@ -64,6 +64,8 @@ Do not use the traditional #ifdef __cplusplus guard, as this makes it difficult 
 
 Instead, use my CFUNC macro, like libunistd uses everywhere.
 
+Do not use NULL. Use 0. When returning 0 or -1 from an empty function body just to stub it out, use my STUB_* macros instead. Macros are better because it will print a warning if called at runtime and are searchable.
+
 ## Author
 
 Robin.Rowe@cinepaint.org 
