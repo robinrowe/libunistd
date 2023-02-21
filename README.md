@@ -26,10 +26,6 @@ Libunistd has some additional small libraries that are not POSIX, but can be use
 
 Open Source MIT/BSD. In other words, you may do pretty much whatever you want with libunistd. Not copyleft GNU. Similar for Qdecoder, Sqlite and xxHash, however you should check their license terms yourself as libunistd is not the owner of these other open source libraries.
 
-## Author
-
-Robin.Rowe@cinepaint.org Hollywood, California 323-535-0952
-
 ## History
 
 Libunistd was originally created to port Linux CinePaint to Windows in 2002. CinePaint is an open source HDR paint application used in making motion pictures, including the _Harry Potter_ and _Lord of the Rings_ films. Libunistd later moved from SourceForge to github and has been continuously improved, with more and more BSD and System V calls added. 
@@ -54,18 +50,23 @@ Try to match the style of existing libunistd code. Align braces. If you don't, d
 
 Do not use the Microsoft macro #pragma once. For consistency, use traditional C #ifdef guard:
 
-#ifndef filename_h 
-#define filename_h 
-#endif
+	#ifndef filename_h 
+	#define filename_h 
+	#endif
 
 ...where filename is the name of the file.
 
 Do not use the traditional #ifdef __cplusplus guard, as this makes it difficult to trace oddball C/C++ compile errors:
 
-#ifdef __cplusplus
-extern "C"
-#endif
+	#ifdef __cplusplus
+	extern "C" {
+	#endif
 
 Instead, use my CFUNC macro, like libunistd uses everywhere.
 
-+++
+## Author
+
+Robin.Rowe@cinepaint.org 
+Los Angeles, California 323-535-0952
+https://goshrobin.com
+
