@@ -8,9 +8,9 @@ Usage: Set the include path in your VC++ project to include the directory libuni
 
 	#include <unistd.h>
 
-Doing this will include the magic to make basic Linux APIs work in Windows. Because unistd.h exists in Linux as a standard header file, making this change for Windows will not break Linux code. Avoid conditionally defining \_WIN32 ugliness in your code. Simply write C++ code as you would for Linux, and it should build in Visual Studio.
+Doing this will include the magic to make basic Linux APIs work in Windows. Because unistd.h exists in Linux as a standard header file, making this change for Windows will not break Linux code. Avoid #ifdef \_WIN32 ugliness in your code. Simply write C++ code as you would for Linux, and it should build in Visual Studio for Windows.
 
-Libunisd is more than unistd.h. It implements many other header files that are POSIX standards, including pthreads.h. When porting your Linux program to Windows for the first time, you may have to include more POSIX headers in your Linux code. In Linux, some standard headers include other standard header files. As a result, sometimes Linux code will compile that's not strictly legal, that hasn't explicitly included all necessary header files. If you port Linux code to FreeBSD or Mac OS X, you may have encountered this before, that the compiler sometimes objects to unknown POSIX functions. Simple solution. Look up in the Linux man page the "unknown" function and include all the header files that the Linux man page says it requires.
+Libunisd is more than unistd.h. It implements many other header files that are POSIX standards, including pthreads.h. When porting your Linux program to Windows for the first time, you may have to include more POSIX headers than were necessary in your Linux code. In Linux, some standard headers include other standard header files. As a result, sometimes Linux code will compile that's not strictly legit, that it hasn't explicitly included all necessary header files. If you port Linux code to FreeBSD or Mac OS X, you may have encountered this before, that the compiler sometimes objects to unknown POSIX functions. Simple solution. Look up in the Linux man page the "unknown" function and include all the header files that the Linux man page says it requires.
 
 Libunistd has some additional small libraries that are not POSIX, but can be useful to those of us developing cross-platform code. Libunistd has no dependencies on these. Use them if you wish.
 
@@ -52,6 +52,7 @@ Do not use the Microsoft macro #pragma once. For consistency, use traditional C 
 
 	#ifndef filename_h 
 	#define filename_h 
+	...
 	#endif
 
 ...where filename is the name of the file.
