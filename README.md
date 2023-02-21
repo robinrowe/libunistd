@@ -36,4 +36,36 @@ Libunistd was originally created to port Linux CinePaint to Windows in 2002. Cin
 
 Libunistd is being used for safety-critical Linux embedded systems. Not to deliver a Windows build on an embedded system, rather for testing and QA of the same embedded system codebase in Windows with access to the superb Microsoft Visual Studio debugger and its excellent static code checker that detects memory overruns. 
 
+## Contributors
 
+Although libunistd was predominately written by me, appreciate any good0 bug fixes, patches or pull requests. Thank you!
+
+Approach... 
+
+I do single codebase development where the same C/C++ code will build on Linux, Windows, MacOS, BSD and Solaris. Except for Windows, the rest of those operating systems offer BSD or System V operating system libraries that make code fairly portable across UNIX-based systems. For Windows, I started implementing POSIX and pthreads calls I encountered in real world code as I ported Linux code to Windows. Because I've been doing this with libunstd over 20 years, there's a lot implemented. However, not complete coverage. When I come across a fresh group of Linux functions to implement, I often do the ones I need, and stub the rest using my STUB_* macros, as you can see in libunistd source code. I try to at least stub all of the functions in the same group, per Linux man pages. If you encounter a stubbed function and implement it, that's great.
+
+Copyright...
+
+When you are the primary author, you created the file, you may note yourself as the copyright holder. It doesn't matter legally as our license is MIT open source, just for provenance. If you are making a correction to an existing file, typically don't add your name. Am not keeping a list of contributors.
+
+Coding style...
+
+Try to match the style of existing libunistd code. Align braces. If you don't, don't be surprised if it gets filtered through a beautifier to make it match.
+
+Do not use the Microsoft macro #pragma once. For consistency, use traditional C #ifdef guard:
+
+#ifndef filename_h 
+#define filename_h 
+#endif
+
+...where filename is the name of the file.
+
+Do not use the traditional #ifdef __cplusplus guard, as this makes it difficult to trace oddball C/C++ compile errors:
+
+#ifdef __cplusplus
+extern "C"
+#endif
+
+Instead, use my CFUNC macro, like libunistd uses everywhere.
+
++++
