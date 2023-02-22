@@ -113,7 +113,7 @@ Instead, use my CFUNC macro, like libunistd uses everywhere.
 
 Do not use NULL. Use 0. When returning 0 or -1 from an empty function body just to stub it out, use my STUB_* macros instead. Macros are better because it will print a warning if called at runtime and are searchable.
 
-Do not use #pragma comment(lib,"filename.lib"), link libs via cmake, avoid hiding build commands in C/C++ code pragmas.
+Do not use #pragma comment(lib,"filename.lib"). Link libs via cmake, to avoid hiding build commands in C/C++ code pragmas.
 
 Cast away unused function parameters, to avoid parameter unused warning and to document this is intended. Like this:
 
