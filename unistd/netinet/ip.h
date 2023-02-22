@@ -14,8 +14,7 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #else
 #define inline __inline
 #endif

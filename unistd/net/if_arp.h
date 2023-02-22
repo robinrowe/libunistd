@@ -3,7 +3,8 @@
 // Copyright (c) 2019 Robin.Rowe@CinePaint.org
 // License open source MIT
 
-#pragma once
+#ifndef net_if_arp_h
+#define net_if_arp_h
 
 #include <stdint.h>
 
@@ -19,3 +20,5 @@ struct arphdr {
 	uint16_t ar_op;
 };
 #pragma pack(pop)
+
+#endif

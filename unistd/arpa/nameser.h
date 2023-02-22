@@ -3,13 +3,10 @@
 // Copyright (c) 2019 Robin.Rowe@CinePaint.org
 // License open source MIT
 
-#pragma once
+#ifndef arpa_nameser_h
+#define arpa_nameser_h
 
 #include <stdlib.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define HFIXEDSZ 12
 
@@ -52,6 +49,4 @@ typedef struct {
 #define ns_initparse(a, b, c) (-1)
 #define ns_parserr(a, b, c, d) (-1)
 
-#ifdef __cplusplus
-extern }
 #endif

@@ -3,7 +3,8 @@
 // Copyright (c) 2019 Robin.Rowe@CinePaint.org
 // License open source MIT
 
-#pragma once
+#ifndef netinet_udp_h
+#define netinet_udp_h
 
 #include <stdint.h>
 
@@ -16,3 +17,5 @@ struct udphdr {
 	uint16_t uh_sum;
 };
 #pragma pack(pop)
+
+#endif

@@ -3,16 +3,12 @@
 // Copyright (c) 2019 Robin.Rowe@CinePaint.org
 // License open source MIT
 
-#pragma once
+#ifndef netdb_h
+#define netdb_h
 
 #include <unistd.h>
+#include "cfunc.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+CFUNC struct hostent *gethostbyname2(const char *name, int af);
 
-struct hostent *gethostbyname2(const char *name, int af);
-
-#ifdef __cplusplus
-}
 #endif

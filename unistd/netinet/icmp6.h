@@ -3,7 +3,8 @@
 // Copyright (c) 2019 Robin.Rowe@CinePaint.org
 // License open source MIT
 
-#pragma once
+#ifndef netinet_icmp6_h
+#define netinet_icmp6_h
 
 #include <stdint.h>
 
@@ -40,3 +41,5 @@ struct icmp6_hdr {
 	} icmp6_dataun;
 };
 #pragma pack(pop)
+
+#endif

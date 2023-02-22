@@ -3,7 +3,8 @@
 // Copyright (c) 2019 Robin.Rowe@CinePaint.org
 // License open source MIT
 
-#pragma once
+#ifndef netinet_tcp_h
+#define netinet_tcp_h
 
 #include <stdint.h>
 
@@ -43,3 +44,5 @@ struct tcphdr {
 	uint16_t th_urp;
 };
 #pragma pack(pop)
+
+#endif
