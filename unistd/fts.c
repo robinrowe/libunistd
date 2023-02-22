@@ -7,13 +7,13 @@
 #include <stddef.h>
 
 FTS *fts_open(char * const *path_argv, int options, int (*compar)(const FTSENT **, const FTSENT **))
-{	return NULL;
+{	STUB_0(fts_open);
 }
 
 FTSENT *fts_read(FTS *ftsp)
-{	return NULL;
+{	return STUB_0(fts_read);
 }
 
 int fts_close(FTS *ftsp)
-{	return -1;
+{	return STUB_NEG(fts_close);
 }

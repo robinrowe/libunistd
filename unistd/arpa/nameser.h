@@ -34,7 +34,7 @@ typedef void ns_rr;
 #define ns_rr_type(rr)	0
 #define ns_rr_ttl(rr)	0
 #define ns_rr_rdlen(rr)	0
-#define ns_rr_rdata(rr)	NULL
+#define ns_rr_rdata(rr)	0
 
 typedef void ns_msg;
 

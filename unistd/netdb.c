@@ -9,6 +9,6 @@
 struct hostent *gethostbyname2(const char *name, int af)
 {	// Winsock's gethostbyname() only returns AF_INET addresses.
 	if ( af != AF_INET )
-		return NULL;
+		return 0;
 	return gethostbyname(name);
 }

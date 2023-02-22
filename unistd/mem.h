@@ -4,10 +4,10 @@
 #include "cfunc.h"
 
 CFUNC void* memmem(const void* haystack, size_t haystack_len, const void* needle, size_t needle_len)
-{	if (haystack == NULL) return NULL;
-	if (haystack_len == 0) return NULL;
-	if (needle == NULL) return NULL;
-	if (needle_len == 0) return NULL;
+{	if (haystack == 0) return 0;
+	if (haystack_len == 0) return 0;
+	if (needle == 0) return 0;
+	if (needle_len == 0) return 0;
 
 	for (const char* h = haystack;
 		haystack_len >= needle_len;
@@ -16,7 +16,7 @@ CFUNC void* memmem(const void* haystack, size_t haystack_len, const void* needle
 			return (void*)h;
 		}
 	}
-	return NULL;
+	return 0;
 }
 
 #endif
