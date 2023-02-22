@@ -10,7 +10,7 @@
 #ifdef _DEBUG
 #include <crtdbg.h>
 #endif
-// debugapi.h 
+// debugapi.h
 #include "../portable/SystemLog.h"
 
 #include <string>
@@ -59,22 +59,18 @@ void openlog(const char *ident, int option, int facility)
 }
 
 void syslog(int priority, const char *format, ...)
-{	
-	va_list argp;
+{	va_list argp;
 	va_start(argp, format);
 	vsyslog(priority, format, argp);
 	va_end(argp);
 }
 
 void vsyslog(int priority, const char* format, va_list argp)
-{
-	if (!(syslog_data.mask & priority))
-	{
-		return;
+{	if (!(syslog_data.mask & priority))
+	{	return;
 	}
 	if (syslog_data.fp)
-	{
-		fprintf(syslog_data.fp, "%s: ", syslog_data.ident.c_str());
+	{	fprintf(syslog_data.fp, "%s: ", syslog_data.ident.c_str());
 		vfprintf(syslog_data.fp, format, argp);
 		fputs("", syslog_data.fp);
 	}
@@ -85,7 +81,7 @@ void vsyslog(int priority, const char* format, va_list argp)
 #endif
 }
 
-void closelog() 
+void closelog()
 {	if(!syslog_data.fp)
 	{	return;
 	}
