@@ -48,8 +48,9 @@ Coding style...
 
 Try to match the style of existing libunistd code. Align braces. If your coding style looks too different, don't be surprised if it gets filtered through a beautifier to make it match libunistd style better. Something like...
 
-	UniversalIndentGUI set to: Artistic, Horstman, add-brackets, delete-empty-lines
-	https://universalindent.sourceforge.net/
+* UniversalIndentGUI 
+ Set to: Artistic, Horstman, add-brackets, delete-empty-lines
+ https://universalindent.sourceforge.net/
 
 Do not use the Microsoft macro #pragma once. For consistency, use traditional C #ifdef guard:
 
