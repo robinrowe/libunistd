@@ -74,7 +74,7 @@ Assignment of copyright, if necessary because the file is being contributed by a
 
 ...note that the original copyright date is preserved, although the original author employee's name is not.
 
-If copying an open source file from another source, when you are not the author or owner, preserve whatever header the file already has, add our standard header format above it, modifying if necessary, and include the URL or wherever this file name from, preserve provenance. When copying a file from somewhere else, are not the author, leave the code formatting as is. You can't assign copyright if you're not the owner.
+If copying an open source file from another source, when you are not the author or owner, preserve whatever header the file already has, add our standard header format above it, modifying if necessary, and include the URL or wherever this file name from, preserve provenance. When copying a file from somewhere else, are not the author, leave the code formatting as is. You can't assign copyright if you're not the owner. It needs to be clear who the original copyright holder is, where the file came from. To be able to prove that there is no infringement.
 
 Coding style...
 
