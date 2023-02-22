@@ -32,6 +32,10 @@ Libunistd was originally created to port Linux CinePaint to Windows in 2002. Cin
 
 Libunistd is being used for safety-critical Linux embedded systems. Not to deliver a Windows build on an embedded system, rather for testing and QA of the same embedded system codebase in Windows with access to the superb Microsoft Visual Studio debugger and its excellent static code checker that detects memory overruns. 
 
+Article About Libunistd...
+
+https://goshrobin.com/cmaker-and-libunistd-presented-to-academy-software-foundation/
+
 ## Contributors
 
 Although libunistd was predominately written by me, appreciate any good bug fixes, patches or pull requests. Thank you!
