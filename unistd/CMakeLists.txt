@@ -40,4 +40,5 @@ add_library(libunistd
 )
 
 target_include_directories(libunistd PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(libunistd LINK_PUBLIC shlwapi)
 target_link_libraries(libunistd LINK_PUBLIC libportable)
