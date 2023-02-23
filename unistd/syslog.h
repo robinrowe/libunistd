@@ -10,7 +10,7 @@ struct Syslog_data;
 //extern Syslog_data Syslog_data;
 
 // option:
-enum 
+enum
 {	LOG_CONS = 1,
 	LOG_NDELAY = 2,
 	LOG_NOWAIT = 4,
@@ -62,7 +62,7 @@ int setlogmask(int mask);
 void vsyslog(int priority, const char* format, va_list argp);
 
 inline
-int LOG_UPTO(const int maxMask) 
+int LOG_UPTO(const int maxMask)
 {	const int mask = ((1<<((maxMask)+1))-1);
 	return mask;
 }

@@ -41,8 +41,8 @@ typedef void ns_msg;
 #define ns_msg_count(handle, section) 0
 #define ns_msg_getflag(handle, flag) 0
 
-typedef struct {
-	int id;
+typedef struct
+{	int id;
 } HEADER;
 
 #define ns_initparse(a, b, c) (-1)

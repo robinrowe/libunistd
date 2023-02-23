@@ -23,8 +23,8 @@
 
 // Modification: Memory packing is needed for cross-platform buffer evaluation.
 #pragma pack(push, 1)
-struct tcphdr {
-	uint16_t th_sport;
+struct tcphdr
+{	uint16_t th_sport;
 	uint16_t th_dport;
 	uint32_t th_seq;
 	uint32_t th_ack;

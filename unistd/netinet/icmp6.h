@@ -29,12 +29,12 @@
 
 // Modification: Memory packing is needed for cross-platform buffer evaluation.
 #pragma pack(push, 1)
-struct icmp6_hdr {
-	uint8_t  icmp6_type;
+struct icmp6_hdr
+{	uint8_t  icmp6_type;
 	uint8_t  icmp6_code;
 	uint16_t icmp6_cksum;
-	union {
-		uint32_t icmp6_un_data32[1];
+	union
+	{	uint32_t icmp6_un_data32[1];
 		uint16_t icmp6_un_data16[2];
 		uint8_t  icmp6_un_data8[4];
 	} icmp6_dataun;

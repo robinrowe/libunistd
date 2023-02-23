@@ -53,7 +53,8 @@ void openlog(const char *ident, int option, int facility)
 		if(!syslog_data.fp)
 		{	error_msg(err);
 			return;
-	}	}
+		}
+	}
 	// syslog_option = option;
 	// syslog_facility = facility;
 }

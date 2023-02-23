@@ -14,7 +14,8 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #else
 #define inline __inline
 #endif
@@ -22,8 +23,7 @@ extern "C" {
 // Modification: Memory packing is needed for cross-platform buffer evaluation.
 #pragma pack(push, 1)
 struct ip
-{
-	// Use uint8_t instead of unsigned for ip_hl and ip_v so they
+{	// Use uint8_t instead of unsigned for ip_hl and ip_v so they
 	// occupy one byte instead of four on Windows.  (MSVC allocates
 	// space sufficient for the bit field's type rather than its
 	// width.  This corresponds to GCC's -mms-bitfields option,

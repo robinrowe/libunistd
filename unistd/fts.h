@@ -10,12 +10,12 @@
 #define FTS_F 0
 #define FTS_NOCHDIR 0
 
-typedef struct {
-	int unused;
+typedef struct
+{	int unused;
 } FTS;
 
-typedef struct {
-	unsigned short fts_info;
+typedef struct
+{	unsigned short fts_info;
 	char * fts_path;
 } FTSENT;
 

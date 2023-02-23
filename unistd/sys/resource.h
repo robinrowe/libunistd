@@ -29,7 +29,6 @@ usage_to_timeval(FILETIME* ft, struct timeval* tv)
 {	ULARGE_INTEGER time;
 	time.LowPart = ft->dwLowDateTime;
 	time.HighPart = ft->dwHighDateTime;
-
 	tv->tv_sec = time.QuadPart / 10000000;
 	tv->tv_usec = (time.QuadPart % 10000000) / 10;
 }
@@ -40,8 +39,8 @@ usage_to_timeval(FILETIME* ft, struct timeval* tv)
 
 typedef unsigned long long rlim_t;
 
-struct rlimit {
-	rlim_t rlim_cur;
+struct rlimit
+{	rlim_t rlim_cur;
 	rlim_t rlim_max;
 };
 
@@ -52,8 +51,8 @@ int setrlimit(int resource, const struct rlimit* rlp);
 #define RUSAGE_CHILDREN (-1)
 #define RUSAGE_THREAD   1
 
-struct rusage {
-	struct timeval ru_utime;
+struct rusage
+{	struct timeval ru_utime;
 	struct timeval ru_stime;
 	long ru_maxrss;
 	long ru_ixrss;
@@ -75,21 +74,17 @@ inline
 int getrusage(int who, struct rusage* usage)
 {	FILETIME creation_time, exit_time, kernel_time, user_time;
 	PROCESS_MEMORY_COUNTERS_EX pmc;
-
 	memset(usage, 0, sizeof(struct rusage));
-
-	if (who == RUSAGE_SELF) {
-		if (!GetProcessTimes(GetCurrentProcess(), &creation_time, &exit_time,
-			&kernel_time, &user_time)) {
-			return -1;
+	if (who == RUSAGE_SELF)
+	{	if (!GetProcessTimes(GetCurrentProcess(), &creation_time, &exit_time,
+							 &kernel_time, &user_time))
+		{	return -1;
 		}
-
 		if (!GetProcessMemoryInfo(GetCurrentProcess(),
-			reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc),
-			sizeof(PROCESS_MEMORY_COUNTERS))) {
-			return -1;
+								  reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc),
+								  sizeof(PROCESS_MEMORY_COUNTERS)))
+		{	return -1;
 		}
-
 		usage_to_timeval(&kernel_time, &usage->ru_stime);
 		usage_to_timeval(&user_time, &usage->ru_utime);
 		usage->ru_majflt = pmc.PageFaultCount;
@@ -97,17 +92,17 @@ int getrusage(int who, struct rusage* usage)
 		usage->ru_ixrss = pmc.PrivateUsage / 1024;
 		return 0;
 	}
-	else if (who == RUSAGE_THREAD) {
-		if (!GetThreadTimes(GetCurrentThread(), &creation_time, &exit_time,
-			&kernel_time, &user_time)) {
-			return -1;
+	else if (who == RUSAGE_THREAD)
+	{	if (!GetThreadTimes(GetCurrentThread(), &creation_time, &exit_time,
+							&kernel_time, &user_time))
+		{	return -1;
 		}
 		usage_to_timeval(&kernel_time, &usage->ru_stime);
 		usage_to_timeval(&user_time, &usage->ru_utime);
 		return 0;
 	}
-	else {
-		return -1;
+	else
+	{	return -1;
 	}
 }
 
@@ -121,7 +116,7 @@ int getrlimit(int resource, struct rlimit* rlim)
 
 inline
 int setrlimit(int resource, const struct rlimit* rlim)
-{   STUB_NEG(setrlimit);
+{	STUB_NEG(setrlimit);
 }
 
 #ifdef __cplusplus
