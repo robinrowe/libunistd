@@ -1,5 +1,5 @@
 // sys/file.cpp
-// 2022/10/19 tomerlev@microsoft.com
+// Copyright (c) 2022/10/19 Tomer Lev <tomerlev@microsoft.com>
 // License open source MIT
 
 #include <unistd.h>
