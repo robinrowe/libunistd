@@ -1,6 +1,5 @@
 // arpa/nameser.h
-// Provided by brimdata on 2022/10/19
-// Copyright (c) 2019 Robin.Rowe@CinePaint.org
+// Copyright (c) 2022/10/19 Noah Treuhaft <noah@brimdata.io>
 // License open source MIT
 
 #ifndef arpa_nameser_h
