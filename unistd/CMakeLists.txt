@@ -1,4 +1,6 @@
 # libunistd/unistd/CMakeLists.txt
+# Copyright 2016 Robin.Rowe@cinepaint.org
+# License MIT open source
 
 if(_M_X64)
 	enable_language(ASM_MASM)
@@ -7,34 +9,9 @@ else(_M_X64)
 	set(INT128_SRC int128/Int128x86.cpp)
 endif(_M_X64)
 
-add_library(libunistd
-	clock_gettime.h
-	clock_gettime.cpp
-	dirent.h
-	dirent.cpp
-	glob.h
-	unistd.cpp
-	unistd.h
-	getopt.cpp
-	pthread.cpp
-	gettimeofday.cpp
-	pthread.h
-	pthread.cpp
-	sigaction.cpp
-	sigaction.h
-	fnmatch.h
-	fnmatch.cpp
-	fts.c
-	fts.h
-	netdb.h
-	netdb.c
-	syslog.cpp
-	sys/sem.h
-	sys/sem.cpp
-	sys/random.h
-	sys/random.cpp
-	sys/file.h
-	sys/file.cpp
+file(STRINGS sources.cmake SOURCES)
+add_library(libunistd 
+	${SOURCES}
 	int128/Int128.h
 	${INT128_SRC}
 )
