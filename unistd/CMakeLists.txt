@@ -10,8 +10,8 @@ endif(_M_X64)
 add_library(libunistd
 	clock_gettime.h
 	clock_gettime.cpp
-    dirent.h
-    dirent.cpp
+	dirent.h
+	dirent.cpp
 	glob.h
 	unistd.cpp
 	unistd.h
@@ -22,12 +22,23 @@ add_library(libunistd
 	pthread.cpp
 	sigaction.cpp
 	sigaction.h
+	fnmatch.h
+	fnmatch.cpp
+	fts.c
+	fts.h
+	netdb.h
+	netdb.c
 	syslog.cpp
 	sys/sem.h
 	sys/sem.cpp
+	sys/random.h
+	sys/random.cpp
+	sys/file.h
+	sys/file.cpp
 	int128/Int128.h
 	${INT128_SRC}
 )
 
 target_include_directories(libunistd PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(libunistd LINK_PUBLIC shlwapi)
 target_link_libraries(libunistd LINK_PUBLIC libportable)
