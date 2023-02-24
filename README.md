@@ -46,7 +46,7 @@ I do single codebase development where the same C/C++ code will build on Linux, 
 
 Copyright and Standard Heading Format on All C/C++ Files...
 
-When you are the original author, you created the file, you may note yourself as the copyright holder. It doesn't matter to libunistd users as our license is MIT open source. However, for provenance, someone needs to assert as being the copyright owner. If you are making a correction to an existing file, typically don't add your name. Not keeping a list of contributors. 
+When you are the original author, you created the file, you may note yourself as the copyright holder. It doesn't matter to libunistd users as our license is MIT open source. However, for provenance, someone needs to assert as being the copyright owner. If you are making a correction to an existing file, typically don't add your name. 
 
 Like this:
 
