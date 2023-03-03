@@ -6,6 +6,7 @@
 #define sys_sys_types_h
 
 #include <stdint.h>
+#include "../linux/limits.h"
 
 typedef intptr_t pid_t;
 typedef int gid_t;
@@ -97,7 +98,7 @@ enum {
 	S_ISVTX
 };
 
-#define PATH_MAX 255
+// #define PATH_MAX 255
 
 #define EBADFD 200
 #define ESHUTDOWN 201

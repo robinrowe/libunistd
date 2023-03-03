@@ -5,13 +5,10 @@
 
 #include "../portable/stub.h"
 
-#ifdef __cplusplus
-extern "C" {
-#else
+#ifndef __cplusplus
 #define inline __inline
 #endif
 
-#define PACKAGE "English"
 #if 0
 #define PACKAGE IntlGetPackage()
 
@@ -27,17 +24,19 @@ const char* bindtextdomain(const char* package, const char* localdir)
 }
 
 inline
-void textdomain(const char* package)
-{   STUB(textdomain);
+char* textdomain(const char* package)
+{   STUB_0(textdomain);
 }
 
 inline
-char const* gettext(char const * text)
+char const* gettext(char const* text)
 {	return text;
 }
 
-#ifdef __cplusplus
-}
-#endif
+#define gettext_noop(String) (String)
+
+#define dgettext(Domain,Message) (char *) (Message)
+#define dcgettext(Domain,Message,Type) (char *) (Message)
+#define bindtextdomain(Domain,Directory) (Domain)
 
 #endif

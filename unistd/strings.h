@@ -6,27 +6,21 @@
 #define strings_h
 
 #include "../portable/stub.h"
+#include "cfunc.h"
 
-#ifdef __cplusplus
-extern "C" {
-#else
-#define inline __inline
-#endif
-
+inline
 int ffs(int i)
 {   STUB_NEG(ffs);
 }
 
+inline
 int ffsl(long int i)
 {   STUB_NEG(ffsl);
 }
 
+inline
 int ffsll(long long int i)
 {   STUB_NEG(ffsll);
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
