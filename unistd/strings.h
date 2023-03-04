@@ -5,6 +5,7 @@
 #ifndef strings_h
 #define strings_h
 
+#include <string.h>
 #include "../portable/stub.h"
 #include "cfunc.h"
 
@@ -21,6 +22,16 @@ int ffsl(long int i)
 inline
 int ffsll(long long int i)
 {   STUB_NEG(ffsll);
+}
+
+inline
+int strcasecmp(const char *s1, const char *s2)
+{	return stricmp(s1,s2);
+}
+
+inline
+int strncasecmp(const char *s1, const char *s2, size_t n)
+{	return strnicmp(s1,s2,n);
 }
 
 #endif
