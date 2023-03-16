@@ -209,7 +209,7 @@ char* realpath(const char *path, char *resolved_path)
 	{	return 0;
 	}
 	const DWORD  err = GetFullPathNameA(path,(DWORD) PATH_MAX,resolved_path,0);
-	if(err)
+	if(err == 0)
 	{	return 0;
 	}
 	return resolved_path;
