@@ -177,7 +177,6 @@ CFUNC int vasprintf(char **strp, const char *fmt, va_list ap);
 #define LONG_LONG_MAX LLONG_MAX     
 #define LONG_LONG_MIN LLONG_MIN     
 #define strdup _strdup
-#define vsnprintf _vsnprintf
 //#define sscanf uni_sscanf
 #undef MAX_PRIORITY /* remove winspool.h warning */
 #ifndef strcasecmp
