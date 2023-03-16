@@ -37,7 +37,6 @@
 #include <direct.h>
 #include <winerror.h>
 #include <memory.h>
-#include <mswsock.h> //for SO_UPDATE_ACCEPT_CONTEXT
 #include <Ws2tcpip.h>//for InetNtop
 #include <ctype.h>
 #include <time.h>
