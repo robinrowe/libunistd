@@ -2,12 +2,16 @@
 #define socket_h
 
 #define WIN32_LEAN_AND_MEAN
+#define CONST const
 #include <winsock2.h>
 #include <windows.h>
+#define VOID void
 #include <Mstcpip.h>
 #include <Ws2tcpip.h>
+#undef VOID
 #include <stdint.h>
 #include "../portable/stub.h"
+#undef CONST
 
 #ifdef __cplusplus
 extern "C" {
