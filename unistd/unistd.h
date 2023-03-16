@@ -163,6 +163,8 @@ CFUNC int fseeko(FILE *stream, off_t offset, int whence);
 CFUNC off_t ftello(FILE *stream);
 CFUNC char* strptime(const char* s, const char* format,struct tm* tm);
 CFUNC ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset);
+CFUNC int setlinebuf(FILE *stream);
+CFUNC int vasprintf(char **strp, const char *fmt, va_list ap);
 
 //#define strlen unistd_safe_strlen
 //#define inet_ntop InetNtop
