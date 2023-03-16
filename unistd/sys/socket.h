@@ -38,6 +38,10 @@ typedef int caddr_t;
 
 // The ioctlsocket function and the WSAIoctl function handle socket functions that were performed by IOCTL and fcntl in BSD
 
+inline int inet_aton(const char* cp, struct in_addr* inp)
+{	return inet_pton(AF_INET, cp, inp);
+}
+
 #ifdef __cplusplus
 }
 #endif
