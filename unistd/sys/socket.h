@@ -38,7 +38,7 @@ struct msghdr
 	int msg_flags;
 };
 
-typedef int caddr_t;
+typedef uint8_t* caddr_t;
 
 // The ioctlsocket function and the WSAIoctl function handle socket functions that were performed by IOCTL and fcntl in BSD
 
