@@ -46,6 +46,10 @@ SIGTERM Termination request
 */
 
 #define WNOHANG 0
+#define SIG_UNBLOCK 1
+#define SIG_BLOCK 2
+#define WIFSIGNALED() false
+#define WTERMSIG() 0
 
 typedef struct siginfo_t siginfo_t;
 
