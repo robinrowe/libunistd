@@ -28,12 +28,13 @@ int setpgrp(pid_t pid, pid_t pgid) /* BSD version */
 
 #pragma warning(disable : 4996)
 
-/*
-inline
 int read(int fh,void* buf,unsigned count)
 {	return _read(fh,buf,count);
 }
-*/
+
+int pipe(int pipes[2])
+{	return _pipe((pipes), 8*1024, _O_BINARY);
+}
 
 int snprintb(char *buf, size_t buflen, const char *fmt, uint64_t val)
 {	(void)buf;
