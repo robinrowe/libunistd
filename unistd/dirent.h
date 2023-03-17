@@ -25,13 +25,13 @@ enum
 	DT_UNKNOWN	// The file type could not be determined.
 };
 
-struct dirent
+typedef struct dirent
 {	long d_ino;
 	unsigned short d_reclen;
 	unsigned short d_namlen;
 	unsigned char d_type;
 	char* d_name;
-};
+} dirent;
 
 typedef ptrdiff_t handle_type; /* C99's intptr_t not sufficiently portable */
 
