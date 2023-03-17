@@ -1,6 +1,6 @@
 /* mdb_load.c - memory-mapped database load tool */
 /*
- * Copyright 2011-2018 Howard Chu, Symas Corp.
+ * Copyright 2011-2021 Howard Chu, Symas Corp.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@ static int Eof;
 static MDB_envinfo info;
 
 static MDB_val kbuf, dbuf;
+static MDB_val k0buf;
 
 #ifdef _WIN32
 #define Z	"I"
@@ -63,9 +64,6 @@ flagbit dbflags[] = {
 	{ MDB_REVERSEDUP, S("reversedup") },
 	{ 0, NULL, 0 }
 };
-
-#pragma warning(disable:4669)
-#pragma warning(disable:4267)
 
 static void readhdr(void)
 {
@@ -241,7 +239,7 @@ badend:
 		while (c2 < end) {
 			if (*c2 == '\\') {
 				if (c2[1] == '\\') {
-					c1++; c2 += 2;
+					*c1++ = *c2;
 				} else {
 					if (c2+3 > end || !isxdigit(c2[1]) || !isxdigit(c2[2])) {
 						Eof = 1;
@@ -249,8 +247,8 @@ badend:
 						return EOF;
 					}
 					*c1++ = unhex(++c2);
-					c2 += 2;
 				}
+				c2 += 2;
 			} else {
 				/* copies are redundant when no escapes were used */
 				*c1++ = *c2++;
@@ -281,8 +279,13 @@ badend:
 
 static void usage(void)
 {
-	fprintf(stderr, "usage: %s [-V] [-f input] [-n] [-s name] [-N] [-T] dbpath\n", prog);
+	fprintf(stderr, "usage: %s [-V] [-a] [-f input] [-n] [-s name] [-N] [-T] dbpath\n", prog);
 	exit(EXIT_FAILURE);
+}
+
+static int greater(const MDB_val *a, const MDB_val *b)
+{
+	return 1;
 }
 
 int main(int argc, char *argv[])
@@ -293,8 +296,9 @@ int main(int argc, char *argv[])
 	MDB_cursor *mc;
 	MDB_dbi dbi;
 	char *envname;
-	int envflags = 0, putflags = 0;
-	int dohdr = 0;
+	int envflags = MDB_NOSYNC, putflags = 0;
+	int dohdr = 0, append = 0;
+	MDB_val prevk;
 
 	prog = argv[0];
 
@@ -302,18 +306,22 @@ int main(int argc, char *argv[])
 		usage();
 	}
 
-	/* -f: load file instead of stdin
+	/* -a: append records in input order
+	 * -f: load file instead of stdin
 	 * -n: use NOSUBDIR flag on env_open
 	 * -s: load into named subDB
 	 * -N: use NOOVERWRITE on puts
 	 * -T: read plaintext
 	 * -V: print version and exit
 	 */
-	while ((i = getopt(argc, argv, "f:ns:NTV")) != EOF) {
+	while ((i = getopt(argc, argv, "af:ns:NTV")) != EOF) {
 		switch(i) {
 		case 'V':
 			printf("%s\n", MDB_VERSION_STRING);
 			exit(0);
+			break;
+		case 'a':
+			append = 1;
 			break;
 		case 'f':
 			if (freopen(optarg, "r", stdin) == NULL) {
@@ -373,11 +381,16 @@ int main(int argc, char *argv[])
 	}
 
 	kbuf.mv_size = mdb_env_get_maxkeysize(env) * 2 + 2;
-	kbuf.mv_data = malloc(kbuf.mv_size);
+	kbuf.mv_data = malloc(kbuf.mv_size * 2);
+	k0buf.mv_size = kbuf.mv_size;
+	k0buf.mv_data = (char *)kbuf.mv_data + kbuf.mv_size;
+	prevk.mv_data = k0buf.mv_data;
 
 	while(!Eof) {
 		MDB_val key, data;
 		int batch = 0;
+		flags = 0;
+		int appflag;
 
 		if (!dohdr) {
 			dohdr = 1;
@@ -394,6 +407,12 @@ int main(int argc, char *argv[])
 		if (rc) {
 			fprintf(stderr, "mdb_open failed, error %d %s\n", rc, mdb_strerror(rc));
 			goto txn_abort;
+		}
+		prevk.mv_size = 0;
+		if (append) {
+			mdb_set_compare(txn, dbi, greater);
+			if (flags & MDB_DUPSORT)
+				mdb_set_dupsort(txn, dbi, greater);
 		}
 
 		rc = mdb_cursor_open(txn, dbi, &mc);
@@ -413,7 +432,20 @@ int main(int argc, char *argv[])
 				goto txn_abort;
 			}
 
-			rc = mdb_cursor_put(mc, &key, &data, putflags);
+			if (append) {
+				appflag = MDB_APPEND;
+				if (flags & MDB_DUPSORT) {
+					if (prevk.mv_size == key.mv_size && !memcmp(prevk.mv_data, key.mv_data, key.mv_size))
+						appflag = MDB_CURRENT|MDB_APPENDDUP;
+					else {
+						memcpy(prevk.mv_data, key.mv_data, key.mv_size);
+						prevk.mv_size = key.mv_size;
+					}
+				}
+			} else {
+				appflag = 0;
+			}
+			rc = mdb_cursor_put(mc, &key, &data, putflags|appflag);
 			if (rc == MDB_KEYEXIST && putflags)
 				continue;
 			if (rc) {
@@ -437,6 +469,10 @@ int main(int argc, char *argv[])
 				if (rc) {
 					fprintf(stderr, "mdb_cursor_open failed, error %d %s\n", rc, mdb_strerror(rc));
 					goto txn_abort;
+				}
+				if (appflag & MDB_APPENDDUP) {
+					MDB_val k, d;
+					mdb_cursor_get(mc, &k, &d, MDB_LAST);
 				}
 				batch = 0;
 			}

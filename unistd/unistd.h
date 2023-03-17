@@ -208,6 +208,7 @@ CFUNC char* strptime(const char* s, const char* format,struct tm* tm);
 #define   __attribute__(x)
 //__attribute__((format (printf, 1, 2)))
 #define mkdir mkdir2
+#define fileno _fileno
 
 #endif
 

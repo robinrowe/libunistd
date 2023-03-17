@@ -1,6 +1,6 @@
 /* mdb_stat.c - memory-mapped database status tool */
 /*
- * Copyright 2011-2018 Howard Chu, Symas Corp.
+ * Copyright 2011-2021 Howard Chu, Symas Corp.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -178,7 +178,6 @@ int main(int argc, char *argv[])
 				char *bad = "";
 				size_t pg, prev;
 				ssize_t i, j, span = 0;
-#pragma warning(disable:4267)
 				j = *iptr++;
 				for (i = j, prev = 1; --i >= 0; ) {
 					pg = iptr[i];

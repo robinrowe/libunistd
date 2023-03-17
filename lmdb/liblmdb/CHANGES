@@ -1,5 +1,35 @@
 LMDB 0.9 Change Log
 
+LMDB 0.9.30 Release (2023/02/08)
+	ITS#9806 - LMDB page_split: key threshold depends on page size
+	ITS#9916 - avoid gcc optimization bug on sparc64 linux
+	ITS#9919 - Mark infrequently used functions as cold
+	ITS#9723 - clear C_EOF on cursor with MDB_FIRST_DUP
+	ITS#9030 - Use sys/cachectl.h rather than asm/cachectl.h on mips
+
+LMDB 0.9.29 Release (2021/03/16)
+	ITS#9461 refix ITS#9376
+	ITS#9500 fix regression from ITS#8662
+
+LMDB 0.9.28 Release (2021/02/04)
+	ITS#8662 add -a append option to mdb_load
+
+LMDB 0.9.27 Release (2020/10/26)
+	ITS#9376 fix repeated DUPSORT cursor deletes
+
+LMDB 0.9.26 Release (2020/08/11)
+	ITS#9278 fix robust mutex cleanup for FreeBSD
+
+LMDB 0.9.25 Release (2020/01/30)
+	ITS#9068 fix mdb_dump/load backslashes in printable content
+	ITS#9118 add MAP_NOSYNC for FreeBSD
+	ITS#9155 free mt_spill_pgs in non-nested txn on end
+
+LMDB 0.9.24 Release (2019/07/24)
+	ITS#8969 Tweak mdb_page_split
+	ITS#8975 WIN32 fix writemap set_mapsize crash
+	ITS#9007 Fix loose pages in WRITEMAP
+
 LMDB 0.9.23 Release (2018/12/19)
 	ITS#8756 Fix loose pages in dirty list
 	ITS#8831 Fix mdb_load flag init
