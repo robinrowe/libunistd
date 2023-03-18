@@ -22,6 +22,8 @@ Libunistd has some additional small libraries that are not POSIX, but can be use
 
 4. xxHash: A small hash library created elsewhere.
 
+5. uuid: A small unique identifier library created elsewhere.
+
 ## License
 
 Open Source MIT/BSD. In other words, you may do pretty much whatever you want with libunistd. Not copyleft GNU. Similar for Qdecoder, Sqlite and xxHash, however you should check their license terms yourself as libunistd is not the owner of these other open source libraries.
