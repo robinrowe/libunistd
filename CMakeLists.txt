@@ -38,7 +38,6 @@ if(NOT WIN32 AND NOT APPLE)
 endif(NOT WIN32 AND NOT APPLE)
 
 add_subdirectory(portable)
-add_subdirectory(lmdb)
 add_subdirectory(sqlite)
 add_subdirectory(uuid)
 add_subdirectory(regex)
