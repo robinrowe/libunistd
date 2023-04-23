@@ -7,6 +7,7 @@
 
 #include <map>
 #include <string_view>
+using namespace std;
 
 template <class T> 
 struct string_view_compare 
@@ -15,17 +16,19 @@ struct string_view_compare
 }	};
 
 class FieldMap
-:	public std::map<std::string_view,std::string_view,string_view_compare<std::string_view> >
 {	char* p;
 	std::string_view empty;
-	const char* StripFieldname(const char* text) const
-	{	if(!text)
-		{	return "";
+//	std::map<std::string_view,std::string_view,string_view_compare<std::string_view> > m;
+	std::map<unsigned,std::string_view> m;
+	std::string_view StripFieldname(std::string_view text) const
+	{	if(text.empty())
+		{	return text;
 		}
-		const char* sep = strstr(text,": ");
-		if(sep)
-		{	return sep+2;
+		auto offset = text.find(": ");
+		if(offset == text.npos)
+		{	return text;
 		}
+		text.remove_prefix(offset+2);
 		return text;
 	}
 public:
@@ -34,29 +37,29 @@ public:
 	}
 	void Clear()
 	{	p=0;
-		clear();
+		m.clear();
 	}
 	void Set(char* data)
 	{	p = data;
 	}
-	std::string_view& Find(const std::string_view key) 
-	{	auto it = find(key);
-		if(it == end())
+	std::string_view& Find(int key) 
+	{	auto it = m.find(key);
+		if(it == m.end())
 		{	return empty;
 		}
 		return it->second;
 	}
-	const std::string_view& Find(const std::string_view key) const 
-	{	auto it = find(key);
-		if(it == end())
+	const std::string_view& Find(int key) const 
+	{	auto it = m.find(key);
+		if(it == m.end())
 		{	return empty;
 		}
 		return it->second;
 	}
-	std::string_view& operator[](const std::string_view key)
+	std::string_view& operator[](int key)
 	{	return Find(key);
 	}
-	std::string_view operator[](const std::string_view key) const
+	std::string_view operator[](int key) const
 	{	return Find(key);
 	}
 	bool AdvancePast(const char* text)
@@ -76,38 +79,37 @@ public:
 	char* Find(char c)
 	{	return strchr(p,c);
 	}
-#if 0
 	bool IsInvalid(unsigned i) const
-	{	return fieldCount<=i;
+	{	return m.size()<=i;
 	}
-	char* GetFieldData(unsigned i)
+	string_view GetFieldData(unsigned i) 
 	{	if(IsInvalid(i))
-		{	return &empty;
+		{	return empty;
 		}
-		return field[i];
+		return m[i];
 	}
-	const char* GetFieldData(unsigned i) const
+#if 0
+	string_view GetFieldData(unsigned i) const
 	{	if(IsInvalid(i))
-		{	return &empty;
+		{	return empty;
 		}
-		return field[i];
+		return m[i];
 	}
-	const char* operator[](unsigned i) const
+#endif
+	string_view operator[](unsigned i) 
 	{	return StripFieldname(GetFieldData(i));
 	}
 
 	char* Parse(const char* fieldName,unsigned i)
 	{	
-#if 0
 		if(IsInvalid(i))
 		{	return 0;
 		}
-#endif
 		char* found = strstr(p,fieldName);
 		if(!found)
 		{	return 0;
 		}
-		field[i] = found;
+		m[i] = found;
 		p = found + 1;
 		char* ends = strchr(p,'\n');
 		if(ends)
@@ -116,7 +118,7 @@ public:
 		}
 		return found;
 	}
-#endif
+
 };
 
 #endif
