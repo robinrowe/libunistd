@@ -5,13 +5,8 @@
 #ifndef VariableClock_h
 #define VariableClock_h
 
-#ifdef _WIN32
 #include <unistd.h>
 #include <sys/time.h>
-#else
-#include <unistd.h>
-#include <sys/time.h>
-#endif
 #include <time.h>
 
 namespace portable

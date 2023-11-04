@@ -91,6 +91,8 @@ struct tm *localtime_r(const time_t *t, struct tm *result)
 	return err ? nullptr:result;
 }
 
+#define timegm _mkgmtime
+
 #ifdef __cplusplus
 }
 #endif

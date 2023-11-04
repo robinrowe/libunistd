@@ -46,6 +46,10 @@ SIGTERM Termination request
 */
 
 #define WNOHANG 0
+#define SIG_UNBLOCK 1
+#define SIG_BLOCK 2
+#define WIFSIGNALED() false
+#define WTERMSIG() 0
 
 typedef struct siginfo_t siginfo_t;
 
@@ -149,6 +153,11 @@ int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 	(void)set;
 	(void)oldset;
 	STUB_0(sigprocmask);
+}
+
+inline
+int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset)
+{	return sigprocmask(how, set, oldset);
 }
 
 inline
