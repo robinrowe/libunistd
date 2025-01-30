@@ -2,12 +2,16 @@
 #define socket_h
 
 #define WIN32_LEAN_AND_MEAN
+#define CONST const
 #include <winsock2.h>
 #include <windows.h>
+#define VOID void
 #include <Mstcpip.h>
 #include <Ws2tcpip.h>
+#undef VOID
 #include <stdint.h>
 #include "../portable/stub.h"
+#undef CONST
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,9 +38,13 @@ struct msghdr
 	int msg_flags;
 };
 
-typedef int caddr_t;
+typedef uint8_t* caddr_t;
 
 // The ioctlsocket function and the WSAIoctl function handle socket functions that were performed by IOCTL and fcntl in BSD
+
+inline int inet_aton(const char* cp, struct in_addr* inp)
+{	return inet_pton(AF_INET, cp, inp);
+}
 
 #ifdef __cplusplus
 }

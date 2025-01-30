@@ -15,19 +15,34 @@ typedef int sigval_t;
 typedef int sigset_t;
 typedef unsigned short ushort;
 typedef	int key_t;
-typedef intptr_t ssize_t;
 typedef unsigned short mode_t;
 typedef int gid_t;
 typedef int uid_t;
 typedef int Atom;
 
+#if defined(_MSC_VER)
+#include <basetsd.h>
+typedef SSIZE_T ssize_t;
+#else
+typedef int ssize_t;
+#endif
+
+#ifndef _WINSOCK2API_
+// Winsock2 already defines these typedefs.
+// In order to avoid including winsock2.h we define them only of winsock2 wasn't already included.
+typedef unsigned char   u_char;
+typedef unsigned short  u_short;
+typedef unsigned int    u_int;
+typedef unsigned long   u_long;
+#endif
+
 enum
-{	F_DUPFD, 
+{	F_DUPFD,
 	F_GETFD,
-	F_SETFD, 
-	F_GETFL, 
-	F_SETFL, 
-	F_GETLK, 
+	F_SETFD,
+	F_GETFL,
+	F_SETFL,
+	F_GETLK,
 	F_SETLK,
 	F_SETLKW,
 	FD_CLOEXEC

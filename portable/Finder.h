@@ -15,6 +15,9 @@
 #include <string>
 #pragma comment(lib, "User32.lib")
 
+// WIN_NO_ERROR = NO_ERROR As we are undeffing `NO_ERROR` to avoid naming collision in unistd.h
+#define WIN_NO_ERROR 0
+
 namespace portable {
 
 class Finder
@@ -28,7 +31,7 @@ class Finder
 	void Reset()
 	{	memset(this,0,sizeof(*this));
 		h = INVALID_HANDLE_VALUE;
-		error = NO_ERROR;//ERROR_NO_MORE_FILES;
+		error = WIN_NO_ERROR;//ERROR_NO_MORE_FILES;
 	}
 #pragma warning(disable:4996)
 #pragma warning(disable:26495)
@@ -68,7 +71,7 @@ class Finder
 	{	if(h == INVALID_HANDLE_VALUE)
 		{	return false;
 		}
-		if(error != ERROR_NO_MORE_FILES && error != NO_ERROR)
+		if(error != ERROR_NO_MORE_FILES && error != WIN_NO_ERROR)
 		{	return false;
 		}
 		return true;
