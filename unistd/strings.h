@@ -6,7 +6,7 @@
 #define strings_h
 
 #include <string.h>
-#include "../portable/stub.h"
+#include "stub.h"
 #include "cfunc.h"
 
 inline

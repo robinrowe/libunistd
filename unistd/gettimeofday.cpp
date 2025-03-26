@@ -16,7 +16,8 @@ extern "C" char* strptime(const char* s,const char* f,struct tm* tm)
 	if (input.fail()) {
 		return nullptr;
 	}
-	return (char*)(s + input.tellg());
+	s += (intptr_t) input.tellg();
+	return (char*)(s);
 }
 
 extern "C" int gettimeofday(struct timeval* tv, struct timezone* tz)

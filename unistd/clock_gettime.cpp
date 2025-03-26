@@ -8,7 +8,7 @@
 #include <thread>
 #include <string>
 #include "unistd.h"
-#include "../portable/stub.h"
+#include "stub.h"
 #include "clock_gettime.h"
 
 #pragma warning(disable:4996)

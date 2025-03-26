@@ -5,7 +5,7 @@
 #ifndef prctl_h
 #define prctl_h
 
-#include "../portable/stub.h"
+#include "stub.h"
 
 #ifdef __cplusplus
 extern "C" {

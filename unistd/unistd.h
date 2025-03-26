@@ -7,25 +7,18 @@
 #ifndef unistd_h
 #define unistd_h
 
-#if  ((defined(_WINDOWS_) || defined(_INC_WINDOWS))) && !defined(WIN32_LEAN_AND_MEAN)
-#error unistd.h must be included before Windows.h!
+#if !defined(_WINSOCK2API_) && defined(_WINSOCKAPI_)
+#error Winsock2.h (unistd.h) must be included before Windows.h!
 #endif
 
-//#define _CRT_SECURE_NO_DEPRECATE 
-//#undef _CRT_SECURE_NO_WARNINGS
-//#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#ifndef _CRT_NONSTDC_NO_WARNINGS
-#define _CRT_NONSTDC_NO_WARNINGS
-#endif
 #define WIN32_LEAN_AND_MEAN
 #include <WinSock2.h>
+#include <Windows.h>
 #include <winnt.h>
 #include <corecrt_io.h>
-//#if _MSC_VER == 1900
 #include <vcruntime.h>
 #undef socklen_t
 #include <WS2tcpip.h>
-#include <windows.h>
 #include <math.h>
 #include <fcntl.h>
 #include <process.h> // getpid()
@@ -55,8 +48,12 @@
 #include "gettimeofday.h"
 #include "clock_gettime.h"
 #include "cfunc.h"
-//#include "int128/Int128.h"
-#include "../portable/stub.h"
+#include "stub.h"
+
+inline 
+const char* GetUnistdVersion()
+{	return "v1.3 2024/06/30"; // git tag -a v1.3 -m "2024/06/30"
+}
 
 CFUNC const char* optarg;
 CFUNC int optind;
@@ -72,8 +69,11 @@ enum
 	F_TEST 
 };
 
-//CFUNC pid_t getpgrp(...); /* POSIX.1 version */
+#ifdef _BSD_SOURCE
 CFUNC pid_t getpgrp(pid_t pid); /* BSD version */
+#else
+CFUNC pid_t getpgrp(); /* POSIX.1 version */
+#endif
 CFUNC int setpgrp(pid_t pid, pid_t pgid); 
 //CFUNC int uni_open(const char* filename,unsigned oflag,int mode);
 CFUNC int uni_open(const char* filename, unsigned oflag,...);
@@ -160,6 +160,8 @@ CFUNC int ftruncate(int fd, off_t length);
 CFUNC int fseeko(FILE *stream, off_t offset, int whence);
 CFUNC off_t ftello(FILE *stream);
 CFUNC char* strptime(const char* s, const char* format,struct tm* tm);
+CFUNC ssize_t getline(char** lineptr, size_t* n,FILE* stream);
+CFUNC ssize_t getdelim(char** lineptr, size_t* n,int delim, FILE* stream);
 
 //#define strlen unistd_safe_strlen
 //#define inet_ntop InetNtop
@@ -184,16 +186,21 @@ CFUNC char* strptime(const char* s, const char* format,struct tm* tm);
 #define lstat stat
 #define fileno _fileno
 #define STDIN_FILENO _fileno(stdin)
+#define STDOUT_FILENO _fileno(stdout)
+#define STDERR_FILENO _fileno(stderr)
 // causes issues with math.h:
 //#define rint(x) floor ((x) + 0.5)
 //#define lround floor
 //#define roundl floor
 // The POSIX name for this item is deprecated by MSVC:
 
+#ifdef POSIX_WRITE
 #define write _write
+#define read _read
+#endif
+
 #define unlink _unlink
 #define rmdir _rmdir
-#define read _read
 #define lseek _lseek
 #define isatty _isatty
 #define getcwd _getcwd
@@ -205,10 +212,22 @@ CFUNC char* strptime(const char* s, const char* format,struct tm* tm);
 #define RETSIGTYPE void
 #define access _access
 #define pipe(pipes) _pipe((pipes),8*1024,_O_BINARY)
+#ifndef __has_attribute
 #define   __attribute__(x)
+#endif
 //__attribute__((format (printf, 1, 2)))
 #define mkdir mkdir2
 #define fileno _fileno
+#define open uni_open
+#define fdopen _fdopen
+#define execve _execve
+#define execv _execv
+#define spawnvpe _spawnvpe
+#define spawnvp _spawnvp
+#define spawnve _spawnve
+#define spawnv _spawnv
+#define SSIZE_MAX SIZE_MAX
+#define SIGTRAP 23
 
 #endif
 

@@ -6,7 +6,7 @@
 #define glob_h
 
 //#include "unistd.h"
-#include "../portable/stub.h"
+#include "stub.h"
 
 #ifdef __cplusplus
 extern "C" {

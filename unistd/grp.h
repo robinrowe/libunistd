@@ -3,7 +3,7 @@
 #ifndef GRP_H
 #define GRP_H
 
-#include "../portable/stub.h"
+#include "stub.h"
 
 struct group {
 	char   *gr_name;       /* group name */

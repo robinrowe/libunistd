@@ -109,56 +109,45 @@ int pthread_detach(pthread_t thread)
 	return 0;
 }
 
-
 void pthread_cleanup_push(void (*routine)(void *),void *arg)
 {   STUB(pthread_cleanup_push);
 }
-
 
 void pthread_cleanup_pop(int execute)
 {   STUB(pthread_cleanup_pop);
 }
 
-
 int pthread_equal(pthread_t t1, pthread_t t2)
 {	return t1==t2;
 }
-
 
 int pthread_attr_init(pthread_attr_t *attr)
 {	STUB_0(pthread_attr_init);
 }
 
-
 int pthread_attr_destroy(pthread_attr_t *attr)
 {	STUB_0(pthread_attr_init);
 }
-
 
 int pthread_attr_setinheritsched(pthread_attr_t *attr,int inheritsched)
 {   STUB_NEG(pthread_attr_setinheritsched);
 }
 
-
 int pthread_attr_getinheritsched(const pthread_attr_t *attr,int *inheritsched)
 {   STUB_NEG(pthread_attr_getinheritsched);
 }
-
 
 int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy)
 {   STUB_NEG(pthread_attr_setschedpolicy);
 }
 
-
 int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy)
 {   STUB_NEG(pthread_attr_getschedpolicy);
 }
 
-
 int pthread_attr_setschedparam(pthread_attr_t *attr,const sched_param *param)
 {   STUB_NEG(pthread_attr_setschedparam);
 }
-
 
 int pthread_attr_getschedparam(const pthread_attr_t *attr,sched_param *param)
 {   STUB_NEG(pthread_attr_getschedparam);
@@ -168,69 +157,66 @@ int pthread_mutex_lock(pthread_mutex_t *mutex)
 {   STUB_NEG(pthread_mutex_lock);
 }
 
-
 int pthread_mutex_trylock(pthread_mutex_t *mutex)
 {   STUB_NEG(pthread_mutex_trylock);
 }
-
 
 int pthread_mutex_unlock(pthread_mutex_t *mutex)
 {   STUB_NEG(pthread_mutex_unlock);
 }
 
-
 void pthread_exit(void *retval)
 {   STUB(pthread_exit);
 }
-
 
 int pthread_cancel(pthread_t thread)
 {   STUB_NEG(pthread_cancel);
 }
 
-
 pthread_t pthread_self()
 {	STUB_0(pthread_self);
 }
-
-int pthread_detach(pthread_t thread);
-
 
 int pthread_cond_destroy(pthread_cond_t *cond)
 {	STUB_NEG(pthread_cond_destroy);
 }
 
-
 int pthread_cond_init(pthread_cond_t* restrict_cond,const pthread_condattr_t* restrict_attr)
 {	STUB_NEG(pthread_cond_destroy);
 }
-
 
 int pthread_cond_broadcast(pthread_cond_t *cond)
 {	STUB_NEG(pthread_cond_broadcast);
 }
 
-
 int pthread_cond_signal(pthread_cond_t *cond)
 {	STUB_NEG(pthread_cond_signal);
 }
-
 
 int pthread_cond_timedwait(pthread_cond_t* restrict_cond,pthread_mutex_t* restrict_mutex,const struct timespec * restrict_abstime)
 {	STUB_NEG(pthread_cond_timedwait);
 }
 
-
 int pthread_cond_wait(pthread_cond_t* restrict_cond,pthread_mutex_t * restrict_mutex)
 {	STUB_NEG(pthread_cond_wait);
 }
-
 
 int pthread_mutex_destroy(pthread_mutex_t *mutex)
 {	STUB_NEG(pthread_mutex_destroy);
 }
 
-
 int pthread_mutex_init(pthread_mutex_t* restrict_mutex,const pthread_mutexattr_t * restrict_attr)
 {	STUB_NEG(pthread_mutex_init);
+}
+
+int pthread_key_create(pthread_key_t* key, void (*destructor)(void*))
+{	STUB_NEG(pthread_key_create);
+}
+
+void* pthread_getspecific(pthread_key_t key)
+{	STUB_0(pthread_getspecific);
+}
+
+int pthread_setspecific(pthread_key_t key, const void* value)
+{	STUB_NEG(pthread_setspecific);
 }

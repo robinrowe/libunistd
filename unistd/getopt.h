@@ -5,11 +5,14 @@
 #ifndef getopt_h
 #define getopt_h
 
-int getopt(int argc, char *const argv[],
+#include "cfunc.h"
+
+CFUNC int getopt(int argc, char *const argv[],
 		  const char *optstring);
 
-extern const char *optarg;
-extern int optind, opterr, optopt;
+CFUNC const char *optarg;
+CFUNC int optind, opterr, optopt;
+enum  	getopt_argument_requirement { no_argument = 0, required_argument = 1, optional_argument = 2 };
 
 struct option {
 	   const char *name;
@@ -18,11 +21,11 @@ struct option {
 	   int         val;
    };
 
-int getopt_long(int argc, char *const argv[],
+CFUNC int getopt_long(int argc, char *const argv[],
 		  const char *optstring,
 		  const struct option *longopts, int *longindex);
 		  
-int getopt_long_only(int argc, char *const argv[],
+CFUNC int getopt_long_only(int argc, char *const argv[],
 		  const char *optstring,
 		  const struct option *longopts, int *longindex);
 		  

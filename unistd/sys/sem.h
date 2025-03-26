@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <sys/ipc.h>
 #include <sys/types.h>
-#include "../../portable/stub.h"
+#include "../stub.h"
 #include "../cfunc.h"
 
 #ifndef SEMS_MAX_COUNT

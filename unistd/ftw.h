@@ -6,7 +6,7 @@
 #define ftw_h
 
 #include <time.h>
-#include "../portable/stub.h"
+#include "stub.h"
 
 inline
 int nftw(const char *dirpath,

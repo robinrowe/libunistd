@@ -5,7 +5,7 @@
 #ifndef pthread_t_h
 #define pthread_t_h
 
-#include "../portable/stub.h"
+#include "stub.h"
 #include "cfunc.h"
 
 enum
@@ -40,7 +40,7 @@ typedef enum
 
 typedef struct PortableThread PortableThread;
 typedef PortableThread* pthread_t;
-typedef struct pthread_attr pthread_attr_t;
+typedef struct pthread_attr pthread_attr_t; //Uses C++ for constructor
 
 typedef int pthread_barrier_t;
 typedef int pthread_barrierattr_t;
@@ -58,7 +58,7 @@ typedef struct sched_param
 {	int sched_priority;
 } sched_param;
 
-/*
+#if 0
 struct pthread_attr_t
 {	int __detachstate;
 	int __schedpolicy;
@@ -69,8 +69,8 @@ struct pthread_attr_t
 	int __stackaddr_set;
 	void *__stackaddr;
 	unsigned long int __stacksize;
-} ;
-*/
+};
+#endif
 
 struct PortableThread;
 typedef struct PortableThread PortableThread;
@@ -102,6 +102,9 @@ CFUNC int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy);
 CFUNC int pthread_attr_setschedparam(pthread_attr_t *attr,const sched_param *param);
 CFUNC int pthread_attr_getschedparam(const pthread_attr_t *attr,sched_param *param);
 CFUNC int pthread_create(pthread_t* pthread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg);
+CFUNC int pthread_key_create(pthread_key_t* key, void (*destructor)(void*));
+CFUNC void* pthread_getspecific(pthread_key_t key);
+CFUNC int pthread_setspecific(pthread_key_t key, const void* value);
 CFUNC int pthread_attr_setdetachstate(pthread_attr_t *attr, ThreadState detachstate);
 CFUNC int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate);
 CFUNC int pthread_join(pthread_t thread, void **retval);

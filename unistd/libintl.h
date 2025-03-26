@@ -3,7 +3,7 @@
 #ifndef libintl_h
 #define libintl_h
 
-#include "../portable/stub.h"
+#include "stub.h"
 
 #ifndef __cplusplus
 #define inline __inline
@@ -19,13 +19,17 @@ const char* IntlGetPackage()
 #endif
 inline
 const char* bindtextdomain(const char* package, const char* localdir)
-{   MSG_BUG("bindtextdomain");
-	return "";
+{   STUB_BLANK(bindtextdomain);
 }
 
 inline
 char* textdomain(const char* package)
-{   STUB_0(textdomain);
+{
+#if 0
+	STUB_0(textdomain);
+#else
+	return "";
+#endif
 }
 
 inline

@@ -1,6 +1,6 @@
 # libunistd/CMakeList.txt
 
-cmake_minimum_required (VERSION 3.0.0)
+cmake_minimum_required (VERSION 3.8)
 project(libunistd)
 message("<<< Parsing libunistd/CMakeList.txt")
 message("--- Building ${PROJECT_NAME} ${CMAKE_SYSTEM_NAME}:${CMAKE_HOST_SYSTEM_PROCESSOR}:${CMAKE_GENERATOR_TOOLSET} ---")
@@ -8,12 +8,15 @@ message("--- Building ${PROJECT_NAME} ${CMAKE_SYSTEM_NAME}:${CMAKE_HOST_SYSTEM_P
 option(UE4 "Disable _ITERATOR_DEBUG_LEVEL for UE4 compatibility" OFF)
 option(WITH_TESTS "Enable this to build the tests / examples as well." OFF)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED FALSE)
-set(CMAKE_CXX_EXTENSIONS FALSE)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_C_STANDARD 23)
 #set(CMAKE_GENERATOR_PLATFORM x64)
 
 add_definitions(-DTRACE_MSG_FUNCTIONS)
+#define _CRT_SECURE_NO_DEPRECATE 
+#define _CRT_SECURE_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _CRT_NONSTDC_NO_WARNINGS
 
 if(UE4)
 add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)

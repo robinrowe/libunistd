@@ -7,16 +7,10 @@
 #include <Mstcpip.h>
 #include <Ws2tcpip.h>
 #include <stdint.h>
-#include "../portable/stub.h"
-
-#ifdef __cplusplus
-extern "C" {
-#else
-#define inline __inline
-#endif
+#include "stub.h"
+#include "cfunc.h"
 
 typedef uint32_t sa_family_t;
-
 
 // The iovec structure shall be defined as described in <sys/uio.h> .
 
@@ -37,10 +31,6 @@ struct msghdr
 typedef int caddr_t;
 
 // The ioctlsocket function and the WSAIoctl function handle socket functions that were performed by IOCTL and fcntl in BSD
-
-#ifdef __cplusplus
-}
-#endif
 
 /* FYI, how to do TCP_KEEPCNT in linux/windows:
 #ifndef _WIN32

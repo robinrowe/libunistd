@@ -5,7 +5,7 @@
 #ifndef resource_h
 #define resource_h
 
-#include "../../portable/stub.h"
+#include "../stub.h"
 #include <unistd.h>
 #include <psapi.h>
 
@@ -81,7 +81,7 @@ int getrusage(int who, struct rusage* usage)
 		{	return -1;
 		}
 		if (!GetProcessMemoryInfo(GetCurrentProcess(),
-								  reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc),
+								  (PROCESS_MEMORY_COUNTERS*)(&pmc),
 								  sizeof(PROCESS_MEMORY_COUNTERS)))
 		{	return -1;
 		}

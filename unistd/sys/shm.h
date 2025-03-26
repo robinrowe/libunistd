@@ -7,7 +7,7 @@
 #include <sys/sys_types.h>
 #include <sys/stat.h>
 #include <memory.h>
-#include "../../portable/stub.h"
+#include "../stub.h"
 
 typedef int shmatt_t;
 

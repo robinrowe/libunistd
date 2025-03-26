@@ -7,7 +7,7 @@
 
 #include "../unistd.h"
 #include <time.h>
-#include "../portable/stub.h"
+#include "stub.h"
 
 #ifdef __cplusplus
 #include <thread>

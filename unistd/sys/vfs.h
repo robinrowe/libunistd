@@ -6,7 +6,7 @@
 #define sys_vfs_h
 
 #include <sys/stat.h>
-#include "../../portable/stub.h"
+#include "../stub.h"
 
 inline
 int statfs(const char *path, struct statfs *buf)

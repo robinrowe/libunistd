@@ -9,7 +9,9 @@
 #define CFUNC extern "C"
 #else
 #define CFUNC extern
+#ifndef inline
 #define inline __inline
+#endif
 #endif
 
 #endif

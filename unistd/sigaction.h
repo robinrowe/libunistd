@@ -8,12 +8,8 @@
 #include <signal.h>
 #include <time.h>
 #include <memory.h>
-#include "../portable/stub.h"
+#include "stub.h"
 #include "sys/sys_types.h"
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {

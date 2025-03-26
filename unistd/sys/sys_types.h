@@ -15,7 +15,7 @@ typedef int sigval_t;
 typedef int sigset_t;
 typedef unsigned short ushort;
 typedef	int key_t;
-typedef intptr_t ssize_t;
+typedef long long ssize_t;
 typedef unsigned short mode_t;
 typedef int gid_t;
 typedef int uid_t;

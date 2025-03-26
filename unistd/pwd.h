@@ -3,7 +3,7 @@
 #ifndef PWD_H
 #define PWD_H
 
-#include "../portable/stub.h"
+#include "stub.h"
 #include "unistd.h"
 
 struct passwd {

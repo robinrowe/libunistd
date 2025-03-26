@@ -12,6 +12,7 @@ getopt.h
 gettimeofday.h
 glob.h
 grp.h
+iconv.h
 ifaddrs.h
 libgen.h
 libintl.h
@@ -34,11 +35,13 @@ clock_gettime.cpp
 dirent.cpp
 fnmatch.cpp
 fts.c
+getline.cpp
 getopt.cpp
 gettimeofday.cpp
 netdb.c
 pthread.cpp
 sigaction.cpp
+stub.h
 syslog.cpp
 unistd.cpp
 arpa/inet.h 

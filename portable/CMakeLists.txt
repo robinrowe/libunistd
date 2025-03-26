@@ -49,7 +49,6 @@ set(HEADERS
 	StdFile.h
 	StdPipe.h
 	strcpy.h
-	stub.h
 	SystemCall.h
 	thread_semaphore.h
 	time/Timecode.h
