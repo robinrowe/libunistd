@@ -25,11 +25,6 @@ add_library(${LIBRARY_NAME}
 
 target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${LIBRARY_NAME} LINK_PUBLIC shlwapi)
-if (lib_type STREQUAL "STATIC")
-    target_link_libraries(${LIBRARY_NAME} LINK_PUBLIC libportable)
-else ()
-	target_link_libraries(${LIBRARY_NAME} PRIVATE libportable)
-endif ()
 
 #######################################
 # Export / installation configuration #
